@@ -1,0 +1,18 @@
+{
+  "name": "AquaPure",
+  "short_name": "AquaPure",
+  "description": "Premium Natural Mineral Water — Pure from Source to Bottle",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#0A77B7",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
