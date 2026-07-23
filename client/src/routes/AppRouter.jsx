@@ -13,6 +13,7 @@ const GalleryPage  = lazy(() => import('@pages/GalleryPage'))
 const ContactPage  = lazy(() => import('@pages/ContactPage'))
 const LoginPage    = lazy(() => import('@pages/LoginPage'))
 const SignupPage   = lazy(() => import('@pages/SignupPage'))
+const CartPage     = lazy(() => import('@pages/CartPage'))
 const NotFoundPage = lazy(() => import('@pages/NotFoundPage'))
 
 // ─── App Router ───────────────────────────────────────────────────────────────
@@ -35,6 +36,7 @@ function AppRouter() {
               <Route path={ROUTES.PRODUCTS} element={<ProductsPage />} />
               <Route path={ROUTES.GALLERY}  element={<GalleryPage />} />
               <Route path={ROUTES.CONTACT}  element={<ContactPage />} />
+              <Route path={ROUTES.CART}     element={<CartPage />} />
             </Route>
 
             {/* Catch-all Not Found Route */}

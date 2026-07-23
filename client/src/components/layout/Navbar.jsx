@@ -8,12 +8,15 @@ import {
   FiX,
   FiDroplet,
   FiMail,
+  FiShoppingCart,
 } from 'react-icons/fi'
 import useAuth from '@hooks/useAuth'
+import useCart from '@hooks/useCart'
 import { ROUTES } from '@constants/routes'
 
 function Navbar() {
   const { user, isAuthenticated, logout } = useAuth()
+  const { cartCount } = useCart()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const dropdownRef = useRef(null)
@@ -79,7 +82,23 @@ function Navbar() {
         </nav>
 
         {/* Right Section: Auth State Buttons / User Profile */}
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-5">
+          {/* Cart Icon Link */}
+          {isAuthenticated && (
+            <Link
+              to={ROUTES.CART}
+              className="relative p-2.5 rounded-full text-gray-600 hover:text-primary hover:bg-lightblue/60 transition-all duration-200 mr-2"
+              aria-label={`View Cart with ${cartCount} items`}
+            >
+              <FiShoppingCart className="w-5 h-5" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-teal text-white rounded-full flex items-center justify-center text-[10px] font-extrabold shadow-brand-sm">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+          )}
+
           {isAuthenticated ? (
             /* Logged In: User Profile Dropdown */
             <div className="relative" ref={dropdownRef}>
@@ -152,6 +171,21 @@ function Navbar() {
 
         {/* Mobile Menu Toggle Button */}
         <div className="flex md:hidden items-center gap-2">
+          {isAuthenticated && (
+            <Link
+              to={ROUTES.CART}
+              className="relative p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors mr-1"
+              aria-label="View Cart"
+            >
+              <FiShoppingCart className="w-6 h-6" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-teal text-white rounded-full flex items-center justify-center text-[10px] font-extrabold shadow-brand-sm">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+          )}
+
           <button
             type="button"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
@@ -183,6 +217,24 @@ function Navbar() {
                 {link.name}
               </NavLink>
             ))}
+            {isAuthenticated && (
+              <NavLink
+                to={ROUTES.CART}
+                onClick={() => setMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  `px-3 py-2 rounded-xl text-sm font-medium transition-colors flex items-center justify-between ${
+                    isActive
+                      ? 'bg-lightblue text-primary font-semibold'
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`
+                }
+              >
+                <span>Cart</span>
+                <span className="bg-teal text-white rounded-full px-2.5 py-0.5 text-[10px] font-extrabold">
+                  {cartCount}
+                </span>
+              </NavLink>
+            )}
           </nav>
 
           <div className="pt-3 border-t border-gray-100">

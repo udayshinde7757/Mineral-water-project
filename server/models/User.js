@@ -28,6 +28,18 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  cart: [
+    {
+      productId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product"
+      },
+      quantity: {
+        type: Number,
+        default: 1
+      }
+    }
+  ],
 });
 
 // Pre-save hook to hash password securely using bcrypt

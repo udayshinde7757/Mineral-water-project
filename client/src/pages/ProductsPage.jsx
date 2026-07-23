@@ -67,7 +67,7 @@ function ProductsPage() {
 
   // Add to Cart Handler
   const handleAddToCart = (product) => {
-    showToast(`Added ${product.name} (${product.size}) to your cart!`)
+    showToast("Product added to cart")
   }
 
   // Buy Now Handler

@@ -8,14 +8,37 @@ import {
   FiDroplet,
   FiPackage,
 } from 'react-icons/fi'
+import { useNavigate, useLocation } from 'react-router-dom'
+import useAuth from '@hooks/useAuth'
+import useCart from '@hooks/useCart'
+import { ROUTES } from '@constants/routes'
 
 function ProductCard({ product, onAddToCart, onBuyNow }) {
   const [adding, setAdding] = useState(false)
+  const { isAuthenticated } = useAuth()
+  const { addToCart } = useCart()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const handleAddToCart = async () => {
-    setAdding(true)
-    await onAddToCart(product)
-    setTimeout(() => setAdding(false), 800)
+    if (!isAuthenticated) {
+      alert("Please login to add products to cart")
+      navigate(ROUTES.LOGIN, { state: { from: location } })
+      return
+    }
+
+    try {
+      setAdding(true)
+      await addToCart(product._id)
+      if (onAddToCart) {
+        onAddToCart(product)
+      }
+    } catch (error) {
+      console.error("Failed to add product to cart:", error)
+      alert(error.message || "Something went wrong while adding product to cart")
+    } finally {
+      setTimeout(() => setAdding(false), 800)
+    }
   }
 
   // Format INR price with commas
