@@ -269,7 +269,7 @@ function ProductsPage() {
 
               {/* Summary Box */}
               <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex items-center gap-4">
-                <img
+                <img 
                   src={checkoutProduct.image}
                   alt={checkoutProduct.name}
                   className="w-16 h-16 object-contain rounded-xl bg-white p-1"
