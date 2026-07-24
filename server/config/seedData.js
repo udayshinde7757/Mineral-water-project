@@ -11,6 +11,17 @@ const initialProducts = [
     isFeatured: true,
   },
   {
+    name: "AquaPure Pani pouch",
+    size: "250ml",
+    price: 8,
+    image: "/images/pani_pouch_bottle.png",
+    category: "Personal",
+    stock: 100,
+    description: "Compact, easy-to-carry natural mineral water bottle. Perfect for gym, travel, and daily hydration on the go.",
+    rating: 4.5,
+    isFeatured: true,
+  },
+  {
     name: "AquaPure Premium Everyday Bottle",
     size: "1 Liter",
     price: 40,
