@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   FiMapPin,
@@ -37,16 +37,66 @@ const loadRazorpayScript = () => {
   })
 }
 
+// Helper: Safely extract string product ID from any item format (populated object, string, or Buy Now item)
+const getProductIdStr = (item) => {
+  if (!item) return null
+  if (typeof item === 'string') return item
+  if (item.productId) {
+    if (typeof item.productId === 'string') return item.productId
+    if (typeof item.productId === 'object' && item.productId !== null) {
+      if (item.productId._id) return String(item.productId._id)
+      if (item.productId.id) return String(item.productId.id)
+    }
+  }
+  if (item._id) return String(item._id)
+  if (item.id) return String(item.id)
+  return null
+}
+
+// Helper: Safely extract Product Object from an item (for display rendering)
+const getProductObject = (item) => {
+  if (!item) return null
+  if (item.productId && typeof item.productId === 'object' && item.productId !== null) {
+    return item.productId
+  }
+  if (typeof item === 'object' && item !== null && (item.name || item.price)) {
+    return item
+  }
+  return null
+}
+
 function CheckoutPage() {
   const { user } = useAuth()
   const { cartItems, cartSubtotal, fetchCart } = useCart()
   const navigate = useNavigate()
+  const location = useLocation()
 
-  // Delivery calculations
+  // Support Buy Now flow if passed via location state
+  const buyNowItem = location.state?.buyNowProduct
+
+  // Merge & validate active checkout items (Filter out nulls or invalid items)
+  const rawItems = (cartItems && cartItems.length > 0)
+    ? cartItems
+    : (buyNowItem ? [buyNowItem] : [])
+
+  const validCartItems = rawItems.filter((item) => {
+    const pId = getProductIdStr(item)
+    return pId !== null && (item.quantity === undefined || item.quantity > 0)
+  })
+
+  // Delivery & Subtotal calculations
+  const calculatedSubtotal = validCartItems.reduce((acc, item) => {
+    const prod = getProductObject(item)
+    const price = prod ? (prod.price || 0) : 0
+    const qty = item.quantity || 1
+    return acc + price * qty
+  }, 0)
+
+  const effectiveSubtotal = cartSubtotal > 0 ? cartSubtotal : calculatedSubtotal
   const FREE_DELIVERY_THRESHOLD = 500
-  const DELIVERY_CHARGE = cartSubtotal >= FREE_DELIVERY_THRESHOLD || cartSubtotal === 0 ? 0 : 50
+  const DELIVERY_CHARGE = effectiveSubtotal >= FREE_DELIVERY_THRESHOLD || effectiveSubtotal === 0 ? 0 : 50
   const GST = 0
-  const finalTotal = cartSubtotal + DELIVERY_CHARGE + GST
+  const finalTotal = effectiveSubtotal + DELIVERY_CHARGE + GST
 
   // Address State
   const [address, setAddress] = useState({
@@ -76,7 +126,7 @@ function CheckoutPage() {
       style: 'currency',
       currency: 'INR',
       maximumFractionDigits: 0,
-    }).format(amount)
+    }).format(amount || 0)
   }
 
   // Load saved address on mount
@@ -141,8 +191,8 @@ function CheckoutPage() {
     e.preventDefault()
     setErrorMessage('')
 
-    if (cartItems.length === 0) {
-      setErrorMessage('Your cart is empty.')
+    if (validCartItems.length === 0) {
+      setErrorMessage('Your cart is empty or contains invalid items.')
       return
     }
 
@@ -160,11 +210,19 @@ function CheckoutPage() {
         }
       }
 
-      // Format products list for backend
-      const formattedProducts = cartItems.map((item) => ({
-        productId: item.productId._id || item.productId,
-        quantity: item.quantity,
-      }))
+      // Safely format products list for backend payload
+      const formattedProducts = validCartItems
+        .map((item) => {
+          const pId = getProductIdStr(item)
+          return pId ? { productId: pId, quantity: item.quantity || 1 } : null
+        })
+        .filter(Boolean)
+
+      if (formattedProducts.length === 0) {
+        setErrorMessage('No valid products selected for checkout.')
+        setIsSubmitting(false)
+        return
+      }
 
       if (paymentMethod === 'COD') {
         // Cash on Delivery flow
@@ -274,7 +332,7 @@ function CheckoutPage() {
   }
 
   // Redirect if cart is empty and not submitting
-  if (cartItems.length === 0 && !isSubmitting) {
+  if (validCartItems.length === 0 && !isSubmitting) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-lightblue/20 to-white flex items-center justify-center py-16 px-4">
         <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-card border border-gray-100 space-y-6">
@@ -586,26 +644,27 @@ function CheckoutPage() {
                 <h3 className="text-xl font-bold text-darkgray border-b border-gray-100 pb-4 flex items-center justify-between">
                   <span>Order Summary</span>
                   <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-lightblue text-primary">
-                    {cartItems.reduce((acc, i) => acc + i.quantity, 0)} Items
+                    {validCartItems.reduce((acc, i) => acc + (i.quantity || 1), 0)} Items
                   </span>
                 </h3>
 
                 {/* Items Preview */}
                 <div className="max-h-60 overflow-y-auto space-y-3.5 pr-1 divide-y divide-gray-50">
-                  {cartItems.map((item) => {
-                    const product = item.productId
+                  {validCartItems.map((item, index) => {
+                    const product = getProductObject(item)
                     if (!product) return null
+                    const pId = getProductIdStr(item) || index
                     return (
-                      <div key={product._id || product.id} className="pt-3 flex items-center gap-3">
+                      <div key={pId} className="pt-3 flex items-center gap-3">
                         <div className="w-14 h-14 rounded-xl bg-lightblue/40 border border-gray-100 p-1 flex-shrink-0 flex items-center justify-center">
-                          <img src={product.image} alt={product.name} className="w-full h-full object-contain" />
+                          <img src={product.image || '/placeholder.png'} alt={product.name || 'Product'} className="w-full h-full object-contain" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs font-bold text-darkgray truncate">{product.name}</p>
-                          <p className="text-[11px] text-gray-400">{product.size} × {item.quantity}</p>
+                          <p className="text-xs font-bold text-darkgray truncate">{product.name || 'Mineral Water'}</p>
+                          <p className="text-[11px] text-gray-400">{product.size || ''} × {item.quantity || 1}</p>
                         </div>
                         <p className="text-xs font-extrabold text-darkgray">
-                          {formatCurrency((product.price || 0) * item.quantity)}
+                          {formatCurrency((product.price || 0) * (item.quantity || 1))}
                         </p>
                       </div>
                     )
@@ -616,7 +675,7 @@ function CheckoutPage() {
                 <div className="border-t border-gray-100 pt-4 space-y-3 text-sm font-medium text-gray-600">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span className="font-bold text-darkgray">{formatCurrency(cartSubtotal)}</span>
+                    <span className="font-bold text-darkgray">{formatCurrency(effectiveSubtotal)}</span>
                   </div>
 
                   <div className="flex justify-between items-center">
