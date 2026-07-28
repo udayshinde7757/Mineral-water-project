@@ -12,6 +12,9 @@ const initialProducts = require("./config/seedData");
 const authRoutes = require("./routes/auth");
 const productRoutes = require("./routes/productRoutes");
 const cartRoutes = require("./routes/cartRoutes");
+const orderRoutes = require("./routes/orderRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
+const addressRoutes = require("./routes/addressRoutes");
 
 dotenv.config();
 
@@ -43,6 +46,9 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/payment", paymentRoutes);
+app.use("/api/address", addressRoutes);
 
 app.get("/", (req, res) => {
   res.send("Backend Running — AquaPure API Active");

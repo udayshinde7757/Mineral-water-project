@@ -84,6 +84,24 @@ export const CartProvider = ({ children }) => {
     }
   }
 
+  // Clear entire cart (after successful order)
+  const clearCart = async () => {
+    try {
+      const data = await cartService.clearCart()
+      if (data.success) {
+        setCartItems([])
+        return data
+      } else {
+        throw new Error(data.message || 'Failed to clear cart')
+      }
+    } catch (error) {
+      console.error('Error in clearCart context:', error)
+      // Even if API fails, clear local state
+      setCartItems([])
+      throw error
+    }
+  }
+
   // Derived properties
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0)
   const cartSubtotal = cartItems.reduce((total, item) => {
@@ -100,7 +118,9 @@ export const CartProvider = ({ children }) => {
     addToCart,
     updateCartQuantity,
     removeFromCart,
+    clearCart,
   }
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }
+

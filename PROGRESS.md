@@ -51,12 +51,16 @@
 
 | Page | Route | Status | Completion |
 |------|-------|--------|------------|
-| Home | `/` | ⬜ Not Started | 0% |
-| About | `/about` | ⬜ Not Started | 0% |
-| Products | `/products` | ⬜ Not Started | 0% |
-| Gallery | `/gallery` | ⬜ Not Started | 0% |
-| Contact | `/contact` | ⬜ Not Started | 0% |
-| 404 | `*` | ⬜ Not Started | 0% |
+| Home | `/` | ✅ Complete | 100% |
+| About | `/about` | ✅ Complete | 100% |
+| Products | `/products` | ✅ Complete | 100% |
+| Gallery | `/gallery` | ✅ Complete | 100% |
+| Contact | `/contact` | ✅ Complete | 100% |
+| Cart | `/cart` | ✅ Complete | 100% |
+| Checkout | `/checkout` | ✅ Complete | 100% |
+| Order Success | `/order-success` | ✅ Complete | 100% |
+| My Orders | `/my-orders` | ✅ Complete | 100% |
+| 404 | `*` | ✅ Complete | 100% |
 
 ---
 

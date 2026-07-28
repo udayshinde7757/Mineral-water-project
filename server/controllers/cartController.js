@@ -176,3 +176,29 @@ exports.removeFromCart = async (req, res) => {
     });
   }
 };
+
+/**
+ * @desc    Clear entire cart (after order placement)
+ * @route   DELETE /api/cart/clear
+ * @access  Private
+ */
+exports.clearCart = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    user.cart = [];
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Cart cleared successfully",
+      cart: [],
+    });
+  } catch (error) {
+    console.error("Clear Cart Error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error while clearing cart",
+      error: error.message,
+    });
+  }
+};

@@ -11,5 +11,7 @@ export const ROUTES = {
   SIGNUP: '/signup',
   CART: '/cart',
   CHECKOUT: '/checkout',
+  ORDER_SUCCESS: '/order-success',
+  MY_ORDERS: '/my-orders',
 }
 

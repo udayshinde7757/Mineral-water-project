@@ -36,6 +36,14 @@ export const cartService = {
     const response = await apiClient.delete(`/cart/remove/${productId}`)
     return response.data
   },
+
+  /**
+   * Clear entire cart (after successful order)
+   */
+  clearCart: async () => {
+    const response = await apiClient.delete('/cart/clear')
+    return response.data
+  },
 }
 
 export default cartService

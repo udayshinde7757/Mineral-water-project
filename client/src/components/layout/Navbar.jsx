@@ -9,6 +9,7 @@ import {
   FiDroplet,
   FiMail,
   FiShoppingCart,
+  FiPackage,
 } from 'react-icons/fi'
 import useAuth from '@hooks/useAuth'
 import useCart from '@hooks/useCart'
@@ -138,6 +139,14 @@ function Navbar() {
                   </div>
 
                   <div className="p-1">
+                    <Link
+                      to={ROUTES.MY_ORDERS}
+                      onClick={() => setDropdownOpen(false)}
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-lightblue/50 hover:text-primary rounded-xl transition-colors"
+                    >
+                      <FiPackage className="w-4 h-4 text-primary" />
+                      <span>My Orders</span>
+                    </Link>
                     <button
                       type="button"
                       onClick={handleLogout}
@@ -218,22 +227,38 @@ function Navbar() {
               </NavLink>
             ))}
             {isAuthenticated && (
-              <NavLink
-                to={ROUTES.CART}
-                onClick={() => setMobileMenuOpen(false)}
-                className={({ isActive }) =>
-                  `px-3 py-2 rounded-xl text-sm font-medium transition-colors flex items-center justify-between ${
-                    isActive
-                      ? 'bg-lightblue text-primary font-semibold'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`
-                }
-              >
-                <span>Cart</span>
-                <span className="bg-teal text-white rounded-full px-2.5 py-0.5 text-[10px] font-extrabold">
-                  {cartCount}
-                </span>
-              </NavLink>
+              <>
+                <NavLink
+                  to={ROUTES.CART}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `px-3 py-2 rounded-xl text-sm font-medium transition-colors flex items-center justify-between ${
+                      isActive
+                        ? 'bg-lightblue text-primary font-semibold'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`
+                  }
+                >
+                  <span>Cart</span>
+                  <span className="bg-teal text-white rounded-full px-2.5 py-0.5 text-[10px] font-extrabold">
+                    {cartCount}
+                  </span>
+                </NavLink>
+                <NavLink
+                  to={ROUTES.MY_ORDERS}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `px-3 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 ${
+                      isActive
+                        ? 'bg-lightblue text-primary font-semibold'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`
+                  }
+                >
+                  <FiPackage className="w-4 h-4" />
+                  <span>My Orders</span>
+                </NavLink>
+              </>
             )}
           </nav>
 

@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   FiSearch,
   FiFilter,
   FiDroplet,
-  FiCheckCircle,
   FiRefreshCw,
   FiSliders,
   FiShoppingCart,
@@ -13,9 +13,14 @@ import {
 import productService from '@services/productService'
 import ProductCard from '@components/products/ProductCard'
 import useAuth from '@hooks/useAuth'
+import useCart from '@hooks/useCart'
+import { ROUTES } from '@constants/routes'
 
 function ProductsPage() {
   const { user } = useAuth()
+  const { addToCart } = useCart()
+  const navigate = useNavigate()
+
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -27,8 +32,6 @@ function ProductsPage() {
 
   // Notification Toast State
   const [toastMessage, setToastMessage] = useState(null)
-  // Checkout Modal State
-  const [checkoutProduct, setCheckoutProduct] = useState(null)
 
   const categories = ['All', 'Personal', 'Bulk', 'Corporate']
 
@@ -43,7 +46,7 @@ function ProductsPage() {
       }
       const data = await productService.getProducts(params)
       if (data.success) {
-        setProducts(data.products)
+        setProducts(data.products || [])
       } else {
         setError(data.message || 'Failed to fetch products')
       }
@@ -66,13 +69,24 @@ function ProductsPage() {
   }
 
   // Add to Cart Handler
-  const handleAddToCart = (product) => {
-    showToast("Product added to cart")
+  const handleAddToCart = async (product) => {
+    try {
+      await addToCart(product._id)
+      showToast(`${product.name} added to cart!`)
+    } catch (err) {
+      showToast(err.message || 'Could not add product to cart')
+    }
   }
 
-  // Buy Now Handler
-  const handleBuyNow = (product) => {
-    setCheckoutProduct(product)
+  // Buy Now Handler — Add item to cart and navigate directly to Checkout
+  const handleBuyNow = async (product) => {
+    try {
+      await addToCart(product._id)
+      navigate(ROUTES.CHECKOUT)
+    } catch (err) {
+      console.error('Buy Now error:', err)
+      navigate(ROUTES.CHECKOUT)
+    }
   }
 
   return (
@@ -236,68 +250,6 @@ function ProductsPage() {
           </div>
         )}
       </div>
-
-      {/* ─── 4. DIRECT BUY NOW CHECKOUT MODAL ───────────────────────────── */}
-      <AnimatePresence>
-        {checkoutProduct && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-darkgray/60 backdrop-blur-sm">
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-6 relative overflow-hidden"
-            >
-              <button
-                type="button"
-                onClick={() => setCheckoutProduct(null)}
-                className="absolute top-4 right-4 text-gray-400 hover:text-darkgray p-1 rounded-full bg-gray-100"
-              >
-                <FiX className="w-5 h-5" />
-              </button>
-
-              <div className="text-center space-y-2">
-                <div className="w-12 h-12 rounded-2xl bg-lightblue text-primary mx-auto flex items-center justify-center">
-                  <FiCheckCircle className="w-7 h-7 text-primary" />
-                </div>
-                <h3 className="text-2xl font-extrabold text-darkgray">
-                  Quick Checkout
-                </h3>
-                <p className="text-xs text-gray-500">
-                  Deliver to: <span className="font-bold text-darkgray">{user?.fullname || 'Customer'}</span> ({user?.email || ''})
-                </p>
-              </div>
-
-              {/* Summary Box */}
-              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex items-center gap-4">
-                <img 
-                  src={checkoutProduct.image}
-                  alt={checkoutProduct.name}
-                  className="w-16 h-16 object-contain rounded-xl bg-white p-1"
-                />
-                <div className="flex-1">
-                  <h4 className="font-bold text-sm text-darkgray">{checkoutProduct.name}</h4>
-                  <p className="text-xs text-teal font-semibold">Size: {checkoutProduct.size}</p>
-                  <p className="text-base font-extrabold text-primary mt-1">
-                    ₹{checkoutProduct.price}
-                  </p>
-                </div>
-              </div>
-
-              {/* Confirm Order Button */}
-              <button
-                type="button"
-                onClick={() => {
-                  setCheckoutProduct(null)
-                  showToast(`Order placed for ${checkoutProduct.name}! Delivery arriving soon.`)
-                }}
-                className="w-full btn-primary !py-3.5 text-base font-bold shadow-brand-md"
-              >
-                Confirm Order (₹{checkoutProduct.price})
-              </button>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   )
 }
