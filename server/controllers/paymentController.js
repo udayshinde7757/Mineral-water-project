@@ -104,6 +104,8 @@ exports.verifyPayment = async (req, res) => {
       paymentMethod,
     } = req.body;
 
+    console.log("💳 Payment verification request:", JSON.stringify({ razorpay_order_id, razorpay_payment_id, productCount: products?.length }, null, 2));
+
     // Validate required fields
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
       return res.status(400).json({
@@ -126,10 +128,21 @@ exports.verifyPayment = async (req, res) => {
       });
     }
 
+    // Validate address fields
+    const requiredAddressFields = ["fullName", "email", "phone", "addressLine1", "city", "state", "pincode", "country"];
+    for (const field of requiredAddressFields) {
+      if (!shippingAddress[field] || shippingAddress[field].trim() === "") {
+        return res.status(400).json({
+          success: false,
+          message: `Shipping address field '${field}' is required`,
+        });
+      }
+    }
+
     // Verify Razorpay signature
     const body = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSignature = crypto
-      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET || "placeholder_secret")
       .update(body)
       .digest("hex");
 
@@ -145,7 +158,23 @@ exports.verifyPayment = async (req, res) => {
     const orderProducts = [];
 
     for (const item of products) {
-      const product = await Product.findById(item.productId);
+      if (!item.productId || typeof item.productId !== "string" || item.productId.trim() === "") {
+        return res.status(400).json({
+          success: false,
+          message: "Each product must have a valid productId string",
+        });
+      }
+
+      let product;
+      try {
+        product = await Product.findById(item.productId);
+      } catch (castErr) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid product ID format: ${item.productId}`,
+        });
+      }
+
       if (!product) {
         return res.status(404).json({
           success: false,
@@ -173,7 +202,7 @@ exports.verifyPayment = async (req, res) => {
       user: req.user._id,
       products: orderProducts,
       shippingAddress,
-      paymentMethod: paymentMethod || "UPI",
+      paymentMethod: paymentMethod || "Razorpay / Online",
       paymentStatus: "Paid",
       orderStatus: "Placed",
       subtotal,
@@ -184,6 +213,8 @@ exports.verifyPayment = async (req, res) => {
       razorpayPaymentId: razorpay_payment_id,
       razorpaySignature: razorpay_signature,
     });
+
+    console.log(`✅ Online Order #${order._id} created successfully for user ${req.user._id}`);
 
     // Reduce stock
     for (const item of orderProducts) {
@@ -211,7 +242,24 @@ exports.verifyPayment = async (req, res) => {
       order,
     });
   } catch (error) {
-    console.error("Verify Payment Error:", error);
+    console.error("❌ Verify Payment Error:", error);
+    console.error("Stack:", error.stack);
+
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((e) => e.message);
+      return res.status(400).json({
+        success: false,
+        message: `Validation error: ${messages.join(", ")}`,
+      });
+    }
+
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid ID format: ${error.value}`,
+      });
+    }
+
     return res.status(500).json({
       success: false,
       message: error.message || "Payment verification failed",

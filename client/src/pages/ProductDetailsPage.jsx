@@ -93,7 +93,19 @@ function ProductDetailsPage() {
       navigate(ROUTES.LOGIN, { state: { from: location } })
       return
     }
-    navigate(ROUTES.CART)
+    navigate(ROUTES.CHECKOUT, {
+      state: {
+        buyNowProduct: {
+          productId: product._id,
+          _id: product._id,
+          quantity: quantity,
+          name: product.name,
+          price: product.price,
+          image: product.image,
+          size: product.size,
+        },
+      },
+    })
   }
 
   if (loading) {
@@ -270,7 +282,7 @@ function ProductDetailsPage() {
                   key={p._id}
                   product={p}
                   onAddToCart={showToast}
-                  onBuyNow={(prod) => navigate(`${ROUTES.PRODUCTS}`)}
+                  onBuyNow={(prod) => navigate(ROUTES.CHECKOUT, { state: { buyNowProduct: { ...prod, productId: prod._id, quantity: 1 } } })}
                 />
               ))}
             </div>

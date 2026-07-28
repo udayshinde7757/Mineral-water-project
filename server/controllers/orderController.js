@@ -18,6 +18,8 @@ exports.createOrder = async (req, res) => {
   try {
     const { products, shippingAddress, paymentMethod } = req.body;
 
+    console.log("📦 Incoming order request body:", JSON.stringify(req.body, null, 2));
+
     // Validate required fields
     if (!products || products.length === 0) {
       return res.status(400).json({
@@ -41,7 +43,8 @@ exports.createOrder = async (req, res) => {
     }
 
     // Only allow COD orders via this endpoint (online payments go through /api/payment/verify)
-    if (paymentMethod !== "COD") {
+    const allowedCOD = ["COD"];
+    if (!allowedCOD.includes(paymentMethod)) {
       return res.status(400).json({
         success: false,
         message: "Use the payment API for online payments",
@@ -64,7 +67,24 @@ exports.createOrder = async (req, res) => {
     const orderProducts = [];
 
     for (const item of products) {
-      const product = await Product.findById(item.productId);
+      // Validate productId is a non-empty string
+      if (!item.productId || typeof item.productId !== "string" || item.productId.trim() === "") {
+        return res.status(400).json({
+          success: false,
+          message: "Each product must have a valid productId string",
+        });
+      }
+
+      let product;
+      try {
+        product = await Product.findById(item.productId);
+      } catch (castErr) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid product ID format: ${item.productId}`,
+        });
+      }
+
       if (!product) {
         return res.status(404).json({
           success: false,
@@ -121,6 +141,8 @@ exports.createOrder = async (req, res) => {
     user.cart = [];
     await user.save();
 
+    console.log(`✅ Order #${order._id} created successfully for user ${req.user._id}`);
+
     // Send email & SMS notifications (non-blocking)
     sendOrderConfirmationEmail(order).catch((err) =>
       console.error("Email notification error:", err.message)
@@ -135,7 +157,26 @@ exports.createOrder = async (req, res) => {
       order,
     });
   } catch (error) {
-    console.error("Create Order Error:", error);
+    console.error("❌ Create Order Error:", error);
+    console.error("Stack:", error.stack);
+
+    // Handle Mongoose validation errors
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((e) => e.message);
+      return res.status(400).json({
+        success: false,
+        message: `Validation error: ${messages.join(", ")}`,
+      });
+    }
+
+    // Handle Mongoose cast errors (invalid ObjectId)
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid ID format: ${error.value}`,
+      });
+    }
+
     return res.status(500).json({
       success: false,
       message: error.message || "Server error while creating order",

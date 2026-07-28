@@ -47,7 +47,7 @@ const orderSchema = new mongoose.Schema(
     paymentMethod: {
       type: String,
       required: true,
-      enum: ["COD", "UPI", "Card", "NetBanking"],
+      enum: ["COD", "UPI", "Card", "NetBanking", "Razorpay / Online"],
     },
     paymentStatus: {
       type: String,
@@ -105,13 +105,12 @@ const orderSchema = new mongoose.Schema(
 );
 
 // Auto-set estimated delivery to 3-5 days from order date
-orderSchema.pre("save", function (next) {
+orderSchema.pre("save", async function () {
   if (!this.estimatedDelivery) {
     const deliveryDate = new Date(this.orderDate || Date.now());
     deliveryDate.setDate(deliveryDate.getDate() + 4); // 4 days estimated
     this.estimatedDelivery = deliveryDate;
   }
-  next();
 });
 
 module.exports = mongoose.model("Order", orderSchema);
