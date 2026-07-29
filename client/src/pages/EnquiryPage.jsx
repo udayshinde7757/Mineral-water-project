@@ -133,7 +133,7 @@ function EnquiryPage() {
     const selectedProduct = products.find((p) => p._id === formData.productId)
     const productName = selectedProduct ? selectedProduct.name : 'General Enquiry'
     const msg = `Hi AquaPure! I'm interested in placing a bulk order.\n\nCustomer Name: ${formData.name || 'N/A'}\nProduct: ${productName}\nQuantity: ${formData.quantity}\nMessage: ${formData.message || 'Please contact me with pricing details.'}`
-    window.open(`https://wa.me/919876543210?text=${encodeURIComponent(msg)}`, '_blank')
+    window.open(`https://wa.me/919356212824?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
   // ─── SUCCESS STATE ─────────────────────────────────────────────────────────
@@ -226,22 +226,31 @@ function EnquiryPage() {
             <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-card space-y-4">
               <h3 className="text-base font-extrabold text-darkgray">Prefer Direct Contact?</h3>
               <a
-                href="tel:+919876543210"
+                href="tel:+919356212824"
                 className="flex items-center gap-3 text-sm font-bold text-darkgray hover:text-primary transition-colors"
               >
                 <div className="w-9 h-9 rounded-xl bg-lightblue text-primary flex items-center justify-center">
                   <FiPhone className="w-4 h-4" />
                 </div>
-                +91 98765 43210
+                +91 9356212824 / +91 7757841157
               </a>
               <a
-                href="mailto:hello@aquapure.in"
+                href="mailto:shreyaslande200@gmail.com"
                 className="flex items-center gap-3 text-sm font-bold text-darkgray hover:text-primary transition-colors"
               >
                 <div className="w-9 h-9 rounded-xl bg-lightblue text-primary flex items-center justify-center">
                   <FiMail className="w-4 h-4" />
                 </div>
-                hello@aquapure.in
+                shreyaslande200@gmail.com
+              </a>
+              <a
+                href="mailto:udayshinde7757@gmail.com"
+                className="flex items-center gap-3 text-sm font-bold text-darkgray hover:text-primary transition-colors"
+              >
+                <div className="w-9 h-9 rounded-xl bg-lightblue text-primary flex items-center justify-center">
+                  <FiMail className="w-4 h-4" />
+                </div>
+                udayshinde7757@gmail.com
               </a>
               <button
                 type="button"
@@ -324,7 +333,7 @@ function EnquiryPage() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      placeholder="+91 98765 43210"
+                      placeholder="+91 9876543210"
                       className={`w-full px-4 py-3 rounded-2xl border text-sm text-darkgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50/50 focus:bg-white transition-all ${
                         validationErrors.phone ? 'border-red-400' : 'border-gray-200'
                       }`}

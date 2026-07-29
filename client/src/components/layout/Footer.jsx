@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { FiPhone, FiMail, FiMapPin, FiInstagram, FiTwitter, FiFacebook, FiYoutube, FiDroplet, FiArrowRight } from 'react-icons/fi'
+import { FiPhone, FiMail, FiMapPin, FiInstagram, FiLinkedin, FiFacebook, FiDroplet, FiArrowRight } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 import { ROUTES } from '@constants/routes'
 
@@ -13,10 +13,10 @@ const NAV_LINKS = [
 ]
 
 const SOCIAL_LINKS = [
-  { icon: FiFacebook,  href: 'https://facebook.com',  label: 'Facebook' },
-  { icon: FiInstagram, href: 'https://instagram.com', label: 'Instagram' },
-  { icon: FiTwitter,   href: 'https://twitter.com',   label: 'Twitter' },
-  { icon: FiYoutube,   href: 'https://youtube.com',   label: 'YouTube' },
+  { icon: FiFacebook,  href: 'https://www.facebook.com/sopan.lande.1297',  label: 'Facebook' },
+  { icon: FiInstagram, href: 'https://www.instagram.com/shreyaslande_/?hl=en', label: 'Instagram' },
+  { icon: FiLinkedin,  href: 'https://www.linkedin.com/in/shreyas-lande-94b973344/', label: 'LinkedIn' },
+  { icon: FaWhatsapp,  href: 'https://wa.me/919356212824',                    label: 'WhatsApp' },
 ]
 
 function Footer() {
@@ -39,7 +39,7 @@ function Footer() {
               Submit Enquiry <FiArrowRight />
             </Link>
             <a
-              href="https://wa.me/919876543210?text=Hi%20AquaPure!%20I%27d%20like%20to%20place%20a%20bulk%20order."
+              href="https://wa.me/919356212824?text=Hi%20AquaPure!%20I'd%20like%20to%20place%20a%20bulk%20order."
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-[#25D366] text-white font-extrabold px-6 py-3 rounded-full text-sm hover:bg-[#20ba59] transition-colors shadow"
@@ -61,7 +61,7 @@ function Footer() {
             <span className="text-xl font-extrabold text-gradient">AquaPure</span>
           </Link>
           <p className="text-white/60 text-sm leading-relaxed max-w-xs">
-            India's leading mineral water brand delivering pure, natural hydration since 2008. From source to bottle, purity guaranteed.
+            India's leading mineral water brand delivering pure, natural hydration since 2011. From source to bottle, purity guaranteed.
           </p>
           {/* Social Icons */}
           <div className="flex gap-3 pt-1">
@@ -122,7 +122,7 @@ function Footer() {
           <ul className="space-y-3">
             <li>
               <a
-                href="tel:+919876543210"
+                href="tel:+919356212824"
                 className="flex items-start gap-3 text-sm text-white/60 hover:text-white transition-colors"
               >
                 <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
@@ -130,13 +130,13 @@ function Footer() {
                 </div>
                 <div>
                   <p className="text-white font-bold text-xs mb-0.5">Phone</p>
-                  +91 98765 43210
+                  +91 9356212824 / +91 7757841157
                 </div>
               </a>
             </li>
             <li>
               <a
-                href="mailto:hello@aquapure.in"
+                href="mailto:shreyaslande200@gmail.com"
                 className="flex items-start gap-3 text-sm text-white/60 hover:text-white transition-colors"
               >
                 <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
@@ -144,7 +144,7 @@ function Footer() {
                 </div>
                 <div>
                   <p className="text-white font-bold text-xs mb-0.5">Email</p>
-                  hello@aquapure.in
+                  shreyaslande200@gmail.com
                 </div>
               </a>
             </li>
@@ -154,7 +154,7 @@ function Footer() {
               </div>
               <div>
                 <p className="text-white font-bold text-xs mb-0.5">Address</p>
-                42 Spring Valley Road, Mineral Springs, Maharashtra — 400 001
+                Nagpur, Maharashtra, India
               </div>
             </li>
           </ul>

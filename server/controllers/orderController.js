@@ -65,6 +65,9 @@ exports.createOrder = async (req, res) => {
     // Verify products and calculate amounts server-side (never trust frontend)
     let subtotal = 0;
     const orderProducts = [];
+    const missingProductIds = [];
+
+    console.log("🔍 Order Controller — Received product IDs:", products.map(p => p.productId));
 
     for (const item of products) {
       // Validate productId is a non-empty string
@@ -77,8 +80,11 @@ exports.createOrder = async (req, res) => {
 
       let product;
       try {
+        console.log(`  🔎 Product.findById("${item.productId}") ...`);
         product = await Product.findById(item.productId);
+        console.log(`  ✅ Found: ${product ? product.name : 'NO'}`);
       } catch (castErr) {
+        console.error(`  ❌ Cast error for ID "${item.productId}":`, castErr.message);
         return res.status(400).json({
           success: false,
           message: `Invalid product ID format: ${item.productId}`,
@@ -86,10 +92,9 @@ exports.createOrder = async (req, res) => {
       }
 
       if (!product) {
-        return res.status(404).json({
-          success: false,
-          message: `Product not found: ${item.productId}`,
-        });
+        missingProductIds.push(item.productId);
+        // Continue checking remaining products to report all missing IDs
+        continue;
       }
 
       if (product.stock < item.quantity) {
@@ -108,6 +113,26 @@ exports.createOrder = async (req, res) => {
       });
 
       subtotal += product.price * item.quantity;
+    }
+
+    // If any products were not found, report all missing IDs and clean up cart
+    if (missingProductIds.length > 0) {
+      console.error("❌ Products NOT found in database:", missingProductIds);
+
+      // Clean up invalid product references from user's cart
+      try {
+        await User.findByIdAndUpdate(req.user._id, {
+          $pull: { cart: { productId: { $in: missingProductIds } } }
+        });
+        console.log(`🧹 Removed ${missingProductIds.length} invalid product(s) from user's cart`);
+      } catch (cleanupErr) {
+        console.error("Cart cleanup error:", cleanupErr.message);
+      }
+
+      return res.status(404).json({
+        success: false,
+        message: `Products not found: ${missingProductIds.join(", ")}. These items were removed from your cart. Please add them again from the products page.`,
+      });
     }
 
     // Calculate charges

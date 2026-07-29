@@ -37,7 +37,9 @@ const loadRazorpayScript = () => {
   })
 }
 
-// Helper: Safely extract string product ID from any item format (populated object, string, or Buy Now item)
+// Helper: Safely extract string product ID from any item format (populated object, string, or Buy Now item).
+// ⚠️  NEVER fall back to item._id — that is the cart subdocument _id, NOT the product's MongoDB _id.
+//     Doing so would send a wrong ID to the backend and cause "Product not found" errors.
 const getProductIdStr = (item) => {
   if (!item) return null
   if (typeof item === 'string') return item
@@ -47,9 +49,11 @@ const getProductIdStr = (item) => {
       if (item.productId._id) return String(item.productId._id)
       if (item.productId.id) return String(item.productId.id)
     }
+    // productId exists but is neither a string nor a valid object → invalid
+    return null
   }
-  if (item._id) return String(item._id)
-  if (item.id) return String(item.id)
+  // No fallback to item._id — that's the cart subdoc ID, not the product ID.
+  // If a product was deleted and productId is null, we cannot determine the product ID.
   return null
 }
 
@@ -81,6 +85,9 @@ function CheckoutPage() {
 
   const validCartItems = rawItems.filter((item) => {
     const pId = getProductIdStr(item)
+    if (pId === null) {
+      console.warn('🧹 CheckoutPage: Filtering out cart item with no valid productId (product was likely deleted from DB):', item)
+    }
     return pId !== null && (item.quantity === undefined || item.quantity > 0)
   })
 

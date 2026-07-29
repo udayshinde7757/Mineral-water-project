@@ -24,18 +24,18 @@ export const FOOTER_COMPANY_LINKS = [
 
 // ─── Contact Info ─────────────────────────────────────────────────────────────
 export const CONTACT_INFO = {
-  email:    'hello@aquapure.in',
-  phone:    '+91 98765 43210',
-  address:  '123 Pure Water Lane, Mineral Springs, India — 400001',
+  email:    'shreyaslande200@gmail.com',
+  phone:    '+91 9356212824',
+  address:  'Nagpur, Maharashtra, India',
   mapUrl:   'https://maps.google.com',
 }
 
 // ─── Social Links ─────────────────────────────────────────────────────────────
 export const SOCIAL_LINKS = [
-  { id: 'social-facebook',  label: 'Facebook',  url: 'https://facebook.com/aquapure',  icon: 'FaFacebook' },
-  { id: 'social-instagram', label: 'Instagram', url: 'https://instagram.com/aquapure', icon: 'FaInstagram' },
-  { id: 'social-twitter',   label: 'Twitter',   url: 'https://twitter.com/aquapure',   icon: 'FaTwitter' },
-  { id: 'social-linkedin',  label: 'LinkedIn',  url: 'https://linkedin.com/company/aquapure', icon: 'FaLinkedin' },
+  { id: 'social-facebook',  label: 'Facebook',  url: 'https://www.facebook.com/sopan.lande.1297',  icon: 'FaFacebook' },
+  { id: 'social-instagram', label: 'Instagram', url: 'https://www.instagram.com/shreyaslande_/?hl=en', icon: 'FaInstagram' },
+  { id: 'social-linkedin',  label: 'LinkedIn',  url: 'https://www.linkedin.com/in/shreyas-lande-94b973344/', icon: 'FaLinkedin' },
+  { id: 'social-whatsapp',  label: 'WhatsApp',  url: 'https://wa.me/919356212824', icon: 'FaWhatsapp' },
 ]
 
 // ─── Framer Motion Shared Variants ───────────────────────────────────────────

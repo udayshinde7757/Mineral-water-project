@@ -6,14 +6,19 @@ import axios from 'axios'
  * - Prod: VITE_API_URL or http://localhost:5000/api
  */
 function resolveApiBaseUrl() {
+  // In development, always use Vite proxy (no CORS issues, simpler).
+  // The Vite proxy forwards /api/* → http://localhost:5000/api/*
+  if (import.meta.env.DEV) {
+    return '/api'
+  }
+
+  // In production, use the absolute URL from env, or a sensible default.
   const envUrl = import.meta.env.VITE_API_URL
   if (envUrl && String(envUrl).trim()) {
     const trimmed = String(envUrl).trim().replace(/\/$/, '')
     return trimmed.endsWith('/api') ? trimmed : `${trimmed}/api`
   }
-  if (import.meta.env.DEV) {
-    return '/api'
-  }
+
   return 'http://localhost:5000/api'
 }
 

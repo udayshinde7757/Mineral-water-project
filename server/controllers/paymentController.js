@@ -39,13 +39,18 @@ exports.createRazorpayOrder = async (req, res) => {
 
     // Verify products and calculate amount server-side
     let subtotal = 0;
+    const missingProductIds = [];
+
+    console.log("🔍 Payment Controller — Received product IDs:", products.map(p => p.productId));
+
     for (const item of products) {
+      console.log(`  🔎 Product.findById("${item.productId}") ...`);
       const product = await Product.findById(item.productId);
+      console.log(`  ✅ Found: ${product ? product.name : 'NO'}`);
+
       if (!product) {
-        return res.status(404).json({
-          success: false,
-          message: `Product not found: ${item.productId}`,
-        });
+        missingProductIds.push(item.productId);
+        continue;
       }
 
       if (product.stock < item.quantity) {
@@ -56,6 +61,25 @@ exports.createRazorpayOrder = async (req, res) => {
       }
 
       subtotal += product.price * item.quantity;
+    }
+
+    if (missingProductIds.length > 0) {
+      console.error("❌ Products NOT found in database:", missingProductIds);
+
+      // Clean up invalid product references from user's cart
+      try {
+        await User.findByIdAndUpdate(req.user._id, {
+          $pull: { cart: { productId: { $in: missingProductIds } } }
+        });
+        console.log(`🧹 Removed ${missingProductIds.length} invalid product(s) from user's cart`);
+      } catch (cleanupErr) {
+        console.error("Cart cleanup error:", cleanupErr.message);
+      }
+
+      return res.status(404).json({
+        success: false,
+        message: `Products not found: ${missingProductIds.join(", ")}. These items were removed from your cart.`,
+      });
     }
 
     const deliveryCharges = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_CHARGE;
@@ -156,6 +180,9 @@ exports.verifyPayment = async (req, res) => {
     // Recalculate amounts server-side
     let subtotal = 0;
     const orderProducts = [];
+    const missingProductIds = [];
+
+    console.log("🔍 Verify Payment — Received product IDs:", products.map(p => p.productId));
 
     for (const item of products) {
       if (!item.productId || typeof item.productId !== "string" || item.productId.trim() === "") {
@@ -167,7 +194,9 @@ exports.verifyPayment = async (req, res) => {
 
       let product;
       try {
+        console.log(`  🔎 Product.findById("${item.productId}") ...`);
         product = await Product.findById(item.productId);
+        console.log(`  ✅ Found: ${product ? product.name : 'NO'}`);
       } catch (castErr) {
         return res.status(400).json({
           success: false,
@@ -176,10 +205,8 @@ exports.verifyPayment = async (req, res) => {
       }
 
       if (!product) {
-        return res.status(404).json({
-          success: false,
-          message: `Product not found: ${item.productId}`,
-        });
+        missingProductIds.push(item.productId);
+        continue;
       }
 
       orderProducts.push({
@@ -191,6 +218,24 @@ exports.verifyPayment = async (req, res) => {
       });
 
       subtotal += product.price * item.quantity;
+    }
+
+    if (missingProductIds.length > 0) {
+      console.error("❌ Products NOT found in database:", missingProductIds);
+
+      try {
+        await User.findByIdAndUpdate(req.user._id, {
+          $pull: { cart: { productId: { $in: missingProductIds } } }
+        });
+        console.log(`🧹 Removed ${missingProductIds.length} invalid product(s) from user's cart`);
+      } catch (cleanupErr) {
+        console.error("Cart cleanup error:", cleanupErr.message);
+      }
+
+      return res.status(404).json({
+        success: false,
+        message: `Products not found: ${missingProductIds.join(", ")}. These items were removed from your cart.`,
+      });
     }
 
     const deliveryCharges = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_CHARGE;
