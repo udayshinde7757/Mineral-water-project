@@ -1,0 +1,311 @@
+/**
+ * ============================================================================
+ * AquaPure Corporate Gallery Data Source
+ * ============================================================================
+ * 
+ * HOW TO ADD NEW IMAGES IN THE FUTURE:
+ * ----------------------------------------------------------------------------
+ * 1. Place your image file in `client/public/images/` directory.
+ * 2. Add a new object to the `GALLERY_IMAGES` array below with:
+ *    - id: Unique numeric or string ID (e.g., 22)
+ *    - title: Clear, high-impact headline for the image
+ *    - category: One of ['Plant', 'Process', 'Products', 'Delivery']
+ *    - tag: Detailed sub-category label (e.g. 'Quality Testing', 'Infrastructure')
+ *    - description: 1-2 sentence detailed description of what is depicted
+ *    - src: Relative path from public directory, e.g. '/images/your-image.png'
+ *    - sizeSpan: Grid sizing hint: 'large' (span 2 cols, 2 rows), 'tall' (span 1 col, 2 rows),
+ *                'wide' (span 2 cols, 1 row), or 'normal' (span 1 col, 1 row)
+ *    - featured: Boolean true/false to highlight in gallery views
+ * ============================================================================
+ */
+
+export const CATEGORIES = ['All', 'Plant', 'Process', 'Products', 'Delivery']
+
+export const GALLERY_STATS = [
+  {
+    id: 'employees',
+    value: '50+',
+    label: 'Dedicated Staff',
+    subtext: 'Engineers, Quality Analysts & Operations',
+    iconName: 'FiUsers',
+  },
+  {
+    id: 'production',
+    value: '10,000+',
+    label: 'Bottles Per Day',
+    subtext: 'Continuous Automated Production',
+    iconName: 'FiActivity',
+  },
+  {
+    id: 'quality',
+    value: '100%',
+    label: 'Quality Tested',
+    subtext: 'WHO & BIS Certified Standards',
+    iconName: 'FiCheckCircle',
+  },
+  {
+    id: 'supply',
+    value: '24/7',
+    label: 'Active Supply',
+    subtext: 'Uninterrupted Doorstep Delivery',
+    iconName: 'FiTruck',
+  },
+]
+
+export const PROCESS_TIMELINE = [
+  {
+    step: 1,
+    title: 'Water Source',
+    subtitle: 'Protected Natural Spring',
+    description: 'Extracted from deep underground mineral aquifers fed by natural mountain spring reservoirs.',
+    iconName: 'FiDroplet',
+  },
+  {
+    step: 2,
+    title: 'Purification',
+    subtitle: '8-Stage Micro-Filtration',
+    description: 'Reverse osmosis, activated carbon, and multi-tier micron filtration eliminate all impurities.',
+    iconName: 'FiFilter',
+  },
+  {
+    step: 3,
+    title: 'Quality Testing',
+    subtitle: 'Lab Surveillance',
+    description: 'Continuous chemical and microbiological testing ensures optimal pH and essential mineral balance.',
+    iconName: 'FiShieldCheck',
+  },
+  {
+    step: 4,
+    title: 'Sterile Bottling',
+    subtitle: 'Automated Filling Line',
+    description: 'Filled in touchless ultra-clean ISO cleanrooms under positive air pressure and UV sterilization.',
+    iconName: 'FiCpu',
+  },
+  {
+    step: 5,
+    title: 'Tamper Packaging',
+    subtitle: 'Smart Sealed Jars',
+    description: 'Automated labeling and shrink-wrapped security seals guarantee 100% untampered delivery.',
+    iconName: 'FiBox',
+  },
+  {
+    step: 6,
+    title: 'Express Delivery',
+    subtitle: '24/7 Supply Fleet',
+    description: 'Dispatched via temperature-regulated logistics vehicles directly to homes and offices.',
+    iconName: 'FiTruck',
+  },
+]
+
+export const GALLERY_IMAGES = [
+  {
+    id: 1,
+    title: 'Natural Mountain Spring Reservoir',
+    category: 'Plant',
+    tag: 'Water Source',
+    description: 'Pristine mountain spring collection basin feeding our state-of-the-art mineral extraction reservoir.',
+    src: '/images/mountainview.png',
+    sizeSpan: 'large',
+    featured: true,
+  },
+  {
+    id: 2,
+    title: 'Automated High-Speed Bottling Line',
+    category: 'Plant',
+    tag: 'Automated Machinery',
+    description: 'German-engineered touchless bottling line operating in sterile cleanroom conditions.',
+    src: '/images/machine.png',
+    sizeSpan: 'normal',
+    featured: true,
+  },
+  {
+    id: 3,
+    title: 'Multi-Stage Reverse Osmosis Unit',
+    category: 'Process',
+    tag: 'Purification',
+    description: 'Advanced 8-stage filtration system removing micro-particles while preserving health-essential minerals.',
+    src: '/images/purifyprocess.png',
+    sizeSpan: 'tall',
+    featured: true,
+  },
+  {
+    id: 4,
+    title: 'AquaPure Corporate Headquarters',
+    category: 'Plant',
+    tag: 'Administration',
+    description: 'Modern administrative hub coordinating manufacturing logistics, client support, and quality audits.',
+    src: '/images/office.png',
+    sizeSpan: 'wide',
+    featured: false,
+  },
+  {
+    id: 5,
+    title: 'Microbiological Laboratory Testing',
+    category: 'Process',
+    tag: 'Quality Control',
+    description: 'Daily lab surveillance verifying pH levels, mineral concentration, and zero-microbe standards.',
+    src: '/images/waterquality.png',
+    sizeSpan: 'normal',
+    featured: true,
+  },
+  {
+    id: 6,
+    title: 'Complete AquaPure Product Showcase',
+    category: 'Products',
+    tag: 'Product Line',
+    description: 'Our full array of mineral water solutions ranging from 250ml event mini-bottles to 20L office jars.',
+    src: '/images/products.png',
+    sizeSpan: 'wide',
+    featured: true,
+  },
+  {
+    id: 7,
+    title: 'Sterile Bottle Ozone Rinsing & Handling',
+    category: 'Process',
+    tag: 'Sanitization',
+    description: 'High-pressure ozone washing and automated robotic container handling prior to water filling.',
+    src: '/images/bottlehandling.png',
+    sizeSpan: 'normal',
+    featured: false,
+  },
+  {
+    id: 8,
+    title: '20L Heavy-Duty Dispenser Jars Fleet',
+    category: 'Products',
+    tag: '20L Jars',
+    description: 'Heavy-duty food-grade 20L jars engineered for high-volume corporate offices and family homes.',
+    src: '/images/20ltr10unitsjar.png',
+    sizeSpan: 'large',
+    featured: true,
+  },
+  {
+    id: 9,
+    title: 'Temperature-Controlled Delivery Vehicles',
+    category: 'Delivery',
+    tag: 'Logistics',
+    description: 'Clean, covered delivery fleet dispatched daily for prompt doorstep distribution.',
+    src: '/images/transport.png',
+    sizeSpan: 'normal',
+    featured: true,
+  },
+  {
+    id: 10,
+    title: 'ISO 9001:2015 & BIS Certification',
+    category: 'Process',
+    tag: 'Certification',
+    description: 'International quality benchmark compliance certifying every drop of water produced at AquaPure.',
+    src: '/images/ISO.png',
+    sizeSpan: 'normal',
+    featured: false,
+  },
+  {
+    id: 11,
+    title: 'Certified Logistics & Dispatch Crew',
+    category: 'Delivery',
+    tag: 'Delivery Staff',
+    description: 'Trained logistics team equipped with protective gear guaranteeing safe, touchless handling.',
+    src: '/images/workers.png',
+    sizeSpan: 'tall',
+    featured: true,
+  },
+  {
+    id: 12,
+    title: 'Premium 20L Smart Dispenser Container',
+    category: 'Products',
+    tag: '20L Jars',
+    description: 'Ergonomic 20-liter jar featuring tamper-evident smart cap seal and easy-grip handle.',
+    src: '/images/premium20ltrjar.png',
+    sizeSpan: 'normal',
+    featured: false,
+  },
+  {
+    id: 13,
+    title: 'Standard 20L Water Dispenser Container',
+    category: 'Products',
+    tag: '20L Jars',
+    description: 'Reusable BPA-free 20L water container built for durability and freshness preservation.',
+    src: '/images/20ltrjar.png',
+    sizeSpan: 'normal',
+    featured: false,
+  },
+  {
+    id: 14,
+    title: '1 Liter Daily Hydration Bottle',
+    category: 'Products',
+    tag: 'PET Bottles',
+    description: 'Sleek 1-liter eco-friendly PET bottle ideal for office desks, workout sessions, and daily carry.',
+    src: '/images/1ltr.png',
+    sizeSpan: 'normal',
+    featured: false,
+  },
+  {
+    id: 15,
+    title: '2 Liter Family & Outdoor Excursion Pack',
+    category: 'Products',
+    tag: 'PET Bottles',
+    description: 'Generous 2-liter bottle designed for family dining tables, picnics, and road trips.',
+    src: '/images/2ltr.png',
+    sizeSpan: 'normal',
+    featured: false,
+  },
+  {
+    id: 16,
+    title: '5 Liter Countertop Hydration Jar',
+    category: 'Products',
+    tag: 'Large Format',
+    description: 'Convenient 5-liter container equipped with built-in tap for kitchens and camping outdoor trips.',
+    src: '/images/5ltr.png',
+    sizeSpan: 'normal',
+    featured: false,
+  },
+  {
+    id: 17,
+    title: '250ml Mini Event & Executive Pack',
+    category: 'Products',
+    tag: 'Event Special',
+    description: 'Compact 250ml mini bottles designed for corporate conferences, luxury banquets, and weddings.',
+    src: '/images/minibottlesof250ml.png',
+    sizeSpan: 'normal',
+    featured: false,
+  },
+  {
+    id: 18,
+    title: 'Ergonomic Sports & Travel Gym Bottle',
+    category: 'Products',
+    tag: 'Active Lifestyle',
+    description: 'Contoured easy-grip hydration bottle built for active athletes and outdoor adventures.',
+    src: '/images/easytocarrygymtravell.png',
+    sizeSpan: 'normal',
+    featured: false,
+  },
+  {
+    id: 19,
+    title: 'Hygienic Sealed Pouch & Packaged Water',
+    category: 'Products',
+    tag: 'Eco Packaging',
+    description: 'Economical multi-layer tamper-proof water pouches for high-mobility utility hydration.',
+    src: '/images/pani_pouch_bottle.png',
+    sizeSpan: 'normal',
+    featured: false,
+  },
+  {
+    id: 20,
+    title: 'Operational Leadership - Uday Shinde',
+    category: 'Plant',
+    tag: 'Leadership',
+    description: 'Executive management ensuring operational perfection, safety compliance, and client trust.',
+    src: '/images/uday_shinde.png',
+    sizeSpan: 'normal',
+    featured: false,
+  },
+  {
+    id: 21,
+    title: 'Plant Engineering Director - Shreyas Lande',
+    category: 'Plant',
+    tag: 'Engineering',
+    description: 'Plant management supervising continuous purification, machinery calibration, and zero downtime.',
+    src: '/images/shreyas_lande.png',
+    sizeSpan: 'normal',
+    featured: false,
+  },
+]
