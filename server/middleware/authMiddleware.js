@@ -46,4 +46,27 @@ const protect = async (req, res, next) => {
   }
 };
 
-module.exports = { protect };
+const admin = (req, res, next) => {
+  const adminEmails = (process.env.ADMIN_EMAILS || "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (adminEmails.length === 0) {
+    return res.status(403).json({
+      success: false,
+      message: "Admin access is not configured on the server.",
+    });
+  }
+
+  if (!req.user || !adminEmails.includes(req.user.email.toLowerCase())) {
+    return res.status(403).json({
+      success: false,
+      message: "Not authorized as admin.",
+    });
+  }
+
+  next();
+};
+
+module.exports = { protect, admin };

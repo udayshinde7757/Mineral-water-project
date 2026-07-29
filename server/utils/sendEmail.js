@@ -1,47 +1,105 @@
 const nodemailer = require("nodemailer");
 
-const sendEmail = async (options) => {
-  let transporter;
-  
-  const hasSMTP = process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS;
-  
-  if (hasSMTP) {
-    transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT) || 587,
-      secure: process.env.SMTP_SECURE === "true",
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+/**
+ * Resolve SMTP settings from .env.
+ * Supports SMTP_EMAIL/SMTP_PASSWORD (Gmail app password) and legacy SMTP_* names.
+ */
+function resolveSmtpConfig() {
+  const user =
+    process.env.SMTP_USER ||
+    process.env.SMTP_EMAIL ||
+    process.env.EMAIL_USER;
+
+  const pass =
+    process.env.SMTP_PASS ||
+    process.env.SMTP_PASSWORD ||
+    process.env.EMAIL_PASS;
+
+  if (!user || !pass) {
+    return null;
+  }
+
+  const host = process.env.SMTP_HOST || process.env.EMAIL_HOST;
+  const port = Number(process.env.SMTP_PORT || process.env.EMAIL_PORT) || 587;
+  const secure = process.env.SMTP_SECURE === "true";
+
+  if (!host) {
+    return {
+      user,
+      transporterOptions: {
+        service: process.env.SMTP_SERVICE || "gmail",
+        auth: { user, pass },
       },
-    });
+    };
+  }
+
+  return {
+    user,
+    transporterOptions: {
+      host,
+      port,
+      secure,
+      auth: { user, pass },
+    },
+  };
+}
+
+const sendEmail = async (options) => {
+  const smtpConfig = resolveSmtpConfig();
+  let transporter;
+
+  if (smtpConfig) {
+    transporter = nodemailer.createTransport(smtpConfig.transporterOptions);
   } else {
-    // Fallback: log emails directly to console for seamless developer experience
+    console.warn(
+      "sendEmail: SMTP credentials missing (SMTP_EMAIL + SMTP_PASSWORD). Logging email to console instead."
+    );
     transporter = nodemailer.createTransport({
       streamTransport: true,
-      newline: 'windows',
-      buffer: true
+      newline: "windows",
+      buffer: true,
     });
   }
 
+  const fromAddress =
+    process.env.EMAIL_FROM ||
+    (smtpConfig?.user
+      ? `"AquaPure Mineral Water" <${smtpConfig.user}>`
+      : '"AquaPure Mineral Water" <no-reply@aquapure.in>');
+
   const mailOptions = {
-    from: process.env.EMAIL_FROM || '"AquaPure Mineral Water" <no-reply@aquapure.in>',
+    from: fromAddress,
     to: options.to,
     subject: options.subject,
     html: options.html,
   };
 
-  const info = await transporter.sendMail(mailOptions);
-  
-  if (!hasSMTP) {
-    console.log("📧 ==== NODEMAILER DEV EMAIL TRIGGERED ====");
-    console.log("To:", mailOptions.to);
-    console.log("Subject:", mailOptions.subject);
-    console.log("Email body:\n", mailOptions.html);
-    console.log("📧 ========================================");
+  try {
+    const info = await transporter.sendMail(mailOptions);
+
+    if (smtpConfig) {
+      console.log(
+        `Email sent successfully to ${mailOptions.to} (messageId: ${info.messageId})`
+      );
+    } else {
+      console.log("==== NODEMAILER DEV EMAIL (not sent via SMTP) ====");
+      console.log("To:", mailOptions.to);
+      console.log("Subject:", mailOptions.subject);
+      console.log("Email body:\n", mailOptions.html);
+      console.log("==================================================");
+    }
+
+    return info;
+  } catch (error) {
+    console.error("sendEmail failed:", {
+      to: mailOptions.to,
+      subject: mailOptions.subject,
+      code: error.code,
+      message: error.message,
+      response: error.response,
+    });
+    throw error;
   }
-  
-  return info;
 };
 
 module.exports = sendEmail;
