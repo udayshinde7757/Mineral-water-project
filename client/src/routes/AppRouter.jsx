@@ -17,6 +17,8 @@ const CartPage         = lazy(() => import('@pages/CartPage'))
 const CheckoutPage     = lazy(() => import('@pages/CheckoutPage'))
 const OrderSuccessPage = lazy(() => import('@pages/OrderSuccessPage'))
 const MyOrdersPage     = lazy(() => import('@pages/MyOrdersPage'))
+const EnquiryPage      = lazy(() => import('@pages/EnquiryPage'))
+const AdminPage        = lazy(() => import('@pages/AdminPage'))
 const NotFoundPage     = lazy(() => import('@pages/NotFoundPage'))
 
 // ─── App Router ───────────────────────────────────────────────────────────────
@@ -43,6 +45,7 @@ function AppRouter() {
               <Route path={ROUTES.CHECKOUT}       element={<CheckoutPage />} />
               <Route path={ROUTES.ORDER_SUCCESS}  element={<OrderSuccessPage />} />
               <Route path={ROUTES.MY_ORDERS}      element={<MyOrdersPage />} />
+              <Route path={ROUTES.ENQUIRY}       element={<EnquiryPage />} />
             </Route>
 
             {/* Catch-all Not Found Route */}

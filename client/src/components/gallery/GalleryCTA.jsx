@@ -8,8 +8,8 @@ function GalleryCTA() {
     <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-16">
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary-700 via-primary-600 to-teal-600 p-8 sm:p-12 md:p-16 shadow-2xl text-white">
         {/* Background decorative water splash rings */}
-        <div className="aria-hidden:true pointer-events-none absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-white/10 blur-2xl" />
-        <div className="aria-hidden:true pointer-events-none absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-teal-400/20 blur-2xl" />
+        <div aria-hidden="true" className="pointer-events-none absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-white/10 blur-2xl" />
+        <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-teal-400/20 blur-2xl" />
 
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           <motion.div

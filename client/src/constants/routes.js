@@ -13,5 +13,6 @@ export const ROUTES = {
   CHECKOUT: '/checkout',
   ORDER_SUCCESS: '/order-success',
   MY_ORDERS: '/my-orders',
+  ENQUIRY: '/enquiry',
 }
 

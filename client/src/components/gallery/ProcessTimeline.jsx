@@ -21,17 +21,17 @@ const ICON_MAP = {
 
 function ProcessTimeline() {
   return (
-    <section className="py-16 md:py-24 bg-gradient-to-b from-white via-blue-50/40 to-white relative overflow-hidden border-t border-gray-100">
+    <section className="py-16 md:py-24 bg-gradient-to-b from-white via-lightblue/40 to-white relative overflow-hidden border-t border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Heading */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-primary-700 bg-primary-50 border border-primary-200/60 uppercase tracking-wider">
+          <span className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-primary bg-lightblue border border-primary/20 uppercase tracking-wider">
             OPERATIONAL EXCELLENCE
           </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-gray-900 tracking-tight mt-4 mb-3">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-darkgray tracking-tight mt-4 mb-3">
             Company Manufacturing Lifecycle
           </h2>
-          <p className="text-sm sm:text-base text-gray-600 leading-relaxed font-normal">
+          <p className="text-sm sm:text-base text-darkgray-light leading-relaxed font-normal">
             From protected natural mountain springs to your doorstep — how AquaPure guarantees 100% purity across every single stage.
           </p>
         </div>
@@ -67,15 +67,15 @@ function ProcessTimeline() {
                     </div>
 
                     {/* Title & Subtitle */}
-                    <h3 className="text-base font-bold text-gray-900 mb-0.5 group-hover:text-primary-600 transition-colors">
+                    <h3 className="text-base font-bold text-darkgray mb-0.5 group-hover:text-primary transition-colors">
                       {item.title}
                     </h3>
-                    <p className="text-xs font-semibold text-teal-600 mb-2">
+                    <p className="text-xs font-semibold text-teal mb-2">
                       {item.subtitle}
                     </p>
 
                     {/* Description */}
-                    <p className="text-xs text-gray-500 leading-relaxed font-normal">
+                    <p className="text-xs text-darkgray-lighter leading-relaxed font-normal">
                       {item.description}
                     </p>
                   </div>

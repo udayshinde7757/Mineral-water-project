@@ -181,7 +181,8 @@ function OrderSuccessPage() {
                   <div key={index} className="py-3 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3.5">
                       <div className="w-14 h-14 rounded-2xl bg-lightblue/40 border border-gray-100 p-1 flex-shrink-0 flex items-center justify-center">
-                        <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
+                        <img src={item.image} alt={item.name} className="w-full h-full object-contain" loading="lazy"
+                          onError={(e) => { e.target.src = 'https://placehold.co/200x200/e8f4fd/0B4F6C?text=Water' }} />
                       </div>
                       <div>
                         <h4 className="text-sm font-bold text-darkgray">{item.name}</h4>

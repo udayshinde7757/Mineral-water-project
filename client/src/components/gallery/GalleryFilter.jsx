@@ -12,10 +12,10 @@ function GalleryFilter({ activeCategory, onSelectCategory, counts }) {
             key={cat}
             type="button"
             onClick={() => onSelectCategory(cat)}
-            className={`relative px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 transform active:scale-95 flex items-center gap-2 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+            className={`group relative px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 transform active:scale-95 flex items-center gap-2 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary ${
               isActive
-                ? 'bg-gradient-to-r from-primary-600 to-teal-600 text-white shadow-brand-md scale-105'
-                : 'bg-white text-gray-700 border border-gray-200 hover:border-primary-300 hover:text-primary-600 hover:bg-blue-50/50 shadow-sm'
+                ? 'bg-gradient-to-r from-primary to-teal text-white shadow-brand-md scale-105'
+                : 'bg-white text-gray-700 border border-gray-200 hover:border-primary/30 hover:text-primary hover:bg-lightblue/50 shadow-sm'
             }`}
           >
             <span>{cat}</span>

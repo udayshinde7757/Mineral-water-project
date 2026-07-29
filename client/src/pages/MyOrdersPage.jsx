@@ -290,7 +290,8 @@ function MyOrdersPage() {
                           className="w-14 h-14 rounded-2xl bg-lightblue/30 border border-gray-100 p-1 flex-shrink-0 flex items-center justify-center relative"
                           title={item.name}
                         >
-                          <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
+                          <img src={item.image} alt={item.name} className="w-full h-full object-contain" loading="lazy"
+                            onError={(e) => { e.target.src = 'https://placehold.co/200x200/e8f4fd/0B4F6C?text=Water' }} />
                           <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                             {item.quantity}
                           </span>
@@ -386,7 +387,8 @@ function MyOrdersPage() {
                     {selectedOrder.products?.map((item, idx) => (
                       <div key={idx} className="py-2.5 flex items-center justify-between text-xs">
                         <div className="flex items-center gap-3">
-                          <img src={item.image} alt={item.name} className="w-10 h-10 object-contain rounded-lg bg-lightblue/30 p-1" />
+                          <img src={item.image} alt={item.name} className="w-10 h-10 object-contain rounded-lg bg-lightblue/30 p-1" loading="lazy"
+                            onError={(e) => { e.target.src = 'https://placehold.co/200x200/e8f4fd/0B4F6C?text=Water' }} />
                           <div>
                             <p className="font-bold text-darkgray">{item.name}</p>
                             <p className="text-gray-400">{formatCurrency(item.price)} × {item.quantity}</p>

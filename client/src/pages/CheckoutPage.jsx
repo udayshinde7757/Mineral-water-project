@@ -657,7 +657,8 @@ function CheckoutPage() {
                     return (
                       <div key={pId} className="pt-3 flex items-center gap-3">
                         <div className="w-14 h-14 rounded-xl bg-lightblue/40 border border-gray-100 p-1 flex-shrink-0 flex items-center justify-center">
-                          <img src={product.image || '/placeholder.png'} alt={product.name || 'Product'} className="w-full h-full object-contain" />
+                          <img src={product.image || '/placeholder.png'} alt={product.name || 'Product'} className="w-full h-full object-contain"
+                            onError={(e) => { e.target.src = 'https://placehold.co/200x200/e8f4fd/0B4F6C?text=Water' }} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-bold text-darkgray truncate">{product.name || 'Mineral Water'}</p>

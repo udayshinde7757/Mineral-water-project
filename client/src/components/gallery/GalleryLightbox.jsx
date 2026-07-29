@@ -51,12 +51,13 @@ function GalleryLightbox({ image, images, currentIndex, onClose, onNext, onPrev 
           {/* Top Bar: Title & Counter & Close Button */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800/80 bg-gray-900/60 backdrop-blur-md z-20">
             <div className="flex items-center gap-3">
-              <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-white bg-primary-600 rounded-full">
+              <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-white"
+                    style={{ background: 'linear-gradient(135deg, #0B4F6C, #01BAEF)' }}>
                 {image.category}
               </span>
               {image.tag && (
                 <span className="hidden sm:inline-flex items-center gap-1 text-xs text-gray-400 font-medium">
-                  <FiTag className="w-3 h-3 text-primary-400" />
+                  <FiTag className="w-3 h-3 text-teal" />
                   {image.tag}
                 </span>
               )}
@@ -84,7 +85,8 @@ function GalleryLightbox({ image, images, currentIndex, onClose, onNext, onPrev 
             <button
               type="button"
               onClick={onPrev}
-              className="absolute left-4 z-30 p-3 rounded-full bg-gray-900/80 hover:bg-primary-600 text-white border border-gray-700/80 hover:border-primary-500 shadow-xl transition-all duration-300 transform hover:scale-110 cursor-pointer outline-none"
+              className="absolute left-4 z-30 p-3 rounded-full bg-gray-900/80 text-white border border-gray-700/80 shadow-xl transition-all duration-300 transform hover:scale-110 cursor-pointer outline-none"
+              style={{ hover: { background: 'linear-gradient(135deg, #0B4F6C, #01BAEF)', borderColor: '#01BAEF' } }}
               aria-label="Previous Image"
             >
               <FiChevronLeft className="w-7 h-7" />
@@ -94,7 +96,8 @@ function GalleryLightbox({ image, images, currentIndex, onClose, onNext, onPrev 
             <button
               type="button"
               onClick={onNext}
-              className="absolute right-4 z-30 p-3 rounded-full bg-gray-900/80 hover:bg-primary-600 text-white border border-gray-700/80 hover:border-primary-500 shadow-xl transition-all duration-300 transform hover:scale-110 cursor-pointer outline-none"
+              className="absolute right-4 z-30 p-3 rounded-full bg-gray-900/80 text-white border border-gray-700/80 shadow-xl transition-all duration-300 transform hover:scale-110 cursor-pointer outline-none"
+              style={{ hover: { background: 'linear-gradient(135deg, #0B4F6C, #01BAEF)', borderColor: '#01BAEF' } }}
               aria-label="Next Image"
             >
               <FiChevronRight className="w-7 h-7" />

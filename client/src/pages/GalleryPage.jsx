@@ -64,22 +64,21 @@ function GalleryPage() {
       {/* 2. Gallery Statistics */}
       <GalleryStats />
 
-      {/* 3. Filter Buttons & 4. Premium Masonry Gallery */}
-      <section className="py-4">
-        <GalleryFilter
-          activeCategory={activeCategory}
-          onSelectCategory={(cat) => {
-            setActiveCategory(cat)
-            setLightboxIndex(null) // Reset lightbox when filter changes
-          }}
-          counts={categoryCounts}
-        />
+      {/* 3. Filter Buttons */}
+      <GalleryFilter
+        activeCategory={activeCategory}
+        onSelectCategory={(cat) => {
+          setActiveCategory(cat)
+          setLightboxIndex(null)
+        }}
+        counts={categoryCounts}
+      />
 
-        <GalleryGrid
-          images={filteredImages}
-          onSelectImage={handleOpenLightbox}
-        />
-      </section>
+      {/* 4. Gallery Grid Section (with theme background, heading, animations) */}
+      <GalleryGrid
+        images={filteredImages}
+        onSelectImage={handleOpenLightbox}
+      />
 
       {/* 5. Fullscreen Lightbox Modal */}
       {activeLightboxImage && (

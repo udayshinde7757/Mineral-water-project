@@ -149,6 +149,7 @@ function CartPage() {
                             src={product.image}
                             alt={product.name}
                             className="w-full h-full object-contain"
+                            onError={(e) => { e.target.src = 'https://placehold.co/200x200/e8f4fd/0B4F6C?text=Water' }}
                           />
                         </div>
                         {/* Title and metadata */}

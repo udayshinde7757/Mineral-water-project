@@ -187,6 +187,7 @@ function AboutPage() {
                   src="https://img.magnific.com/premium-photo/capped-bottles-with-purified-carbonated-mineral-water-moving-production-line-large-modern_660230-63166.jpg?ga=GA1.1.2137670955.1781590794&semt=ais_test_c&w=740&q=80"
                   alt="Crystal Clear AquaPure Mineral Water"
                   className="w-full h-[400px] sm:h-[480px] object-cover rounded-2xl shadow-inner"
+                  loading="lazy"
                 />
               </div>
 
@@ -422,6 +423,7 @@ function AboutPage() {
               src={member.image}
               alt={member.name}
               className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500"
+              loading="lazy"
             />
             <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-primary shadow-sm">
               {member.badge}

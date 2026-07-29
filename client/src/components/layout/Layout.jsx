@@ -1,17 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import ScrollToTop from '@components/common/ScrollToTop'
 import Navbar from './Navbar'
-
-function FooterPlaceholder() {
-  return (
-    <footer className="bg-darkgray text-white py-10">
-      <div className="container-app text-center">
-        <p className="text-gradient text-xl font-bold mb-2">AquaPure</p>
-        <p className="text-sm text-white/50">© {new Date().getFullYear()} AquaPure. All rights reserved.</p>
-      </div>
-    </footer>
-  )
-}
+import Footer from './Footer'
 
 function Layout() {
   return (
@@ -24,7 +14,7 @@ function Layout() {
         <Outlet />
       </main>
 
-      <FooterPlaceholder />
+      <Footer />
     </div>
   )
 }

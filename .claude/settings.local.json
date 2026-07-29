@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx vite *)",
+      "Bash(node -e \"const fi = require\\('react-icons/fi'\\); console.log\\(Object.keys\\(fi\\).filter\\(k => k.startsWith\\('Fi'\\)\\).sort\\(\\).join\\('\\\\n'\\)\\)\")",
+      "Bash(node -e \"const fi = require\\('react-icons/fi'\\); Object.keys\\(fi\\).filter\\(k => k.startsWith\\('Fi'\\)\\).sort\\(\\).forEach\\(k => console.log\\(k\\)\\)\")",
+      "Bash(npm run *)"
+    ]
+  }
+}

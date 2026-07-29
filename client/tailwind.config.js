@@ -6,35 +6,44 @@ export default {
   ],
   theme: {
     extend: {
-      // ─── Brand Color Palette ───────────────────────────────────────────
+      // ─── Premium Water-Brand Color Palette ─────────────────────────────
       colors: {
         primary: {
-          DEFAULT: '#0A77B7',
-          50:  '#E6F7FF',
-          100: '#BAE3FF',
-          200: '#7EC8F5',
-          300: '#42ACEC',
-          400: '#1A91D6',
-          500: '#0A77B7',
-          600: '#085E92',
-          700: '#06456D',
-          800: '#042C47',
-          900: '#021422',
+          DEFAULT: '#0B4F6C',
+          50:  '#F0F7FA',
+          100: '#D5EAF2',
+          200: '#ABD5E5',
+          300: '#72B5CF',
+          400: '#3A95B9',
+          500: '#0B4F6C',
+          600: '#094055',
+          700: '#07313F',
+          800: '#05212A',
+          900: '#031015',
         },
         teal: {
-          DEFAULT: '#00B8A9',
-          50:  '#E0F8F6',
-          100: '#B3EEE9',
-          200: '#66DDDA',
-          300: '#33CDCA',
-          400: '#00C2B5',
-          500: '#00B8A9',
-          600: '#009287',
-          700: '#006D65',
-          800: '#004843',
-          900: '#002422',
+          DEFAULT: '#01BAEF',
+          50:  '#E6F9FE',
+          100: '#B3EEFC',
+          200: '#80E3FA',
+          300: '#4DD8F8',
+          400: '#1ACDF6',
+          500: '#01BAEF',
+          600: '#0195BF',
+          700: '#01708F',
+          800: '#004B5F',
+          900: '#002530',
         },
-        lightblue: '#E6F7FF',
+        // Background / ambient tones
+        ice:    '#F4FBFD',
+        sky:    '#DDF3F5',
+        mint:   '#C7F0E8',
+        lightblue: '#E6F7FF', // kept for backward compatibility
+        // Warm accent (used sparingly for CTAs, highlights)
+        coral:  '#FFB37D',
+        sand:   '#FFDD95',
+        // Dark text — soft near-black navy instead of pure black
+        navy:   '#0E1B26',
         darkgray: {
           DEFAULT: '#333333',
           light: '#555555',
@@ -43,16 +52,16 @@ export default {
         },
       },
 
-      // ─── Typography ─────────────────────────────────────────────────────
+      // ─── Typography ────────────────────────────────────────────────────
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        display: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans:    ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['Sora', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       fontSize: {
-        'display-xl': ['4rem',    { lineHeight: '1.1',  fontWeight: '800' }],
-        'display-lg': ['3rem',    { lineHeight: '1.15', fontWeight: '700' }],
-        'display-md': ['2.25rem', { lineHeight: '1.2',  fontWeight: '700' }],
-        'display-sm': ['1.875rem',{ lineHeight: '1.25', fontWeight: '600' }],
+        'display-xl': ['clamp(2.75rem, 6vw, 4.25rem)', { lineHeight: '1.08', fontWeight: '800' }],
+        'display-lg': ['clamp(2.25rem, 5vw, 3.5rem)',  { lineHeight: '1.12', fontWeight: '700' }],
+        'display-md': ['clamp(1.75rem, 4vw, 2.5rem)',  { lineHeight: '1.2',  fontWeight: '700' }],
+        'display-sm': ['clamp(1.375rem, 3vw, 1.875rem)',{ lineHeight: '1.25', fontWeight: '600' }],
       },
 
       // ─── Spacing ────────────────────────────────────────────────────────
@@ -71,32 +80,44 @@ export default {
         '5xl': '2.5rem',
       },
 
-      // ─── Box Shadow ─────────────────────────────────────────────────────
+      // ─── Box Shadow ────────────────────────────────────────────────────
       boxShadow: {
-        'brand-sm':  '0 2px 12px rgba(10, 119, 183, 0.12)',
-        'brand-md':  '0 4px 24px rgba(10, 119, 183, 0.18)',
-        'brand-lg':  '0 8px 40px rgba(10, 119, 183, 0.24)',
-        'teal-sm':   '0 2px 12px rgba(0, 184, 169, 0.12)',
-        'teal-md':   '0 4px 24px rgba(0, 184, 169, 0.18)',
-        'card':      '0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.08)',
-        'card-hover':'0 4px 16px rgba(0,0,0,0.08), 0 16px 40px rgba(10, 119, 183, 0.14)',
+        'brand-sm':  '0 2px 12px rgba(11, 79, 108, 0.12)',
+        'brand-md':  '0 4px 24px rgba(11, 79, 108, 0.18)',
+        'brand-lg':  '0 8px 40px rgba(11, 79, 108, 0.25)',
+        'brand-xl':  '0 12px 56px rgba(11, 79, 108, 0.30)',
+        'teal-sm':   '0 2px 12px rgba(1, 186, 239, 0.12)',
+        'teal-md':   '0 4px 24px rgba(1, 186, 239, 0.18)',
+        'teal-lg':   '0 8px 40px rgba(1, 186, 239, 0.25)',
+        'card':      '0 1px 4px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06)',
+        'card-hover':'0 4px 16px rgba(0,0,0,0.06), 0 16px 40px rgba(11, 79, 108, 0.12)',
+        'glow-teal': '0 0 30px rgba(1, 186, 239, 0.25)',
+        'glow-coral':'0 0 30px rgba(255, 179, 125, 0.25)',
       },
 
-      // ─── Background gradients (via backgroundImage) ──────────────────────
+      // ─── Background gradients ──────────────────────────────────────────
       backgroundImage: {
-        'gradient-brand':    'linear-gradient(135deg, #0A77B7 0%, #00B8A9 100%)',
-        'gradient-brand-v':  'linear-gradient(180deg, #0A77B7 0%, #005F90 100%)',
-        'gradient-hero':     'linear-gradient(135deg, #0A77B7 0%, #00B8A9 60%, #E6F7FF 100%)',
-        'gradient-light':    'linear-gradient(180deg, #E6F7FF 0%, #FFFFFF 100%)',
-        'gradient-dark':     'linear-gradient(135deg, #0A3D62 0%, #0A77B7 100%)',
+        'gradient-brand':    'linear-gradient(135deg, #0B4F6C 0%, #01BAEF 100%)',
+        'gradient-brand-v':  'linear-gradient(180deg, #0B4F6C 0%, #07313F 100%)',
+        'gradient-light':    'linear-gradient(180deg, #F4FBFD 0%, #DDF3F5 40%, #C7F0E8 100%)',
+        'gradient-dark':     'linear-gradient(135deg, #07313F 0%, #0B4F6C 100%)',
+        'gradient-coral':    'linear-gradient(135deg, #FFB37D 0%, #FFDD95 100%)',
       },
 
-      // ─── Animation ──────────────────────────────────────────────────────
+      // ─── Animation ─────────────────────────────────────────────────────
       animation: {
-        'fade-in':       'fadeIn 0.5s ease-out forwards',
-        'slide-up':      'slideUp 0.5s ease-out forwards',
-        'float':         'float 3s ease-in-out infinite',
-        'pulse-brand':   'pulseBrand 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'fade-in':     'fadeIn 0.6s ease-out forwards',
+        'slide-up':    'slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+        'float':       'float 3s ease-in-out infinite',
+        'float-slow':  'float 6s ease-in-out infinite',
+        'pulse-brand': 'pulseBrand 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'pulse-gentle':'pulseGentle 3s ease-in-out infinite',
+        'blob':        'blob 18s ease-in-out infinite',
+        'blob-reverse':'blob 22s ease-in-out infinite reverse',
+        'wave':        'wave 8s ease-in-out infinite',
+        'wave-slow':   'wave 12s ease-in-out infinite',
+        'scroll-cue':  'scrollCue 2.4s ease-in-out infinite',
+        'scroll-cue-fade':'scrollCueFade 2.4s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -104,26 +125,45 @@ export default {
           '100%': { opacity: '1' },
         },
         slideUp: {
-          '0%':   { opacity: '0', transform: 'translateY(24px)' },
+          '0%':   { opacity: '0', transform: 'translateY(28px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         float: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%':      { transform: 'translateY(-10px)' },
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%':      { transform: 'translateY(-14px)' },
+        },
+        pulseGentle: {
+          '0%, 100%': { opacity: '1', transform: 'scale(1)' },
+          '50%':      { opacity: '0.85', transform: 'scale(1.08)' },
         },
         pulseBrand: {
           '0%, 100%': { opacity: '1' },
           '50%':      { opacity: '0.6' },
         },
+        blob: {
+          '0%':   { transform: 'translate(0px, 0px) scale(1)' },
+          '25%':  { transform: 'translate(40px, -30px) scale(1.08)' },
+          '50%':  { transform: 'translate(-20px, -60px) scale(0.95)' },
+          '75%':  { transform: 'translate(-50px, 20px) scale(1.05)' },
+          '100%': { transform: 'translate(0px, 0px) scale(1)' },
+        },
+        wave: {
+          '0%, 100%': { transform: 'translateX(0) translateY(0)' },
+          '25%':      { transform: 'translateX(-15px) translateY(4px)' },
+          '50%':      { transform: 'translateX(0) translateY(-4px)' },
+          '75%':      { transform: 'translateX(15px) translateY(2px)' },
+        },
+        scrollCue: {
+          '0%':   { transform: 'translateY(0)', opacity: '1' },
+          '40%':  { transform: 'translateY(10px)', opacity: '0.4' },
+          '60%':  { transform: 'translateY(10px)', opacity: '0.4' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        scrollCueFade: {
+          '0%, 100%': { opacity: '1' },
+          '50%':      { opacity: '0.3' },
+        },
       },
-
-      // ─── Transitions ────────────────────────────────────────────────────
-      transitionDuration: {
-        '400': '400ms',
-      },
-
-      // ─── Screen breakpoints (Tailwind defaults, documented here) ────────
-      // sm: 640px  md: 768px  lg: 1024px  xl: 1280px  2xl: 1536px
     },
   },
   plugins: [],
