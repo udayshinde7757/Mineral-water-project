@@ -4,7 +4,8 @@
       "Bash(npx vite *)",
       "Bash(node -e \"const fi = require\\('react-icons/fi'\\); console.log\\(Object.keys\\(fi\\).filter\\(k => k.startsWith\\('Fi'\\)\\).sort\\(\\).join\\('\\\\n'\\)\\)\")",
       "Bash(node -e \"const fi = require\\('react-icons/fi'\\); Object.keys\\(fi\\).filter\\(k => k.startsWith\\('Fi'\\)\\).sort\\(\\).forEach\\(k => console.log\\(k\\)\\)\")",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Read(//c/Users/udays/.claude/projects/C--Programming-Mineral-water-Mineral-water-project/6833d6de-4a95-4cb1-a6b5-cf1405049d3f/subagents/workflows/wf_7f35a6f1-a4d/**)"
     ]
   }
 }

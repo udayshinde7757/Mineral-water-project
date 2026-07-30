@@ -90,7 +90,7 @@ function ProductsPage() {
   }
 
   return (
-    <div className="bg-gradient-to-b from-lightblue/30 via-white to-white min-h-screen py-10 lg:py-16">
+    <div className="bg-background min-h-screen py-10 lg:py-16">
       {/* Toast Notification Alert */}
       <AnimatePresence>
         {toastMessage && (
@@ -98,13 +98,13 @@ function ProductsPage() {
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
-            className="fixed top-24 right-4 sm:right-8 z-50 bg-darkgray text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border border-primary/40"
+            className="fixed top-24 right-4 sm:right-8 z-50 bg-white text-darkgray border border-gray-200 px-5 py-3.5 rounded-2xl shadow-brand-md flex items-center gap-3"
           >
-            <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shrink-0">
               <FiShoppingCart className="w-4 h-4" />
             </div>
             <div>
-              <p className="text-xs font-bold text-teal">Cart Updated</p>
+              <p className="text-xs font-bold text-primary">Cart Updated</p>
               <p className="text-sm font-medium">{toastMessage}</p>
             </div>
           </motion.div>
@@ -114,24 +114,24 @@ function ProductsPage() {
       <div className="container-app space-y-10">
         {/* ─── 1. HERO BANNER ──────────────────────────────────────────────── */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-lightblue text-primary text-xs sm:text-sm font-bold shadow-brand-sm">
-            <FiDroplet className="w-4 h-4 fill-primary" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary text-white text-xs sm:text-sm font-semibold shadow-brand-sm">
+            <FiDroplet className="w-4 h-4 fill-white" />
             <span>100% Pure & Certified Mineral Water</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-darkgray tracking-tight">
+          <h1 className="text-3xl sm:text-5xl font-extrabold text-heading tracking-tight">
             Our Water Products
           </h1>
-          <p className="text-base sm:text-lg text-darkgray-light">
+          <p className="text-base sm:text-lg text-body">
             From personal compact bottles to 20L dispenser jars and corporate refills — pure hydration delivered right to your doorstep.
           </p>
         </div>
 
         {/* ─── 2. SEARCH & FILTER CONTROL BAR ──────────────────────────────── */}
-        <div className="bg-white p-4 sm:p-6 rounded-3xl shadow-card border border-gray-100 space-y-4">
+        <div className="bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-gray-100 space-y-4">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
             {/* Search Input */}
             <div className="relative w-full lg:w-96">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-muted">
                 <FiSearch className="w-5 h-5" />
               </div>
               <input
@@ -139,13 +139,13 @@ function ProductsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by name, size (e.g. 1L, 20L)..."
-                className="w-full pl-11 pr-10 py-3 rounded-2xl border border-gray-200 text-sm text-darkgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50/50 focus:bg-white transition-all"
+                className="w-full pl-11 pr-10 py-3 rounded-2xl border border-gray-200 text-sm text-navy bg-white placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-darkgray"
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-muted hover:text-navy"
                 >
                   <FiX className="w-4 h-4" />
                 </button>
@@ -159,10 +159,10 @@ function ProductsPage() {
                   key={cat}
                   type="button"
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${
+                  className={`px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${
                     selectedCategory === cat
-                      ? 'bg-primary text-white shadow-brand-sm scale-105'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      ? 'bg-primary text-white shadow-sm'
+                      : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700'
                   }`}
                 >
                   {cat}
@@ -172,11 +172,11 @@ function ProductsPage() {
 
             {/* Sort Selector */}
             <div className="flex items-center gap-2 w-full lg:w-auto justify-end">
-              <FiSliders className="w-4 h-4 text-gray-400" />
+              <FiSliders className="w-4 h-4 text-muted" />
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-gray-100 text-darkgray font-medium text-xs sm:text-sm rounded-2xl px-4 py-2.5 border-none focus:ring-2 focus:ring-primary focus:outline-none cursor-pointer"
+                className="bg-white text-navy font-medium text-xs sm:text-sm rounded-2xl px-4 py-2.5 border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none cursor-pointer"
               >
                 <option value="featured">Featured First</option>
                 <option value="price_asc">Price: Low to High</option>
@@ -193,18 +193,18 @@ function ProductsPage() {
             {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
               <div
                 key={n}
-                className="bg-white rounded-3xl p-6 border border-gray-100 shadow-card animate-pulse space-y-4"
+                className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm animate-pulse space-y-4"
               >
-                <div className="h-48 bg-gray-100 rounded-2xl" />
-                <div className="h-6 bg-gray-100 rounded w-3/4" />
-                <div className="h-4 bg-gray-100 rounded w-1/2" />
-                <div className="h-10 bg-gray-100 rounded-xl" />
+                <div className="h-48 bg-gray-100/60 rounded-2xl" />
+                <div className="h-6 bg-gray-100/60 rounded w-3/4" />
+                <div className="h-4 bg-gray-100/60 rounded w-1/2" />
+                <div className="h-10 bg-gray-100/60 rounded-xl" />
               </div>
             ))}
           </div>
         ) : error ? (
           /* Error State */
-          <div className="text-center py-16 bg-white rounded-3xl p-8 shadow-card border border-red-100 space-y-4">
+          <div className="text-center py-16 bg-white rounded-3xl p-8 shadow-sm border border-red-100 space-y-4">
             <p className="text-red-500 font-semibold">{error}</p>
             <button
               type="button"
@@ -215,13 +215,13 @@ function ProductsPage() {
             </button>
           </div>
         ) : products.length === 0 ? (
-          /* Empty Search / Filter State */
-          <div className="text-center py-20 bg-white rounded-3xl p-8 shadow-card border border-gray-100 space-y-4 max-w-lg mx-auto">
-            <div className="w-16 h-16 rounded-full bg-lightblue text-primary mx-auto flex items-center justify-center">
+          {/* Empty Search / Filter State */}
+          <div className="text-center py-20 bg-white rounded-3xl shadow-sm border border-gray-100 space-y-4 max-w-lg mx-auto px-8">
+            <div className="w-16 h-16 rounded-full bg-primary/10 text-primary mx-auto flex items-center justify-center">
               <FiFilter className="w-8 h-8" />
             </div>
-            <h3 className="text-xl font-bold text-darkgray">No products found</h3>
-            <p className="text-sm text-gray-500">
+            <h3 className="text-xl font-bold text-heading">No products found</h3>
+            <p className="text-sm text-body">
               We couldn't find any water products matching your selected filter or search term.
             </p>
             <button

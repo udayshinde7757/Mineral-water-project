@@ -6,7 +6,7 @@ function GalleryHero() {
     <section className="relative overflow-hidden pt-12 pb-16 md:pt-16 md:pb-24 bg-gradient-to-b from-blue-50/60 via-white to-white">
       {/* Decorative blurred background ambient glowing circles */}
       <div aria-hidden="true" className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 overflow-hidden">
-        <div className="absolute -top-20 -left-10 w-96 h-96 rounded-full bg-primary-100/60 blur-3xl opacity-70 animate-pulse-brand" />
+        <div className="absolute -top-20 -left-10 w-96 h-96 rounded-full bg-primary-100/60 blur-3xl opacity-70" />
         <div className="absolute top-10 right-0 w-96 h-96 rounded-full bg-teal-100/60 blur-3xl opacity-60" />
         <div className="absolute top-32 left-1/3 w-80 h-80 rounded-full bg-primary-200/40 blur-3xl opacity-50" />
       </div>
@@ -17,9 +17,9 @@ function GalleryHero() {
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-primary-500/10 via-primary-500/15 to-teal-500/10 border border-primary-200/60 text-primary-700 font-semibold text-xs uppercase tracking-wider shadow-sm mb-6"
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-50 border border-primary-200/60 text-primary-700 font-semibold text-xs uppercase tracking-wider shadow-sm mb-6"
         >
-          <FiDroplet className="w-3.5 h-3.5 text-primary-600 animate-bounce" />
+          <FiDroplet className="w-3.5 h-3.5 text-primary-600" />
           <span>VISUAL STORY</span>
         </motion.div>
 

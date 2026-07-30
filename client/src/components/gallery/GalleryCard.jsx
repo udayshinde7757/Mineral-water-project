@@ -40,20 +40,9 @@ function GalleryCard({ image, index, onClick }) {
 
       {/* ── Top: Category Badge ────────────────────────────────────────── */}
       <div className="absolute top-3 left-3 right-3 z-10 flex items-start gap-2 pointer-events-none">
-        <motion.span
-          className="inline-block px-3 py-1 rounded-full text-xs font-semibold text-white backdrop-blur-md border border-white/20 shadow-sm"
-          style={{ background: 'linear-gradient(135deg, rgba(11,79,108,0.85), rgba(1,186,239,0.65))' }}
-          animate={{
-            boxShadow: [
-              '0 0 0px rgba(1,186,239,0)',
-              '0 0 10px rgba(1,186,239,0.15)',
-              '0 0 0px rgba(1,186,239,0)',
-            ],
-          }}
-          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-        >
+        <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold text-white bg-[#0F4C81] shadow-sm">
           {category}
-        </motion.span>
+        </span>
         {tag && (
           <span className="inline-block px-2.5 py-1 rounded-full text-[11px] font-medium text-gray-200 bg-black/40 backdrop-blur-md border border-white/10">
             {tag}

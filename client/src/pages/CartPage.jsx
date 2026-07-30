@@ -71,7 +71,7 @@ function CartPage() {
 
   if (loading && cartItems.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-lightblue/20 to-white">
+      <div className="min-h-screen flex items-center justify-center bg-[#F8FBFD]">
         <div className="flex flex-col items-center gap-4">
           <FiRefreshCw className="w-10 h-10 text-primary animate-spin" />
           <p className="text-gray-500 font-medium">Loading your hydration cart...</p>
@@ -81,7 +81,7 @@ function CartPage() {
   }
 
   return (
-    <div className="bg-gradient-to-b from-lightblue/30 via-white to-white min-h-screen py-10 lg:py-16">
+    <div className="bg-[#F8FBFD] min-h-screen py-10 lg:py-16">
       <div className="container-app">
         {/* Header */}
         <div className="mb-10 text-center md:text-left">
@@ -103,9 +103,9 @@ function CartPage() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4 }}
-            className="bg-white rounded-3xl p-8 md:p-16 text-center max-w-xl mx-auto shadow-card border border-gray-100 space-y-6"
+            className="bg-white rounded-3xl p-8 md:p-16 text-center max-w-xl mx-auto shadow-sm border border-gray-100 space-y-6"
           >
-            <div className="w-20 h-20 rounded-full bg-lightblue text-primary mx-auto flex items-center justify-center shadow-brand-sm">
+            <div className="w-20 h-20 rounded-full bg-[#F8FBFD] text-primary mx-auto flex items-center justify-center shadow-sm">
               <FiShoppingBag className="w-10 h-10" />
             </div>
             <div className="space-y-2">
@@ -116,7 +116,7 @@ function CartPage() {
             </div>
             <Link
               to={ROUTES.PRODUCTS}
-              className="inline-flex btn-primary !px-8 !py-3.5 text-sm font-bold shadow-brand-md"
+              className="inline-flex btn-primary !px-8 !py-3.5 text-sm font-bold shadow-md"
             >
               Continue Shopping
             </Link>
@@ -124,7 +124,7 @@ function CartPage() {
         ) : (
           /* Cart Content Layout */
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
+
             {/* 1. Cart Items List */}
             <div className="lg:col-span-8 space-y-4">
               <AnimatePresence initial={false}>
@@ -144,7 +144,7 @@ function CartPage() {
                       {/* Product details group */}
                       <div className="flex items-center gap-4 w-full sm:w-auto">
                         {/* Image wrapper */}
-                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-lightblue/40 border border-gray-50 p-2 flex items-center justify-center flex-shrink-0">
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-[#F8FBFD] border border-gray-100 p-2 flex items-center justify-center flex-shrink-0">
                           <img
                             src={product.image}
                             alt={product.name}
@@ -174,17 +174,17 @@ function CartPage() {
                       {/* Controls and calculations */}
                       <div className="flex items-center justify-between sm:justify-end gap-6 sm:gap-8 w-full sm:w-auto border-t sm:border-t-0 pt-4 sm:pt-0">
                         {/* Quantity Controls */}
-                        <div className="flex items-center border border-gray-200 rounded-2xl bg-gray-50/50 p-1">
+                        <div className="flex items-center border border-gray-200 rounded-xl bg-white p-1">
                           <button
                             type="button"
                             onClick={() => handleQuantityChange(product._id, item.quantity, -1)}
                             disabled={item.quantity <= 1 || updatingId === product._id}
-                            className="p-2 rounded-xl text-gray-500 hover:bg-white hover:text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="p-2 rounded-lg text-gray-500 hover:bg-gray-50 hover:text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                             aria-label="Decrease quantity"
                           >
                             <FiMinus className="w-3.5 h-3.5" />
                           </button>
-                          
+
                           <span className="w-10 text-center font-bold text-sm text-darkgray">
                             {item.quantity}
                           </span>
@@ -193,7 +193,7 @@ function CartPage() {
                             type="button"
                             onClick={() => handleQuantityChange(product._id, item.quantity, 1)}
                             disabled={updatingId === product._id || item.quantity >= product.stock}
-                            className="p-2 rounded-xl text-gray-500 hover:bg-white hover:text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="p-2 rounded-lg text-gray-500 hover:bg-gray-50 hover:text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                             aria-label="Increase quantity"
                           >
                             <FiPlus className="w-3.5 h-3.5" />
@@ -228,14 +228,14 @@ function CartPage() {
 
             {/* 2. Price Calculation & Summary Card */}
             <div className="lg:col-span-4">
-              <div className="bg-white rounded-3xl p-6 md:p-8 shadow-card border border-gray-100 space-y-6">
+              <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 space-y-6">
                 <h3 className="text-xl font-bold text-darkgray border-b border-gray-100 pb-4">
                   Order Summary
                 </h3>
 
                 {/* Free delivery progress bar */}
                 {cartSubtotal < FREE_DELIVERY_THRESHOLD && (
-                  <div className="bg-lightblue/40 p-4 rounded-2xl border border-primary/10 space-y-2">
+                  <div className="bg-[#F8FBFD] p-4 rounded-2xl border border-gray-100 space-y-2">
                     <p className="text-xs text-gray-600 font-medium leading-relaxed">
                       Add <span className="font-bold text-primary">{formatCurrency(FREE_DELIVERY_THRESHOLD - cartSubtotal)}</span> more for <span className="font-bold text-teal">Free Delivery!</span>
                     </p>
@@ -254,12 +254,12 @@ function CartPage() {
                     <span>Total Items</span>
                     <span className="font-bold text-darkgray">{cartCount}</span>
                   </div>
-                  
+
                   <div className="flex justify-between">
                     <span>Subtotal</span>
                     <span className="font-bold text-darkgray">{formatCurrency(cartSubtotal)}</span>
                   </div>
-                  
+
                   <div className="flex justify-between items-center">
                     <span className="flex items-center gap-1">
                       <FiTruck className="w-4 h-4 text-primary" /> Delivery Charges
@@ -293,7 +293,7 @@ function CartPage() {
                 <button
                   type="button"
                   onClick={() => navigate(ROUTES.CHECKOUT)}
-                  className="w-full btn-primary !py-4 text-base font-bold flex items-center justify-center gap-2 shadow-brand-md hover:shadow-brand-lg"
+                  className="w-full bg-[#0F4C81] hover:bg-[#0F4C81]/90 text-white !py-4 text-base font-bold flex items-center justify-center gap-2 rounded-2xl shadow-md hover:shadow-lg transition-all"
                 >
                   <span>Proceed to Checkout</span>
                   <FiArrowRight className="w-5 h-5 animate-pulse" />

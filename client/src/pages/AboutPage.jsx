@@ -45,7 +45,7 @@ function AboutPage() {
       year: '2016',
       title: 'Multi-Stage Purification Tech',
       desc: 'Pioneered advanced 7-stage filtration and UV sterilization while keeping natural electrolytes 100% intact.',
-      icon: <FiCpu className="w-6 h-6 text-teal" />,
+      icon: <FiCpu className="w-6 h-6 text-[#22D3EE]" />,
     },
     {
       year: '2021',
@@ -57,7 +57,7 @@ function AboutPage() {
       year: '2026',
       title: 'Sustainable Hydration Leadership',
       desc: 'Celebrating 15 years of excellence with carbon-neutral logistics, digital smart delivery, and global purity standards.',
-      icon: <FiAward className="w-6 h-6 text-teal" />,
+      icon: <FiAward className="w-6 h-6 text-[#22D3EE]" />,
     },
   ]
 
@@ -77,9 +77,9 @@ function AboutPage() {
       title: 'Multi-Stage Filtration',
       subtitle: 'Microscopic Level Purification',
       desc: 'Passed through dual sand filters, carbon beds, and sub-micron membranes to eliminate all suspended sediment, organic compounds, and micro-impurities.',
-      icon: <FiShield className="w-7 h-7 text-teal" />,
-      color: 'from-teal/10 to-teal/5',
-      borderColor: 'border-teal/20',
+      icon: <FiShield className="w-7 h-7 text-[#22D3EE]" />,
+      color: 'from-[#22D3EE]/10 to-[#22D3EE]/5',
+      borderColor: 'border-[#22D3EE]/20',
     },
     {
       step: '03',
@@ -95,9 +95,9 @@ function AboutPage() {
       title: 'UV Sterilization & Quality Control',
       subtitle: 'Rigorous Batch Testing',
       desc: 'Subjected to double UV radiation disinfection and continuous automated lab testing before being sealed in eco-friendly, sanitized containers.',
-      icon: <FiZap className="w-7 h-7 text-teal" />,
-      color: 'from-teal/10 to-teal/5',
-      borderColor: 'border-teal/20',
+      icon: <FiZap className="w-7 h-7 text-[#22D3EE]" />,
+      color: 'from-[#22D3EE]/10 to-[#22D3EE]/5',
+      borderColor: 'border-[#22D3EE]/20',
     },
   ]
 
@@ -113,7 +113,7 @@ function AboutPage() {
     {
       name: 'Shreyas Lande',
       role: 'Co-Founder & IT Lead',
-      bio: 'Technology pioneer leading AquaPure’s digital transformation, e-commerce platform, and smart supply chain systems.',
+      bio: 'Technology pioneer leading AquaPure\'s digital transformation, e-commerce platform, and smart supply chain systems.',
       image: '/images/shreyas_lande.png',
       badge: 'Co-Founder',
     },
@@ -124,8 +124,8 @@ function AboutPage() {
       {/* ─── 1. HERO SECTION ──────────────────────────────────────────────── */}
       <section className="relative py-20 lg:py-32 bg-gradient-to-b from-lightblue/60 via-white to-white overflow-hidden">
         {/* Decorative Ambient Glowing Orbs */}
-        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-brand opacity-10 blur-3xl rounded-full pointer-events-none" />
-        <div className="absolute top-1/3 -right-20 w-80 h-80 bg-teal/10 blur-3xl rounded-full pointer-events-none" />
+        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[#0F4C81] opacity-10 blur-3xl rounded-full pointer-events-none" />
+        <div className="absolute top-1/3 -right-20 w-80 h-80 bg-[#22D3EE]/10 blur-3xl rounded-full pointer-events-none" />
 
         <div className="container-app relative z-10 text-center max-w-4xl mx-auto">
           <motion.div
@@ -273,7 +273,7 @@ function AboutPage() {
               >
                 {/* Top Badge */}
                 <div className="flex items-center justify-between mb-6">
-                  <span className="text-3xl font-black text-gradient">{item.year}</span>
+                  <span className="text-3xl font-black text-primary">{item.year}</span>
                   <div className="w-12 h-12 rounded-2xl bg-lightblue/80 flex items-center justify-center shadow-brand-sm group-hover:bg-primary group-hover:text-white transition-colors duration-300">
                     {item.icon}
                   </div>
@@ -288,7 +288,7 @@ function AboutPage() {
                 </p>
 
                 {/* Decorative Top Accent Line */}
-                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-brand opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute top-0 inset-x-0 h-1 bg-[#0F4C81] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </motion.div>
             ))}
           </div>
@@ -325,12 +325,12 @@ function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-gradient-to-br from-teal/10 via-white to-white p-8 sm:p-10 rounded-3xl border border-teal/20 shadow-card relative overflow-hidden"
+              className="bg-gradient-to-br from-[#22D3EE]/10 via-white to-white p-8 sm:p-10 rounded-3xl border border-[#22D3EE]/20 shadow-card relative overflow-hidden"
             >
-              <div className="w-14 h-14 rounded-2xl bg-teal text-white flex items-center justify-center text-2xl mb-6 shadow-brand-md">
+              <div className="w-14 h-14 rounded-2xl bg-[#22D3EE] text-white flex items-center justify-center text-2xl mb-6 shadow-brand-md">
                 <FiGlobe className="w-7 h-7" />
               </div>
-              <p className="text-xs uppercase tracking-widest text-teal font-bold mb-2">Future Outlook</p>
+              <p className="text-xs uppercase tracking-widest text-[#22D3EE] font-bold mb-2">Future Outlook</p>
               <h3 className="text-2xl sm:text-3xl font-extrabold text-darkgray mb-4">
                 Our Vision
               </h3>
@@ -349,7 +349,7 @@ function AboutPage() {
             <p className="section-label mb-2">Uncompromising Purity</p>
             <h2 className="section-title">Our 4-Step Water Purification Process</h2>
             <p className="section-subtitle mx-auto">
-              How we transform pristine aquifer water into nature’s most refreshing, mineral-balanced drink.
+              How we transform pristine aquifer water into nature's most refreshing, mineral-balanced drink.
             </p>
           </div>
 
@@ -377,7 +377,7 @@ function AboutPage() {
                   <h3 className="text-xl font-bold text-darkgray mb-1 group-hover:text-primary transition-colors">
                     {step.title}
                   </h3>
-                  <p className="text-xs font-semibold text-teal mb-4">
+                  <p className="text-xs font-semibold text-[#22D3EE] mb-4">
                     {step.subtitle}
                   </p>
                   <p className="text-sm text-gray-600 leading-relaxed">
@@ -386,7 +386,7 @@ function AboutPage() {
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-gray-100 flex items-center gap-2 text-xs font-semibold text-primary">
-                  <FiCheckCircle className="w-4 h-4 text-teal" />
+                  <FiCheckCircle className="w-4 h-4 text-[#22D3EE]" />
                   <span>Quality Verified Stage</span>
                 </div>
               </motion.div>
@@ -435,7 +435,7 @@ function AboutPage() {
             <h3 className="text-xl font-bold text-darkgray group-hover:text-primary transition-colors">
               {member.name}
             </h3>
-            <p className="text-xs font-semibold text-teal mb-3">
+            <p className="text-xs font-semibold text-[#22D3EE] mb-3">
               {member.role}
             </p>
             <p className="text-xs text-gray-600 leading-relaxed">
@@ -449,7 +449,7 @@ function AboutPage() {
 </section>
 
       {/* ─── 7. CALL TO ACTION BANNER ──────────────────────────────────────── */}
-      <section className="py-16 bg-gradient-brand text-white relative overflow-hidden">
+      <section className="py-16 bg-[#0F4C81] text-white relative overflow-hidden">
         <div className="container-app relative z-10 text-center max-w-3xl mx-auto space-y-6">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white">
             Experience Pure Hydration Today

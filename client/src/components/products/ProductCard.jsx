@@ -52,35 +52,29 @@ function ProductCard({ product, onAddToCart, onBuyNow }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -6 }}
+      whileHover={{ y: -4 }}
       transition={{ duration: 0.3 }}
-      className="card group flex flex-col justify-between overflow-hidden bg-white rounded-3xl border border-gray-100 shadow-card hover:shadow-card-hover transition-all duration-300"
+      className="group flex flex-col justify-between overflow-hidden bg-white rounded-3xl border border-gray-100/80 shadow-sm hover:shadow-md transition-all duration-300"
     >
       {/* Top Image Container */}
-      <div className="relative h-56 sm:h-64 bg-gradient-to-b from-lightblue/40 via-white to-white p-4 flex items-center justify-center overflow-hidden">
+      <div className="relative h-56 sm:h-64 bg-gradient-to-b from-primary-50/40 via-white to-white p-4 flex items-center justify-center overflow-hidden">
         {/* Badges */}
         <div className="absolute top-4 left-4 z-10 flex flex-wrap gap-2">
           {/* Category Badge */}
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/90 backdrop-blur-md text-primary shadow-sm border border-primary/10">
+          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-primary-50 text-primary">
             {product.category}
           </span>
-          {/* Featured Badge */}
-          {product.isFeatured && (
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-teal text-white shadow-sm flex items-center gap-1">
-              <FiStar className="w-3 h-3 fill-white" /> Featured
-            </span>
-          )}
         </div>
 
         {/* Size Badge */}
         <div className="absolute top-4 right-4 z-10">
-          <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-primary text-white shadow-brand-sm flex items-center gap-1">
+          <span className="px-3 py-1 rounded-full text-xs font-bold bg-primary text-white flex items-center gap-1">
             <FiDroplet className="w-3 h-3 fill-white" />
             {product.size}
           </span>
         </div>
 
-        {/* Product Image — Properly scaled without awkward cropping */}
+        {/* Product Image */}
         <img
           src={product.image}
           alt={product.name}
@@ -113,8 +107,7 @@ function ProductCard({ product, onAddToCart, onBuyNow }) {
             </div>
 
             {/* Stock */}
-            <span className="flex items-center gap-1 font-medium text-emerald-600">
-              <FiCheckCircle className="w-3.5 h-3.5" />
+            <span className="font-medium text-emerald-600">
               In Stock ({product.stock})
             </span>
           </div>
@@ -127,7 +120,7 @@ function ProductCard({ product, onAddToCart, onBuyNow }) {
             <span className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
               Price
             </span>
-            <span className="text-2xl font-extrabold text-darkgray">
+            <span className="text-3xl font-extrabold text-darkgray">
               {formattedPrice}
             </span>
           </div>
@@ -139,7 +132,7 @@ function ProductCard({ product, onAddToCart, onBuyNow }) {
               type="button"
               onClick={handleAddToCart}
               disabled={adding}
-              className="w-full py-2.5 px-3 rounded-xl bg-lightblue hover:bg-primary text-primary hover:text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-200 shadow-sm"
+              className="w-full py-2.5 px-3 rounded-xl bg-primary-50/60 hover:bg-primary-100 text-primary text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-200"
             >
               {adding ? (
                 <>
@@ -158,7 +151,7 @@ function ProductCard({ product, onAddToCart, onBuyNow }) {
             <button
               type="button"
               onClick={() => onBuyNow(product)}
-              className="w-full btn-primary !py-2.5 !px-3 !text-xs !rounded-xl font-bold flex items-center justify-center gap-1.5 shadow-brand-sm hover:shadow-brand-md"
+              className="w-full py-2.5 px-3 rounded-xl bg-[#0F4C81] hover:bg-[#0d3f6a] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-200 shadow-sm hover:shadow-md"
             >
               <FiZap className="w-4 h-4 fill-white" />
               <span>Buy Now</span>

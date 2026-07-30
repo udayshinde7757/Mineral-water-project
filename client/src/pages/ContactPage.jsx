@@ -26,17 +26,17 @@ function ContactPage() {
   }, [])
 
   return (
-    <div className="bg-white overflow-hidden">
+    <div className="overflow-hidden">
       {/* Hero */}
-      <section className="relative py-20 lg:py-28 bg-gradient-to-b from-lightblue/60 via-white to-white overflow-hidden">
-        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-brand opacity-10 blur-3xl rounded-full pointer-events-none" />
-        <div className="absolute top-1/3 -right-20 w-80 h-80 bg-teal/10 blur-3xl rounded-full pointer-events-none" />
+      <section className="relative py-20 lg:py-28 bg-gradient-to-b from-background via-white to-white overflow-hidden">
+        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-brand opacity-[0.07] blur-2xl rounded-full pointer-events-none" />
+        <div className="absolute top-1/3 -right-20 w-80 h-80 bg-teal/[0.08] blur-xl rounded-full pointer-events-none" />
 
         <div className="container-app relative z-10 text-center max-w-4xl mx-auto">
           <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="space-y-6">
             <motion.div
               variants={fadeInUp}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-lightblue border border-primary/20 text-primary text-xs sm:text-sm font-semibold shadow-brand-sm"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background border border-primary/20 text-primary text-xs sm:text-sm font-semibold shadow-brand-sm"
             >
               <FiDroplet className="w-4 h-4 fill-primary" />
               <span>We&apos;re Here for You</span>
@@ -68,7 +68,7 @@ function ContactPage() {
       </section>
 
       {/* Team */}
-      <section className="section-padding bg-gradient-to-b from-gray-50/80 to-white">
+      <section className="section-padding bg-gradient-to-b from-background/80 to-white">
         <div className="container-app">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <p className="section-label mb-2">Leadership</p>
@@ -80,7 +80,7 @@ function ContactPage() {
       </section>
 
       {/* Form + sidebar */}
-      <section className="section-padding bg-gradient-to-b from-lightblue/20 via-white to-white">
+      <section className="section-padding bg-gradient-to-b from-altSection/30 via-white to-white">
         <div className="container-app max-w-6xl">
           <AnimatePresence mode="wait">
             {submitted ? (
@@ -90,7 +90,7 @@ function ContactPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="max-w-xl mx-auto bg-white/95 backdrop-blur-md rounded-3xl p-10 sm:p-12 border border-gray-100 shadow-card-hover text-center space-y-5"
               >
-                <div className="w-20 h-20 bg-lightblue rounded-full flex items-center justify-center mx-auto">
+                <div className="w-20 h-20 bg-background/80 rounded-full flex items-center justify-center mx-auto">
                   <FiCheckCircle className="w-11 h-11 text-primary" />
                 </div>
                 <p className="text-lg sm:text-xl text-darkgray font-semibold leading-relaxed">
