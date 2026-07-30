@@ -139,14 +139,14 @@ function EnquiryPage() {
   // ─── SUCCESS STATE ─────────────────────────────────────────────────────────
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-emerald-50 via-white to-white flex items-center justify-center px-4 py-20">
+      <div className="bg-background min-h-screen flex items-center justify-center px-4 py-20">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="bg-white rounded-3xl p-10 sm:p-14 max-w-lg w-full shadow-2xl border border-gray-100 text-center space-y-6"
         >
-          <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto">
-            <FiCheckCircle className="w-11 h-11 text-emerald-600" />
+          <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto">
+            <FiCheckCircle className="w-11 h-11 text-primary" />
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-darkgray">
             Enquiry Submitted Successfully!
@@ -155,15 +155,15 @@ function EnquiryPage() {
             Thank you for reaching out to <strong>AquaPure</strong>. Your enquiry has been saved in our database. A confirmation email has been sent to your inbox, and our team will contact you within 24 business hours.
           </p>
 
-          <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100 space-y-2 text-left text-sm">
-            <p className="font-bold text-emerald-900">What happens next?</p>
-            <p className="flex items-start gap-2 text-emerald-700">
+          <div className="bg-primary-50 p-4 rounded-2xl border border-primary-100 space-y-2 text-left text-sm">
+            <p className="font-bold text-primary-800">What happens next?</p>
+            <p className="flex items-start gap-2 text-primary-600">
               <FiCheckCircle className="flex-shrink-0 mt-0.5" /> Confirmation email dispatched to your inbox
             </p>
-            <p className="flex items-start gap-2 text-emerald-700">
+            <p className="flex items-start gap-2 text-primary-600">
               <FiCheckCircle className="flex-shrink-0 mt-0.5" /> Manager reviews your product requirement
             </p>
-            <p className="flex items-start gap-2 text-emerald-700">
+            <p className="flex items-start gap-2 text-primary-600">
               <FiCheckCircle className="flex-shrink-0 mt-0.5" /> You get a customised quote within 24 hours
             </p>
           </div>
@@ -189,7 +189,7 @@ function EnquiryPage() {
 
   // ─── FORM STATE ────────────────────────────────────────────────────────────
   return (
-    <div className="section-padding bg-gradient-to-b from-lightblue/20 via-white to-white min-h-screen">
+    <div className="bg-background section-padding min-h-screen">
       <div className="container-app max-w-5xl">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-10 space-y-3">
@@ -204,7 +204,7 @@ function EnquiryPage() {
           {/* Left: Info Panel */}
           <div className="lg:col-span-4 space-y-5">
             {/* Why enquire box */}
-            <div className="bg-gradient-brand text-white p-6 rounded-3xl shadow-brand-md space-y-4">
+            <div className="bg-primary text-white p-6 rounded-3xl shadow-brand-md space-y-4">
               <h3 className="text-lg font-extrabold">Why Submit an Enquiry?</h3>
               <ul className="space-y-2.5 text-sm">
                 {[
@@ -223,7 +223,7 @@ function EnquiryPage() {
             </div>
 
             {/* WhatsApp Quick Contact */}
-            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-card space-y-4">
+            <div className="bg-white rounded-3xl p-6 shadow-card space-y-4">
               <h3 className="text-base font-extrabold text-darkgray">Prefer Direct Contact?</h3>
               <a
                 href="tel:+919356212824"
@@ -291,7 +291,7 @@ function EnquiryPage() {
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="Your full name"
-                      className={`w-full px-4 py-3 rounded-2xl border text-sm text-darkgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50/50 focus:bg-white transition-all ${
+                      className={`w-full px-4 py-3 rounded-2xl border text-sm text-darkgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-white transition-all ${
                         validationErrors.name ? 'border-red-400' : 'border-gray-200'
                       }`}
                     />
@@ -311,7 +311,7 @@ function EnquiryPage() {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="your@email.com"
-                      className={`w-full px-4 py-3 rounded-2xl border text-sm text-darkgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50/50 focus:bg-white transition-all ${
+                      className={`w-full px-4 py-3 rounded-2xl border text-sm text-darkgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-white transition-all ${
                         validationErrors.email ? 'border-red-400' : 'border-gray-200'
                       }`}
                     />
@@ -334,7 +334,7 @@ function EnquiryPage() {
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder="+91 9876543210"
-                      className={`w-full px-4 py-3 rounded-2xl border text-sm text-darkgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50/50 focus:bg-white transition-all ${
+                      className={`w-full px-4 py-3 rounded-2xl border text-sm text-darkgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-white transition-all ${
                         validationErrors.phone ? 'border-red-400' : 'border-gray-200'
                       }`}
                     />
@@ -354,7 +354,7 @@ function EnquiryPage() {
                       min="1"
                       value={formData.quantity}
                       onChange={handleChange}
-                      className={`w-full px-4 py-3 rounded-2xl border text-sm text-darkgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50/50 focus:bg-white transition-all ${
+                      className={`w-full px-4 py-3 rounded-2xl border text-sm text-darkgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-white transition-all ${
                         validationErrors.quantity ? 'border-red-400' : 'border-gray-200'
                       }`}
                     />
@@ -374,7 +374,7 @@ function EnquiryPage() {
                     name="productId"
                     value={formData.productId}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-2xl border border-gray-200 text-sm text-darkgray bg-gray-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer"
+                    className="w-full px-4 py-3 rounded-2xl border border-gray-200 text-sm text-darkgray bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all cursor-pointer"
                   >
                     <option value="">— Select a product (Optional) —</option>
                     {products.map((p) => (
@@ -397,7 +397,7 @@ function EnquiryPage() {
                     value={formData.message}
                     onChange={handleChange}
                     placeholder="Describe your bulk order requirements, delivery frequency, business details, or any questions..."
-                    className={`w-full px-4 py-3 rounded-2xl border text-sm text-darkgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50/50 focus:bg-white transition-all resize-none ${
+                    className={`w-full px-4 py-3 rounded-2xl border text-sm text-darkgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-white transition-all resize-none ${
                       validationErrors.message ? 'border-red-400' : 'border-gray-200'
                     }`}
                   />

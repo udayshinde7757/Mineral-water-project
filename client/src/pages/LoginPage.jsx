@@ -54,16 +54,12 @@ function LoginPage() {
   }
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-lightblue/50 via-white to-lightblue/30">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 sm:p-10 rounded-3xl shadow-card border border-gray-100 relative overflow-hidden">
-        {/* Decorative Water Drop Gradient Glow */}
-        <div className="absolute -top-12 -right-12 w-32 h-32 bg-primary/10 rounded-full blur-2xl pointer-events-none" />
-        <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-teal/10 rounded-full blur-2xl pointer-events-none" />
-
+    <div className="min-h-[85vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-white to-white">
+      <div className="max-w-md w-full space-y-8 bg-white p-8 sm:p-10 rounded-3xl shadow-lg border border-gray-100">
         {/* Brand Header */}
-        <div className="text-center relative">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-lightblue rounded-2xl mb-4 text-primary shadow-brand-sm">
-            <FiDroplet className="w-8 h-8 text-primary animate-pulse" />
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-14 h-14 bg-primary rounded-2xl mb-4">
+            <FiDroplet className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-3xl font-extrabold text-darkgray tracking-tight">
             Welcome Back
@@ -75,7 +71,7 @@ function LoginPage() {
 
         {/* Error Alert */}
         {error && (
-          <div className="flex items-center gap-3 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl text-red-700 text-sm animate-fadeIn">
+          <div className="flex items-center gap-3 bg-red-50 border border-red-200 p-3 rounded-xl text-red-700 text-sm">
             <FiAlertCircle className="w-5 h-5 flex-shrink-0 text-red-500" />
             <span>{error}</span>
           </div>
@@ -89,7 +85,7 @@ function LoginPage() {
               <label htmlFor="email" className="block text-sm font-semibold text-darkgray mb-1.5">
                 Email Address
               </label>
-              <div className="relative rounded-xl shadow-sm">
+              <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
                   <FiMail className="w-5 h-5" />
                 </div>
@@ -102,7 +98,7 @@ function LoginPage() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="name@example.com"
-                  className="block w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl text-darkgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-sm bg-gray-50/50 focus:bg-white"
+                  className="block w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl text-darkgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-sm bg-white"
                 />
               </div>
             </div>
@@ -112,7 +108,7 @@ function LoginPage() {
               <label htmlFor="password" className="block text-sm font-semibold text-darkgray mb-1.5">
                 Password
               </label>
-              <div className="relative rounded-xl shadow-sm">
+              <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
                   <FiLock className="w-5 h-5" />
                 </div>
@@ -125,7 +121,7 @@ function LoginPage() {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="block w-full pl-11 pr-11 py-3 border border-gray-200 rounded-xl text-darkgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-sm bg-gray-50/50 focus:bg-white"
+                  className="block w-full pl-11 pr-11 py-3 border border-gray-200 rounded-xl text-darkgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-sm bg-white"
                 />
                 <button
                   type="button"
@@ -143,7 +139,7 @@ function LoginPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full btn-primary !py-3.5 !rounded-xl text-base shadow-brand-md hover:shadow-brand-lg transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full bg-primary text-white !py-3.5 !rounded-xl hover:opacity-90 focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed shadow-md"
             >
               {isSubmitting ? (
                 <div className="flex items-center justify-center gap-2">

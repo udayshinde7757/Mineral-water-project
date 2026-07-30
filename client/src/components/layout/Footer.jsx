@@ -23,9 +23,9 @@ function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="bg-darkgray text-white" aria-label="Site footer">
+    <footer className="bg-[#0A2540] text-white" aria-label="Site footer">
       {/* CTA Banner */}
-      <div className="bg-gradient-brand px-4 py-10">
+      <div className="bg-[#0F4C81] px-4 py-10">
         <div className="container-app flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
           <div>
             <h2 className="text-xl sm:text-2xl font-extrabold text-white">Ready to Order?</h2>
@@ -55,10 +55,10 @@ function Footer() {
         {/* Brand Column */}
         <div className="space-y-4 lg:col-span-1">
           <Link to={ROUTES.HOME} className="flex items-center gap-2">
-            <div className="w-9 h-9 bg-gradient-brand rounded-xl flex items-center justify-center">
+            <div className="w-9 h-9 bg-[#0F4C81] rounded-xl flex items-center justify-center">
               <FiDroplet className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-extrabold text-gradient">AquaPure</span>
+            <span className="text-xl font-extrabold text-white">AquaPure</span>
           </Link>
           <p className="text-white/60 text-sm leading-relaxed max-w-xs">
             India's leading mineral water brand delivering pure, natural hydration since 2011. From source to bottle, purity guaranteed.
@@ -72,7 +72,7 @@ function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="w-9 h-9 rounded-xl bg-white/10 hover:bg-gradient-brand flex items-center justify-center transition-all hover:scale-105"
+                className="w-9 h-9 rounded-xl bg-white/10 hover:bg-[#0F4C81] flex items-center justify-center transition-all hover:scale-105 hover:shadow-lg"
               >
                 <Icon className="w-4 h-4 text-white/70 hover:text-white" />
               </a>
@@ -88,9 +88,9 @@ function Footer() {
               <li key={to}>
                 <Link
                   to={to}
-                  className="text-white/60 hover:text-white text-sm transition-colors flex items-center gap-1.5 group"
+                  className="text-white/60 hover:text-white text-sm transition-all duration-300 flex items-center gap-1.5 group hover:translate-x-1"
                 >
-                  <FiArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <FiArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-x-1 group-hover:translate-x-0" />
                   {label}
                 </Link>
               </li>
@@ -106,9 +106,9 @@ function Footer() {
               <li key={item}>
                 <Link
                   to={ROUTES.PRODUCTS}
-                  className="text-white/60 hover:text-white text-sm transition-colors flex items-center gap-1.5 group"
+                  className="text-white/60 hover:text-white text-sm transition-all duration-300 flex items-center gap-1.5 group hover:translate-x-1"
                 >
-                  <FiArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <FiArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-x-1 group-hover:translate-x-0" />
                   {item}
                 </Link>
               </li>
@@ -123,7 +123,7 @@ function Footer() {
             <li>
               <a
                 href="tel:+919356212824"
-                className="flex items-start gap-3 text-sm text-white/60 hover:text-white transition-colors"
+                className="flex items-start gap-3 text-sm text-white/60 hover:text-white transition-all duration-300 hover:translate-x-1"
               >
                 <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
                   <FiPhone className="w-4 h-4" />
@@ -137,7 +137,7 @@ function Footer() {
             <li>
               <a
                 href="mailto:shreyaslande200@gmail.com"
-                className="flex items-start gap-3 text-sm text-white/60 hover:text-white transition-colors"
+                className="flex items-start gap-3 text-sm text-white/60 hover:text-white transition-all duration-300 hover:translate-x-1"
               >
                 <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
                   <FiMail className="w-4 h-4" />
@@ -148,7 +148,7 @@ function Footer() {
                 </div>
               </a>
             </li>
-            <li className="flex items-start gap-3 text-sm text-white/60">
+            <li className="flex items-start gap-3 text-sm text-white/60 transition-all duration-300 hover:translate-x-1">
               <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
                 <FiMapPin className="w-4 h-4" />
               </div>

@@ -86,10 +86,10 @@ function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 inset-x-0 z-40 transition-all duration-300 ${
+      className={`fixed top-0 inset-x-0 z-40 bg-white/90 backdrop-blur-lg border-b border-gray-100/80 transition-all duration-500 ${
         scrolled
-          ? 'frosted-glass-solid shadow-md'
-          : 'frosted-glass'
+          ? 'shadow-sm mx-auto max-w-7xl rounded-2xl top-2'
+          : ''
       }`}
     >
       <div className="container-app flex items-center justify-between h-16 sm:h-20">
@@ -99,21 +99,13 @@ function Navbar() {
           className="flex items-center gap-2 text-xl sm:text-2xl font-bold tracking-tight"
           style={{ fontFamily: 'var(--font-display)' }}
         >
-          <motion.div
+          <div
             className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, #0B4F6C, #01BAEF)' }}
-            animate={{
-              boxShadow: [
-                '0 2px 12px rgba(11, 79, 108, 0.12)',
-                '0 2px 24px rgba(1, 186, 239, 0.35)',
-                '0 2px 12px rgba(11, 79, 108, 0.12)',
-              ],
-            }}
-            transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ backgroundColor: '#0F4F81' }}
           >
             <FiDroplet className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-          </motion.div>
-          <span className="text-gradient">AquaPure</span>
+          </div>
+          <span style={{ color: '#0F4F81' }}>AquaPure</span>
         </Link>
 
         {/* Desktop Navigation Links */}
@@ -137,7 +129,7 @@ function Navbar() {
                     <motion.div
                       layoutId="nav-underline"
                       className="absolute -bottom-1 left-0 right-0 h-[2.5px] rounded-full"
-                      style={{ background: 'linear-gradient(90deg, #0B4F6C, #01BAEF)' }}
+                      style={{ backgroundColor: '#0F4F81' }}
                     />
                   )}
                 </span>
@@ -163,7 +155,7 @@ function Navbar() {
                   animate={{ scale: 1, transition: { type: 'spring', stiffness: 500, damping: 15 } }}
                   whileHover={{ scale: 1.15 }}
                   className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-extrabold shadow-brand-sm"
-                  style={{ background: 'linear-gradient(135deg, #0B4F6C, #01BAEF)' }}
+                  style={{ backgroundColor: '#0F4F81' }}
                 >
                   {cartCount}
                 </motion.span>
@@ -179,14 +171,14 @@ function Navbar() {
                 onClick={() => setDropdownOpen((prev) => !prev)}
                 className="flex items-center gap-2 px-4 py-2 rounded-full font-medium text-sm transition-all border shadow-sm focus:outline-none"
                 style={{
-                  background: 'rgba(11, 79, 108, 0.06)',
-                  color: '#0B4F6C',
-                  borderColor: 'rgba(11, 79, 108, 0.15)',
+                  background: 'rgba(15, 79, 129, 0.06)',
+                  color: '#0F4F81',
+                  borderColor: 'rgba(15, 79, 129, 0.15)',
                 }}
                 aria-expanded={dropdownOpen}
               >
                 <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white"
-                     style={{ background: 'linear-gradient(135deg, #0B4F6C, #01BAEF)' }}>
+                     style={{ backgroundColor: '#0F4F81' }}>
                   {user?.fullname ? user.fullname.charAt(0).toUpperCase() : 'U'}
                 </div>
                 <span className="font-semibold max-w-[120px] truncate">
@@ -218,7 +210,7 @@ function Navbar() {
                         {user?.fullname}
                       </p>
                       <div className="flex items-center gap-1.5 text-xs text-gray-500 truncate mt-0.5">
-                        <FiMail className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#0B4F6C' }} />
+                        <FiMail className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#0F4F81' }} />
                         <span className="truncate">{user?.email}</span>
                       </div>
                     </div>
@@ -228,9 +220,8 @@ function Navbar() {
                         to={ROUTES.MY_ORDERS}
                         onClick={() => setDropdownOpen(false)}
                         className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-primary-50/50 rounded-xl transition-colors"
-                        style={{ hover: { color: '#0B4F6C' } }}
                       >
-                        <FiPackage className="w-4 h-4" style={{ color: '#0B4F6C' }} />
+                        <FiPackage className="w-4 h-4" style={{ color: '#0F4F81' }} />
                         <span>My Orders</span>
                       </Link>
                       <button
@@ -280,7 +271,7 @@ function Navbar() {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1, transition: { type: 'spring', stiffness: 500, damping: 15 } }}
                   className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-extrabold text-white shadow-brand-sm"
-                  style={{ background: 'linear-gradient(135deg, #0B4F6C, #01BAEF)' }}
+                  style={{ backgroundColor: '#0F4F81' }}
                 >
                   {cartCount}
                 </motion.span>
@@ -319,8 +310,7 @@ function Navbar() {
                     className={({ isActive }) =>
                       `px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                         isActive
-                          ? 'text-white font-semibold' +
-                            ' [background:linear-gradient(135deg,#0B4F6C,#01BAEF)]'
+                          ? 'text-white font-semibold bg-[#0F4F81]'
                           : 'text-gray-700 hover:bg-primary-50/50'
                       }`
                     }
@@ -336,15 +326,14 @@ function Navbar() {
                       className={({ isActive }) =>
                         `px-3 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center justify-between ${
                           isActive
-                            ? 'text-white font-semibold' +
-                              ' [background:linear-gradient(135deg,#0B4F6C,#01BAEF)]'
+                            ? 'text-white font-semibold bg-[#0F4F81]'
                             : 'text-gray-700 hover:bg-primary-50/50'
                         }`
                       }
                     >
                       <span>Cart</span>
                       <span className="rounded-full px-2.5 py-0.5 text-[10px] font-extrabold text-white"
-                            style={{ background: 'linear-gradient(135deg, #0B4F6C, #01BAEF)' }}>
+                            style={{ backgroundColor: '#0F4F81' }}>
                         {cartCount}
                       </span>
                     </NavLink>
@@ -354,8 +343,7 @@ function Navbar() {
                       className={({ isActive }) =>
                         `px-3 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 ${
                           isActive
-                            ? 'text-white font-semibold' +
-                              ' [background:linear-gradient(135deg,#0B4F6C,#01BAEF)]'
+                            ? 'text-white font-semibold bg-[#0F4F81]'
                             : 'text-gray-700 hover:bg-primary-50/50'
                         }`
                       }
@@ -371,7 +359,7 @@ function Navbar() {
                 {isAuthenticated ? (
                   <div className="space-y-3">
                     <div className="px-3 py-2.5 rounded-xl"
-                         style={{ background: 'rgba(11, 79, 108, 0.04)' }}>
+                         style={{ background: 'rgba(15, 79, 129, 0.04)' }}>
                       <p className="text-xs text-gray-500 font-medium">Logged in user</p>
                       <p className="text-sm font-bold text-navy">{user?.fullname}</p>
                       <p className="text-xs text-gray-600 truncate">{user?.email}</p>
@@ -408,10 +396,6 @@ function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
-      {/* Gradient bottom border */}
-      <div className="absolute bottom-0 left-0 right-0 h-px pointer-events-none"
-           style={{ background: 'linear-gradient(90deg, transparent, rgba(1,186,239,0.25), rgba(11,79,108,0.35), rgba(1,186,239,0.25), transparent)' }} />
-
     </header>
   )
 }

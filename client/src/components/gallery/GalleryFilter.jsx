@@ -14,7 +14,7 @@ function GalleryFilter({ activeCategory, onSelectCategory, counts }) {
             onClick={() => onSelectCategory(cat)}
             className={`group relative px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 transform active:scale-95 flex items-center gap-2 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary ${
               isActive
-                ? 'bg-gradient-to-r from-primary to-teal text-white shadow-brand-md scale-105'
+                ? 'bg-[#0F4C81] text-white shadow-md scale-105'
                 : 'bg-white text-gray-700 border border-gray-200 hover:border-primary/30 hover:text-primary hover:bg-lightblue/50 shadow-sm'
             }`}
           >

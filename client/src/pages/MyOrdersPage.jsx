@@ -112,17 +112,17 @@ function MyOrdersPage() {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'Placed':
-        return <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-600 border border-blue-200">Order Placed</span>
+        return <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700">Order Placed</span>
       case 'Confirmed':
-        return <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-600 border border-indigo-200">Confirmed</span>
+        return <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-700">Confirmed</span>
       case 'Shipped':
-        return <span className="px-3 py-1 rounded-full text-xs font-bold bg-yellow-50 text-yellow-700 border border-yellow-200">Out for Delivery</span>
+        return <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700">Out for Delivery</span>
       case 'Delivered':
-        return <span className="px-3 py-1 rounded-full text-xs font-bold bg-teal/10 text-teal border border-teal/20">Delivered</span>
+        return <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700">Delivered</span>
       case 'Cancelled':
-        return <span className="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-600 border border-red-200">Cancelled</span>
+        return <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-red-50 text-red-600">Cancelled</span>
       default:
-        return <span className="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600">{status}</span>
+        return <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-600">{status}</span>
     }
   }
 
@@ -135,13 +135,13 @@ function MyOrdersPage() {
   })
 
   return (
-    <div className="bg-gradient-to-b from-lightblue/30 via-white to-white min-h-screen py-10 lg:py-16">
+    <div className="bg-[#F8FBFD] min-h-screen py-10 lg:py-16">
       <div className="container-app">
 
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-lightblue text-primary text-xs font-bold mb-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-2">
               <FiPackage className="w-3.5 h-3.5" />
               <span>Customer Portal</span>
             </div>
@@ -153,9 +153,9 @@ function MyOrdersPage() {
             type="button"
             onClick={loadUserOrders}
             disabled={loading}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-white border border-gray-200 text-sm font-semibold text-gray-700 hover:text-primary hover:border-primary transition-all shadow-sm"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200/80 bg-white text-sm font-semibold text-gray-600 hover:text-[#0F4C81] hover:border-[#0F4C81]/40 transition-all shadow-sm"
           >
-            <FiRefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-primary' : ''}`} />
+            <FiRefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-[#0F4C81]' : ''}`} />
             <span>Refresh Orders</span>
           </button>
         </div>
@@ -183,15 +183,15 @@ function MyOrdersPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 ${
+              className={`px-4 py-2.5 rounded-2xl text-xs font-semibold transition-all whitespace-nowrap flex items-center gap-2 ${
                 activeTab === tab.id
-                  ? 'bg-primary text-white shadow-brand-sm'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:border-primary/50'
+                  ? 'bg-[#0F4C81] text-white shadow-sm'
+                  : 'bg-white text-gray-500 border border-gray-200/70 hover:border-[#0F4C81]/40 hover:text-[#0F4C81]'
               }`}
             >
               <span>{tab.label}</span>
               <span
-                className={`px-2 py-0.5 rounded-full text-[10px] ${
+                className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
                   activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
                 }`}
               >
@@ -218,7 +218,7 @@ function MyOrdersPage() {
 
         {/* Content Area */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm gap-3">
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-gray-100/80 shadow-sm gap-3">
             <FiRefreshCw className="w-10 h-10 text-primary animate-spin" />
             <p className="text-gray-500 font-semibold text-sm">Fetching your orders...</p>
           </div>
@@ -227,9 +227,9 @@ function MyOrdersPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-3xl p-10 md:p-16 text-center max-w-lg mx-auto shadow-card border border-gray-100 space-y-6"
+            className="bg-white rounded-2xl p-10 md:p-16 text-center max-w-lg mx-auto shadow-sm border border-gray-100/80 space-y-6"
           >
-            <div className="w-20 h-20 rounded-full bg-lightblue text-primary mx-auto flex items-center justify-center">
+            <div className="w-20 h-20 rounded-full bg-primary/10 text-primary mx-auto flex items-center justify-center">
               <FiPackage className="w-10 h-10" />
             </div>
             <div className="space-y-2">
@@ -240,7 +240,7 @@ function MyOrdersPage() {
                   : `No orders found in '${activeTab}' category.`}
               </p>
             </div>
-            <Link to={ROUTES.PRODUCTS} className="btn-primary inline-flex !px-8 !py-3.5 font-bold text-sm">
+            <Link to={ROUTES.PRODUCTS} className="btn-primary inline-flex !px-8 !py-3.5 font-semibold text-sm">
               Shop Mineral Water
             </Link>
           </motion.div>
@@ -255,12 +255,12 @@ function MyOrdersPage() {
                   key={order._id}
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white rounded-3xl p-6 shadow-card border border-gray-100 space-y-5 hover:border-primary/20 transition-all"
+                  className="bg-white rounded-2xl p-5 sm:p-6 border border-gray-100/80 hover:border-primary/20 hover:shadow-sm transition-all shadow-sm"
                 >
                   {/* Card Top Banner */}
-                  <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-4">
+                  <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100/70 pb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-2xl bg-lightblue/60 text-primary flex items-center justify-center font-bold">
+                      <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
                         <FiPackage className="w-5 h-5" />
                       </div>
                       <div>
@@ -287,7 +287,7 @@ function MyOrdersPage() {
                       {order.products?.slice(0, 4).map((item, idx) => (
                         <div
                           key={idx}
-                          className="w-14 h-14 rounded-2xl bg-lightblue/30 border border-gray-100 p-1 flex-shrink-0 flex items-center justify-center relative"
+                          className="w-14 h-14 rounded-xl bg-[#F8FBFD] border border-gray-100/80 p-1 flex-shrink-0 flex items-center justify-center relative"
                           title={item.name}
                         >
                           <img src={item.image} alt={item.name} className="w-full h-full object-contain" loading="lazy"
@@ -298,7 +298,7 @@ function MyOrdersPage() {
                         </div>
                       ))}
                       {order.products?.length > 4 && (
-                        <div className="w-14 h-14 rounded-2xl bg-gray-100 text-gray-500 text-xs font-bold flex items-center justify-center">
+                        <div className="w-14 h-14 rounded-xl bg-gray-100 text-gray-400 text-xs font-semibold flex items-center justify-center">
                           +{order.products.length - 4} more
                         </div>
                       )}
@@ -309,7 +309,7 @@ function MyOrdersPage() {
                       <button
                         type="button"
                         onClick={() => setSelectedOrder(order)}
-                        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-lightblue/60 text-primary text-xs font-bold hover:bg-lightblue transition-colors"
+                        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-primary/20 text-primary text-xs font-semibold hover:bg-primary/5 transition-colors"
                       >
                         <FiEye className="w-4 h-4" />
                         <span>View Details</span>
@@ -320,7 +320,7 @@ function MyOrdersPage() {
                           type="button"
                           onClick={() => handleCancelOrder(order._id)}
                           disabled={cancellingId === order._id}
-                          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-red-50 text-red-600 text-xs font-bold hover:bg-red-100 transition-colors disabled:opacity-50"
+                          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-red-50 text-red-600 text-xs font-semibold hover:bg-red-100 transition-colors disabled:opacity-50"
                         >
                           {cancellingId === order._id ? (
                             <FiRefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -342,24 +342,24 @@ function MyOrdersPage() {
         {/* Order Details Modal */}
         <AnimatePresence>
           {selectedOrder && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-darkgray/60 backdrop-blur-sm">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm">
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-card border border-gray-100 p-6 sm:p-8 space-y-6 relative"
+                className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-lg border border-gray-100/80 p-6 sm:p-8 space-y-6 relative"
               >
                 {/* Close Button */}
                 <button
                   type="button"
                   onClick={() => setSelectedOrder(null)}
-                  className="absolute top-6 right-6 p-2 rounded-full text-gray-400 hover:bg-gray-100 hover:text-darkgray transition-colors"
+                  className="absolute top-6 right-6 p-2 rounded-xl text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors"
                 >
                   <FiX className="w-6 h-6" />
                 </button>
 
                 {/* Modal Header */}
-                <div className="space-y-2 border-b border-gray-100 pb-4 pr-10">
+                <div className="space-y-2 border-b border-gray-100/70 pb-4 pr-10">
                   <div className="flex items-center gap-2">
                     <h2 className="text-xl font-bold text-darkgray font-mono">Order #{selectedOrder._id}</h2>
                     {getStatusBadge(selectedOrder.orderStatus)}
@@ -368,7 +368,7 @@ function MyOrdersPage() {
                 </div>
 
                 {/* Shipping Address */}
-                <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 space-y-1 text-xs text-gray-600">
+                <div className="bg-[#F8FBFD] rounded-xl p-4 border border-gray-100/80 space-y-1 text-xs text-gray-600">
                   <p className="font-bold text-darkgray text-sm flex items-center gap-1.5 mb-1.5">
                     <FiMapPin className="w-4 h-4 text-primary" />
                     <span>Shipping Address</span>
@@ -383,11 +383,11 @@ function MyOrdersPage() {
                 {/* Products List */}
                 <div className="space-y-3">
                   <h3 className="text-sm font-bold text-darkgray uppercase tracking-wider">Ordered Products</h3>
-                  <div className="divide-y divide-gray-100 border border-gray-100 rounded-2xl p-3 max-h-48 overflow-y-auto">
+                  <div className="divide-y divide-gray-100 border border-gray-100/80 rounded-xl p-3 max-h-48 overflow-y-auto">
                     {selectedOrder.products?.map((item, idx) => (
                       <div key={idx} className="py-2.5 flex items-center justify-between text-xs">
                         <div className="flex items-center gap-3">
-                          <img src={item.image} alt={item.name} className="w-10 h-10 object-contain rounded-lg bg-lightblue/30 p-1" loading="lazy"
+                          <img src={item.image} alt={item.name} className="w-10 h-10 object-contain rounded-lg bg-[#F8FBFD] p-1" loading="lazy"
                             onError={(e) => { e.target.src = 'https://placehold.co/200x200/e8f4fd/0B4F6C?text=Water' }} />
                           <div>
                             <p className="font-bold text-darkgray">{item.name}</p>
@@ -401,7 +401,7 @@ function MyOrdersPage() {
                 </div>
 
                 {/* Price Breakdown */}
-                <div className="bg-lightblue/20 rounded-2xl p-4 space-y-2 text-xs font-semibold text-gray-600 border border-primary/10">
+                <div className="bg-[#F8FBFD] rounded-xl p-4 space-y-2 text-xs font-semibold text-gray-600 border border-primary/10">
                   <div className="flex justify-between">
                     <span>Payment Method</span>
                     <span className="font-bold text-darkgray uppercase">{selectedOrder.paymentMethod}</span>
@@ -431,7 +431,7 @@ function MyOrdersPage() {
                       type="button"
                       onClick={() => handleCancelOrder(selectedOrder._id)}
                       disabled={cancellingId === selectedOrder._id}
-                      className="btn-secondary !py-2.5 !px-4 text-xs font-bold text-red-600 hover:bg-red-50"
+                      className="btn-secondary !py-2.5 !px-4 text-xs font-semibold text-red-600 hover:bg-red-50"
                     >
                       Cancel Order
                     </button>
@@ -439,7 +439,7 @@ function MyOrdersPage() {
                   <button
                     type="button"
                     onClick={() => setSelectedOrder(null)}
-                    className="btn-primary !py-2.5 !px-5 text-xs font-bold"
+                    className="btn-primary !py-2.5 !px-5 text-xs font-semibold"
                   >
                     Close Window
                   </button>

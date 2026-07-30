@@ -1,6 +1,15 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FiDroplet, FiShield, FiGlobe } from 'react-icons/fi'
+import {
+  FiDroplet,
+  FiShield,
+  FiTruck,
+  FiStar,
+  FiChevronRight,
+} from 'react-icons/fi'
+import ProductCard from '@components/products/ProductCard'
+import productService from '@services/productService'
 
 const MotionLink = motion(Link)
 
@@ -8,381 +17,510 @@ const MotionLink = motion(Link)
 const easeOut = [0.22, 1, 0.36, 1]
 
 // ─── Variants ─────────────────────────────────────────────────────────────────
-const container = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
-}
-
-const wordReveal = {
-  hidden: { opacity: 0, y: 48, rotateX: 8 },
-  visible: {
-    opacity: 1, y: 0, rotateX: 0,
-    transition: { duration: 0.7, ease: easeOut },
-  },
-}
-
 const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 32 },
   visible: {
-    opacity: 1, y: 0,
+    opacity: 1,
+    y: 0,
     transition: { duration: 0.6, ease: easeOut },
   },
 }
 
-const buttonVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i) => ({
-    opacity: 1, y: 0,
-    transition: { duration: 0.5, ease: easeOut, delay: 0.45 + i * 0.12 },
-  }),
-  hover: {
-    scale: 1.04,
-    transition: { type: 'spring', stiffness: 400, damping: 12 },
-  },
-  tap: { scale: 0.98 },
-}
-
-const scrollReveal = {
-  hidden: { opacity: 0, y: 48 },
+const staggerContainer = {
+  hidden: {},
   visible: {
-    opacity: 1, y: 0,
-    transition: { duration: 0.7, ease: easeOut },
+    transition: { staggerChildren: 0.12, delayChildren: 0.15 },
   },
 }
 
-// ─── Bubble Particles ─────────────────────────────────────────────────────────
-const bubbles = [
-  { size: 24, x: '10%', duration: 7, delay: 0 },
-  { size: 14, x: '25%', duration: 9, delay: 1.2 },
-  { size: 32, x: '45%', duration: 8, delay: 0.5 },
-  { size: 18, x: '65%', duration: 10, delay: 2 },
-  { size: 26, x: '80%', duration: 7.5, delay: 0.8 },
-  { size: 12, x: '90%', duration: 11, delay: 1.5 },
-  { size: 20, x: '35%', duration: 8.5, delay: 3 },
-  { size: 16, x: '72%', duration: 9.5, delay: 0.3 },
-]
+const cardReveal = {
+  hidden: { opacity: 0, y: 40 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: easeOut },
+  },
+}
 
-function BubbleParticles() {
+// ─── Hero Bottle SVG ─────────────────────────────────────────────────────────
+function BottleIllustration() {
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-      {bubbles.map((b, i) => (
-        <motion.div
+    <svg
+      viewBox="0 0 240 400"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="w-48 sm:w-56 md:w-64 h-auto drop-shadow-xl"
+      aria-hidden="true"
+    >
+      {/* Bottle body */}
+      <defs>
+        <linearGradient id="bottleGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#0F4C81" stopOpacity="0.08" />
+          <stop offset="50%" stopColor="#22D3EE" stopOpacity="0.15" />
+          <stop offset="100%" stopColor="#0F4C81" stopOpacity="0.05" />
+        </linearGradient>
+        <linearGradient id="waterFill" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stopColor="#22D3EE" stopOpacity="0.35" />
+          <stop offset="100%" stopColor="#0F4C81" stopOpacity="0.20" />
+        </linearGradient>
+        <linearGradient id="shine" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.5" />
+          <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+
+      {/* Bottle outline */}
+      <path
+        d="M100 20 C100 20 95 8 100 4 C105 0 135 0 140 4 C145 8 140 20 140 20
+           L142 30 C142 30 155 50 158 80 C161 110 160 130 160 160
+           C160 190 158 210 155 240 C152 270 148 290 145 310
+           C142 330 140 350 140 370
+           C140 380 145 390 150 394
+           C155 398 155 400 120 400
+           C85 400 85 398 90 394
+           C95 390 100 380 100 370
+           C100 350 98 330 95 310
+           C92 290 88 270 85 240
+           C82 210 80 190 80 160
+           C80 130 79 110 82 80
+           C85 50 98 30 98 30 L100 20 Z"
+        fill="url(#bottleGrad)"
+        stroke="#0F4C81"
+        strokeWidth="1.5"
+        strokeOpacity="0.15"
+      />
+
+      {/* Water inside */}
+      <path
+        d="M86 240 C88 210 90 190 92 170
+           L148 170 C150 190 152 210 154 240
+           C155 280 154 320 152 360
+           C150 380 148 390 145 394
+           C140 398 100 398 95 394
+           C92 390 90 380 88 360
+           C86 320 85 280 86 240 Z"
+        fill="url(#waterFill)"
+      />
+
+      {/* Water ripple line */}
+      <path
+        d="M86 240 C100 250 120 235 140 245 C150 250 152 245 154 240"
+        stroke="#22D3EE"
+        strokeWidth="1"
+        strokeOpacity="0.5"
+        fill="none"
+      />
+
+      {/* Shine / highlight */}
+      <path
+        d="M100 60 L102 320"
+        stroke="url(#shine)"
+        strokeWidth="6"
+        strokeLinecap="round"
+        strokeOpacity="0.6"
+      />
+
+      {/* Cap */}
+      <rect x="95" y="2" width="50" height="18" rx="4" fill="#0F4C81" opacity="0.9" />
+      <rect x="98" y="4" width="44" height="4" rx="2" fill="#22D3EE" opacity="0.3" />
+
+      {/* Label */}
+      <rect x="92" y="290" width="56" height="60" rx="6" fill="#0F4C81" opacity="0.08" />
+      <rect x="98" y="298" width="44" height="3" rx="1.5" fill="#0F4C81" opacity="0.25" />
+      <rect x="98" y="306" width="30" height="2" rx="1" fill="#0F4C81" opacity="0.15" />
+      <circle cx="120" cy="330" r="8" fill="#22D3EE" opacity="0.2" />
+    </svg>
+  )
+}
+
+// ─── Star Rating ────────────────────────────────────────────────────────────
+function StarRating({ rating = 5 }) {
+  return (
+    <div className="flex gap-1">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <FiStar
           key={i}
-          className="absolute rounded-full"
-          style={{
-            width: b.size,
-            height: b.size,
-            left: b.x,
-            bottom: '-5%',
-            background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.35), rgba(255,255,255,0.06))',
-            border: '1px solid rgba(255,255,255,0.15)',
-            boxShadow: 'inset 0 1px 3px rgba(255,255,255,0.3)',
-          }}
-          animate={{
-            y: [0, -250, -500, -750],
-            x: [0, 15, -10, 5],
-            opacity: [0, 0.5, 0.4, 0],
-          }}
-          transition={{
-            duration: b.duration,
-            repeat: Infinity,
-            delay: b.delay,
-            ease: 'linear',
-          }}
+          className={`w-4 h-4 ${i < rating ? 'fill-amber-400 text-amber-400' : 'text-gray-200'}`}
         />
       ))}
     </div>
   )
 }
 
-// ─── Animated Gradient Blobs (water-ripple background) ────────────────────────
-function WaterBlobs() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-      <div
-        className="water-blob absolute -top-[20%] -left-[10%] w-[60%] aspect-square"
-        style={{
-          background: 'radial-gradient(circle, rgba(1,186,239,0.25), transparent 70%)',
-          animation: 'blob 18s ease-in-out infinite',
-        }}
-      />
-      <div
-        className="water-blob absolute -bottom-[15%] -right-[10%] w-[55%] aspect-square"
-        style={{
-          background: 'radial-gradient(circle, rgba(11,79,108,0.2), transparent 70%)',
-          animation: 'blob-reverse 22s ease-in-out infinite',
-        }}
-      />
-      <div
-        className="water-blob absolute top-[30%] right-[20%] w-[40%] aspect-square"
-        style={{
-          background: 'radial-gradient(circle, rgba(199,240,232,0.2), transparent 70%)',
-          animation: 'blob 20s ease-in-out infinite 5s',
-        }}
-      />
-      <div
-        className="water-blob absolute top-[10%] left-[40%] w-[35%] aspect-square"
-        style={{
-          background: 'radial-gradient(circle, rgba(255,221,149,0.08), transparent 70%)',
-          animation: 'blob 25s ease-in-out infinite 3s',
-        }}
-      />
-    </div>
-  )
-}
-
-// ─── SVG Wave Layers ──────────────────────────────────────────────────────────
-function WaveLayers() {
-  return (
-    <div className="absolute bottom-0 left-0 w-full h-32 sm:h-48 pointer-events-none overflow-hidden" aria-hidden="true">
-      <svg
-        className="wave-layer"
-        viewBox="0 0 1440 120"
-        preserveAspectRatio="none"
-        style={{ animation: 'wave 8s ease-in-out infinite', opacity: 0.06 }}
-      >
-        <path
-          d="M0,60 C320,120 480,0 720,60 C960,120 1120,0 1440,60 L1440,120 L0,120 Z"
-          fill="#01BAEF"
-        />
-      </svg>
-      <svg
-        className="wave-layer"
-        viewBox="0 0 1440 120"
-        preserveAspectRatio="none"
-        style={{ animation: 'wave-slow 12s ease-in-out infinite', opacity: 0.04, bottom: '-4px' }}
-      >
-        <path
-          d="M0,40 C240,100 540,0 720,40 C900,80 1200,0 1440,40 L1440,120 L0,120 Z"
-          fill="#0B4F6C"
-        />
-      </svg>
-    </div>
-  )
-}
-
-// ─── Scroll Cue ───────────────────────────────────────────────────────────────
-function ScrollCue() {
-  return (
-    <motion.div
-      className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 1.6, duration: 0.8 }}
-    >
-      <span className="text-[10px] uppercase tracking-[0.2em] font-medium"
-            style={{ color: 'rgba(255,255,255,0.45)' }}>
-        Scroll
-      </span>
-      <div className="scroll-cue flex flex-col items-center">
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="rgba(255,255,255,0.4)"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M6 9l6 6 6-6" />
-        </svg>
-      </div>
-    </motion.div>
-  )
-}
-
-// ─── HomePage ─────────────────────────────────────────────────────────────────
+// ─── HomePage ────────────────────────────────────────────────────────────────
 function HomePage() {
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let mounted = true
+    const fetchProducts = async () => {
+      try {
+        const data = await productService.getProducts({})
+        if (mounted && data.success) {
+          setProducts((data.products || []).slice(0, 4))
+        }
+      } catch {
+        // silently fail – products section simply won't render
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    }
+    fetchProducts()
+    return () => { mounted = false }
+  }, [])
+
   return (
     <div>
-      {/* ═══════════════════════════════════════════════════════════════════
+      {/* ═══════════════════════════════════════════════════════════════════════
           HERO SECTION
-          ═══════════════════════════════════════════════════════════════════ */}
+          ═══════════════════════════════════════════════════════════════════════ */}
       <section
-        className="relative flex items-center justify-center min-h-[90vh] overflow-hidden section-padding"
+        className="relative flex items-center justify-center min-h-[85vh] overflow-hidden section-padding"
         style={{
-          background: 'linear-gradient(160deg, #0B4F6C 0%, #07313F 35%, #094055 65%, #0B4F6C 100%)',
+          background: 'linear-gradient(170deg, #EEF6FB 0%, #F8FBFD 50%, #ffffff 100%)',
         }}
       >
-        {/* Animated water ripple blobs */}
-        <WaterBlobs />
-
-        {/* Floating bubble particles */}
-        <BubbleParticles />
-
-        {/* Wave layers at bottom */}
-        <WaveLayers />
-
-        {/* Content */}
-        <motion.div
-          className="container-app text-center relative z-10"
-          variants={container}
-          initial="hidden"
-          animate="visible"
-        >
-          {/* Eyebrow tag */}
-          <motion.p
-            variants={fadeUp}
-            className="text-sm font-semibold tracking-[0.2em] uppercase mb-5"
-            style={{ color: 'rgba(1, 186, 239, 0.8)' }}
-          >
-            Pure · Natural · Certified
-          </motion.p>
-
-          {/* Headline — staggered word reveal */}
-          <h1
-            className="text-4xl sm:text-5xl md:text-display-xl font-extrabold mb-5 leading-tight text-white"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            <span className="sr-only">Pure from Source to Every Bottle</span>
-            <span className="flex flex-col items-center gap-1" aria-hidden="true">
-              <span className="flex flex-wrap justify-center gap-x-3 sm:gap-x-4">
-                {'Pure from Source'.split(' ').map((word, i) => (
-                  <motion.span
-                    key={i}
-                    variants={wordReveal}
-                    className="inline-block"
-                  >
-                    {word}
-                  </motion.span>
-                ))}
-              </span>
-              <span className="flex flex-wrap justify-center gap-x-3 sm:gap-x-4">
-                {'to Every Bottle'.split(' ').map((word, i) => (
-                  <motion.span
-                    key={i}
-                    variants={wordReveal}
-                    className="inline-block"
-                    custom={i}
-                  >
-                    {word}
-                  </motion.span>
-                ))}
-              </span>
-            </span>
-          </h1>
-
-          {/* Subtext */}
-          <motion.p
-            variants={fadeUp}
-            className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-10 sm:mb-12"
-            style={{ color: 'rgba(255, 255, 255, 0.7)' }}
-          >
-            AquaPure delivers the finest natural mineral water, sourced from protected springs
-            and sealed with care for your health and wellbeing.
-          </motion.p>
-
-          {/* CTA Buttons */}
-          <motion.div
-            className="flex flex-col sm:flex-row gap-4 justify-center"
-            variants={container}
-          >
-            <MotionLink
-              to="/products"
-              custom={0}
-              variants={buttonVariants}
+        <div className="container-app w-full relative z-10">
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+            {/* Text Content */}
+            <motion.div
+              className="flex-1 text-center lg:text-left"
               initial="hidden"
               animate="visible"
-              whileHover="hover"
-              whileTap="tap"
-              className="btn-primary !px-9 !py-3.5 !text-sm sm:!text-base"
+              variants={staggerContainer}
             >
-              Explore Products
-            </MotionLink>
-            <MotionLink
-              to="/about"
-              custom={1}
-              variants={buttonVariants}
-              initial="hidden"
-              animate="visible"
-              whileHover="hover"
-              whileTap="tap"
-              className="btn-outline-white !px-9 !py-3.5 !text-sm sm:!text-base"
-            >
-              Our Story
-            </MotionLink>
-          </motion.div>
-        </motion.div>
+              {/* Eyebrow */}
+              <motion.p
+                variants={fadeUp}
+                className="text-sm font-semibold tracking-[0.25em] uppercase mb-5"
+                style={{ color: '#22D3EE', fontFamily: 'var(--font-sans)' }}
+              >
+                Premium Natural Mineral Water
+              </motion.p>
 
-        {/* Scroll Cue */}
-        <ScrollCue />
+              {/* Heading */}
+              <motion.h1
+                variants={fadeUp}
+                className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight"
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  letterSpacing: '-0.02em',
+                  color: '#0A2540',
+                }}
+              >
+                Pure Water,{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0F4C81] to-[#22D3EE]">
+                  Perfect Life
+                </span>
+              </motion.h1>
+
+              {/* Subtitle */}
+              <motion.p
+                variants={fadeUp}
+                className="text-base sm:text-lg md:text-xl mt-5 max-w-xl mx-auto lg:mx-0"
+                style={{ color: '#486581', lineHeight: '1.7' }}
+              >
+                Sourced from nature's finest springs and bottled with care.
+                AquaPure brings you the crisp, refreshing taste of pure mineral
+                water every single day.
+              </motion.p>
+
+              {/* CTA Buttons */}
+              <motion.div
+                variants={fadeUp}
+                className="flex flex-col sm:flex-row gap-4 mt-10 justify-center lg:justify-start"
+              >
+                <MotionLink
+                  to="/products"
+                  className="btn-primary !px-10 !py-3.5 !text-sm sm:!text-base shadow-lg shadow-[#0F4C81]/20"
+                  whileHover={{ y: -2, boxShadow: '0 8px 25px rgba(15, 76, 129, 0.3)' }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Shop Now
+                </MotionLink>
+                <MotionLink
+                  to="/about"
+                  className="btn-secondary !px-10 !py-3.5 !text-sm sm:!text-base"
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Learn More
+                </MotionLink>
+              </motion.div>
+            </motion.div>
+
+            {/* Bottle Illustration */}
+            <motion.div
+              className="flex-shrink-0"
+              initial={{ opacity: 0, x: 60 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, ease: easeOut, delay: 0.3 }}
+            >
+              <BottleIllustration />
+            </motion.div>
+          </div>
+        </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════════
-          WHY AQUAPURE SECTION (replaces old placeholder)
-          ═══════════════════════════════════════════════════════════════════ */}
-      <section
-        className="section-padding relative overflow-hidden"
-        style={{
-          background: 'linear-gradient(180deg, #F4FBFD 0%, #DDF3F5 40%, #C7F0E8 100%)',
-        }}
-      >
-        <div className="container-app text-center relative z-10">
-          {/* Eyebrow */}
-          <motion.p
-            className="section-label mb-4"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+      {/* ═══════════════════════════════════════════════════════════════════════
+          WHY AQUAPURE — Features
+          ═══════════════════════════════════════════════════════════════════════ */}
+      <section className="section-padding" style={{ backgroundColor: '#EEF6FB' }}>
+        <div className="container-app">
+          {/* Section Header */}
+          <motion.div
+            className="text-center mb-14 md:mb-16"
+            initial="hidden"
+            whileInView="visible"
             viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.6, ease: easeOut }}
+            variants={staggerContainer}
           >
-            Coming Next
-          </motion.p>
+            <motion.p variants={fadeUp} className="section-label mb-4">
+              Why AquaPure
+            </motion.p>
+            <motion.h2 variants={fadeUp} className="section-title">
+              What Makes Us Different
+            </motion.h2>
+            <motion.p variants={fadeUp} className="section-subtitle mx-auto">
+              We believe in purity at every step — from the spring to your glass.
+            </motion.p>
+          </motion.div>
 
-          {/* Heading */}
-          <motion.h2
-            className="section-title mb-14 sm:mb-16"
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.6, ease: easeOut, delay: 0.1 }}
-          >
-            What Sets Us Apart
-          </motion.h2>
-
-          {/* 3-Column Grid */}
-          <div className="grid md:grid-cols-3 gap-8 lg:gap-10 max-w-5xl mx-auto">
+          {/* Feature Cards */}
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {[
               {
                 Icon: FiDroplet,
-                title: '100% Natural Spring Source',
-                desc: 'Sourced from protected natural springs, untouched and pure.',
+                title: '100% Natural Spring Water',
+                desc: 'Sourced from protected underground springs, naturally filtered through mineral-rich layers for that pure, crisp taste.',
               },
               {
                 Icon: FiShield,
-                title: 'Certified Purity Testing',
-                desc: 'Every batch undergoes rigorous quality certification.',
+                title: 'Certified Quality',
+                desc: 'Every batch undergoes rigorous lab testing and quality certification to ensure the highest purity standards.',
               },
               {
-                Icon: FiGlobe,
-                title: 'Eco-Friendly Packaging',
-                desc: 'Sustainably bottled with minimal environmental impact.',
+                Icon: FiTruck,
+                title: 'Free Home Delivery',
+                desc: 'We bring hydration to your doorstep with free delivery on all orders. Fresh water, whenever you need it.',
               },
-            ].map((col, i) => (
+            ].map((feature, i) => (
               <motion.div
-                key={col.title}
-                className="flex flex-col items-center text-center p-6 sm:p-8 rounded-3xl bg-white/70 backdrop-blur-sm border border-white/60 shadow-sm hover:shadow-md transition-shadow duration-300"
+                key={feature.title}
+                className="bg-white rounded-2xl border border-[#0F4C81]/10 p-8 text-center hover:shadow-lg hover:border-[#0F4C81]/20 transition-all duration-300"
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.6, ease: easeOut, delay: 0.2 + i * 0.1 }}
+                transition={{ duration: 0.6, ease: easeOut, delay: 0.1 + i * 0.12 }}
+                whileHover={{ y: -4 }}
               >
-                {/* Icon badge */}
+                {/* Icon */}
                 <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5 shadow-sm"
-                  style={{ background: 'linear-gradient(135deg, rgba(11,79,108,0.1), rgba(1,186,239,0.15))' }}
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(15, 76, 129, 0.08), rgba(34, 211, 238, 0.12))',
+                  }}
                 >
-                  <col.Icon className="w-7 h-7" style={{ color: '#0B4F6C' }} />
+                  <feature.Icon className="w-7 h-7" style={{ color: '#0F4C81' }} />
                 </div>
-                <h3 className="text-lg font-bold text-navy mb-2">{col.title}</h3>
-                <p className="text-sm text-darkgray-light leading-relaxed max-w-[18rem]">
-                  {col.desc}
+                <h3 className="text-lg font-bold mb-3" style={{ color: '#0A2540', fontFamily: 'var(--font-display)' }}>
+                  {feature.title}
+                </h3>
+                <p className="text-sm leading-relaxed" style={{ color: '#486581' }}>
+                  {feature.desc}
                 </p>
               </motion.div>
             ))}
           </div>
         </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          BEST SELLING PRODUCTS
+          ═══════════════════════════════════════════════════════════════════════ */}
+      <section className="section-padding" style={{ backgroundColor: '#F8FBFD' }}>
+        <div className="container-app">
+          <motion.div
+            className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-12"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-60px' }}
+            variants={staggerContainer}
+          >
+            <div>
+              <motion.p variants={fadeUp} className="section-label mb-3">
+                Shop
+              </motion.p>
+              <motion.h2 variants={fadeUp} className="section-title">
+                Best Selling Products
+              </motion.h2>
+            </div>
+            <motion.div variants={fadeUp}>
+              <Link
+                to="/products"
+                className="inline-flex items-center gap-1.5 text-sm font-semibold transition-colors duration-200"
+                style={{ color: '#0F4C81' }}
+              >
+                View All Products
+                <FiChevronRight className="w-4 h-4" />
+              </Link>
+            </motion.div>
+          </motion.div>
+
+          {/* Products Grid */}
+          {loading ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-3xl border border-gray-100/80 h-96 animate-pulse"
+                />
+              ))}
+            </div>
+          ) : products.length > 0 ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {products.map((product) => (
+                <motion.div
+                  key={product._id}
+                  variants={cardReveal}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: '-60px' }}
+                >
+                  <ProductCard product={product} />
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center py-12" style={{ color: '#7B8794' }}>
+              Products coming soon.
+            </p>
+          )}
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          TESTIMONIALS
+          ═══════════════════════════════════════════════════════════════════════ */}
+      <section className="section-padding" style={{ backgroundColor: '#EEF6FB' }}>
+        <div className="container-app">
+          <motion.div
+            className="text-center mb-14 md:mb-16"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-60px' }}
+            variants={staggerContainer}
+          >
+            <motion.p variants={fadeUp} className="section-label mb-4">
+              Testimonials
+            </motion.p>
+            <motion.h2 variants={fadeUp} className="section-title">
+              What Our Customers Say
+            </motion.h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {[
+              {
+                name: 'Priya Sharma',
+                role: 'Regular Customer',
+                text: 'AquaPure has completely changed how I think about drinking water. The taste is incredibly fresh and clean — I can tell the difference immediately. Highly recommended!',
+                rating: 5,
+              },
+              {
+                name: 'Rahul Mehta',
+                role: 'Fitness Enthusiast',
+                text: 'As someone who drinks over 3 litres of water daily, quality matters. AquaPure delivers consistently pure water with free home delivery. A game-changer for my hydration.',
+                rating: 5,
+              },
+              {
+                name: 'Ananya Gupta',
+                role: 'Home Chef',
+                text: 'I use AquaPure for all my cooking and beverages. The natural mineral content enhances the flavour of everything I prepare. It is now the only water in my kitchen.',
+                rating: 4,
+              },
+            ].map((t, i) => (
+              <motion.div
+                key={t.name}
+                className="bg-white rounded-2xl border border-[#0F4C81]/10 p-8 flex flex-col h-full"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.5, ease: easeOut, delay: 0.1 + i * 0.1 }}
+                whileHover={{ y: -3 }}
+              >
+                {/* Stars */}
+                <StarRating rating={t.rating} />
+                {/* Quote */}
+                <p className="text-sm leading-relaxed mt-4 flex-1" style={{ color: '#486581' }}>
+                  &ldquo;{t.text}&rdquo;
+                </p>
+                {/* Author */}
+                <div className="mt-6 pt-4 border-t border-gray-100">
+                  <p className="text-sm font-bold" style={{ color: '#0A2540' }}>{t.name}</p>
+                  <p className="text-xs mt-0.5" style={{ color: '#7B8794' }}>{t.role}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          DELIVERY CTA
+          ═══════════════════════════════════════════════════════════════════════ */}
+      <section className="section-padding" style={{ backgroundColor: '#F8FBFD' }}>
+        <motion.div
+          className="container-app"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-60px' }}
+          variants={staggerContainer}
+        >
+          <motion.div
+            variants={fadeUp}
+            className="rounded-2xl overflow-hidden"
+            style={{ backgroundColor: '#EEF6FB' }}
+          >
+            <div className="px-8 py-12 md:py-16 md:px-16 text-center">
+              <div className="max-w-2xl mx-auto">
+                <motion.p
+                  variants={fadeUp}
+                  className="section-label mb-4"
+                >
+                  Free Delivery
+                </motion.p>
+                <motion.h2
+                  variants={fadeUp}
+                  className="text-2xl md:text-3xl font-bold mb-4"
+                  style={{ color: '#0A2540', fontFamily: 'var(--font-display)' }}
+                >
+                  Fresh Water, Delivered to Your Doorstep
+                </motion.h2>
+                <motion.p
+                  variants={fadeUp}
+                  className="text-base mb-8 max-w-lg mx-auto"
+                  style={{ color: '#486581' }}
+                >
+                  Enjoy free home delivery on all orders across the city.
+                  We ensure your water arrives fresh, clean, and on time —
+                  every single time.
+                </motion.p>
+                <motion.div variants={fadeUp}>
+                  <Link
+                    to="/products"
+                    className="inline-flex items-center gap-2 btn-primary !px-10 !py-3.5 shadow-lg shadow-[#0F4C81]/20"
+                    style={{ textDecoration: 'none' }}
+                  >
+                    Order Now
+                    <FiChevronRight className="w-4 h-4" />
+                  </Link>
+                </motion.div>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
       </section>
     </div>
   )

@@ -364,18 +364,21 @@ function CheckoutPage() {
     const buttonLink = isBuyNowFlow ? ROUTES.PRODUCTS : ROUTES.PRODUCTS
 
     return (
-      <div className="min-h-screen bg-gradient-to-b from-lightblue/20 to-white flex items-center justify-center py-16 px-4">
-        <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-card border border-gray-100 space-y-6">
-          <div className="w-16 h-16 rounded-full bg-lightblue text-primary mx-auto flex items-center justify-center">
+      <div className="min-h-screen bg-[#F8FBFD] flex items-center justify-center py-16 px-4">
+        <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center shadow-sm border border-gray-100 space-y-6">
+          <div className="w-16 h-16 rounded-full bg-gray-100 text-[#0F4C81] mx-auto flex items-center justify-center">
             <FiShoppingBag className="w-8 h-8" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-darkgray">
+            <h2 className="text-2xl font-bold text-gray-900">
               {isBuyNowFlow ? 'Product Unavailable' : 'Your cart is empty'}
             </h2>
             <p className="text-gray-500 text-sm">{message}</p>
           </div>
-          <Link to={buttonLink} className="btn-primary w-full inline-block !py-3 font-bold">
+          <Link
+            to={buttonLink}
+            className="inline-block w-full bg-[#0F4C81] text-white font-bold py-3 px-6 rounded-xl hover:bg-[#0F4C81]/90 transition-colors"
+          >
             {buttonText}
           </Link>
         </div>
@@ -384,13 +387,13 @@ function CheckoutPage() {
   }
 
   return (
-    <div className="bg-gradient-to-b from-lightblue/30 via-white to-white min-h-screen py-10 lg:py-16">
+    <div className="bg-[#F8FBFD] min-h-screen py-10 lg:py-16">
       <div className="container-app">
         {/* Navigation back link */}
         <div className="mb-6">
           <Link
             to={isBuyNowFlow ? ROUTES.PRODUCTS : ROUTES.CART}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-primary transition-colors"
+            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#0F4C81] transition-colors"
           >
             <FiArrowLeft className="w-4 h-4" />
             <span>{isBuyNowFlow ? 'Back to Products' : 'Back to Shopping Cart'}</span>
@@ -399,7 +402,7 @@ function CheckoutPage() {
 
         {/* Page Header */}
         <div className="mb-10">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-darkgray tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
             Checkout & Delivery
           </h1>
           <p className="text-sm text-gray-500 mt-1">
@@ -414,34 +417,34 @@ function CheckoutPage() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8 p-4 rounded-2xl bg-red-50 border border-red-200 flex items-start gap-3 text-red-700 text-sm font-medium"
+            className="mb-8 p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3 text-red-700 text-sm leading-relaxed"
           >
-            <FiAlertCircle className="w-5 h-5 flex-shrink-0 text-red-600 mt-0.5" />
+            <FiAlertCircle className="w-5 h-5 flex-shrink-0 text-red-400 mt-0.5" />
             <div className="flex-1">{errorMessage}</div>
           </motion.div>
         )}
 
         <form onSubmit={handleSubmitOrder}>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
+
             {/* Left Column: Delivery Address & Payment Method */}
             <div className="lg:col-span-7 space-y-8">
 
               {/* 1. Shipping Address Section */}
-              <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-card border border-gray-100 space-y-6">
+              <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-100 space-y-6">
                 <div className="flex items-center gap-3 border-b border-gray-100 pb-4">
-                  <div className="w-10 h-10 rounded-2xl bg-lightblue text-primary flex items-center justify-center font-bold">
+                  <div className="w-10 h-10 rounded-xl bg-gray-100 text-[#0F4C81] flex items-center justify-center font-bold">
                     <FiMapPin className="w-5 h-5" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-darkgray">1. Delivery Address</h2>
+                    <h2 className="text-xl font-bold text-gray-900">1. Delivery Address</h2>
                     <p className="text-xs text-gray-400">Where should we deliver your mineral water?</p>
                   </div>
                 </div>
 
                 {loadingAddress ? (
                   <div className="flex items-center justify-center py-8 gap-3 text-gray-500 text-sm">
-                    <FiRefreshCw className="w-5 h-5 text-primary animate-spin" />
+                    <FiRefreshCw className="w-5 h-5 text-[#0F4C81] animate-spin" />
                     <span>Loading saved address...</span>
                   </div>
                 ) : (
@@ -449,7 +452,7 @@ function CheckoutPage() {
                     {/* Full Name & Phone */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-bold text-darkgray uppercase tracking-wider mb-1.5">
+                        <label className="block text-xs font-semibold text-gray-700 mb-1.5">
                           Full Name <span className="text-red-500">*</span>
                         </label>
                         <input
@@ -459,11 +462,11 @@ function CheckoutPage() {
                           onChange={handleInputChange}
                           placeholder="e.g. Rahul Sharma"
                           required
-                          className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium outline-none transition-all"
+                          className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#0F4C81] focus:ring-2 focus:ring-[#0F4C81]/20 text-sm outline-none transition-all bg-white"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-darkgray uppercase tracking-wider mb-1.5">
+                        <label className="block text-xs font-semibold text-gray-700 mb-1.5">
                           Phone Number <span className="text-red-500">*</span>
                         </label>
                         <input
@@ -473,14 +476,14 @@ function CheckoutPage() {
                           onChange={handleInputChange}
                           placeholder="10-digit mobile number"
                           required
-                          className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium outline-none transition-all"
+                          className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#0F4C81] focus:ring-2 focus:ring-[#0F4C81]/20 text-sm outline-none transition-all bg-white"
                         />
                       </div>
                     </div>
 
                     {/* Email */}
                     <div>
-                      <label className="block text-xs font-bold text-darkgray uppercase tracking-wider mb-1.5">
+                      <label className="block text-xs font-semibold text-gray-700 mb-1.5">
                         Email Address <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -490,13 +493,13 @@ function CheckoutPage() {
                         onChange={handleInputChange}
                         placeholder="your.email@example.com"
                         required
-                        className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium outline-none transition-all"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#0F4C81] focus:ring-2 focus:ring-[#0F4C81]/20 text-sm outline-none transition-all bg-white"
                       />
                     </div>
 
                     {/* Address Line 1 */}
                     <div>
-                      <label className="block text-xs font-bold text-darkgray uppercase tracking-wider mb-1.5">
+                      <label className="block text-xs font-semibold text-gray-700 mb-1.5">
                         Flat, House No., Building / Apartment <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -506,13 +509,13 @@ function CheckoutPage() {
                         onChange={handleInputChange}
                         placeholder="e.g. Flat 302, Aqua Springs Residency"
                         required
-                        className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium outline-none transition-all"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#0F4C81] focus:ring-2 focus:ring-[#0F4C81]/20 text-sm outline-none transition-all bg-white"
                       />
                     </div>
 
                     {/* Address Line 2 */}
                     <div>
-                      <label className="block text-xs font-bold text-darkgray uppercase tracking-wider mb-1.5">
+                      <label className="block text-xs font-semibold text-gray-700 mb-1.5">
                         Street, Area, Landmark <span className="text-gray-400 font-normal">(Optional)</span>
                       </label>
                       <input
@@ -521,14 +524,14 @@ function CheckoutPage() {
                         value={address.addressLine2}
                         onChange={handleInputChange}
                         placeholder="e.g. Near Water Tank, Green Park Road"
-                        className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium outline-none transition-all"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#0F4C81] focus:ring-2 focus:ring-[#0F4C81]/20 text-sm outline-none transition-all bg-white"
                       />
                     </div>
 
                     {/* City, State, Pincode */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-xs font-bold text-darkgray uppercase tracking-wider mb-1.5">
+                        <label className="block text-xs font-semibold text-gray-700 mb-1.5">
                           City / Town <span className="text-red-500">*</span>
                         </label>
                         <input
@@ -538,11 +541,11 @@ function CheckoutPage() {
                           onChange={handleInputChange}
                           placeholder="e.g. Mumbai"
                           required
-                          className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium outline-none transition-all"
+                          className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#0F4C81] focus:ring-2 focus:ring-[#0F4C81]/20 text-sm outline-none transition-all bg-white"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-darkgray uppercase tracking-wider mb-1.5">
+                        <label className="block text-xs font-semibold text-gray-700 mb-1.5">
                           State <span className="text-red-500">*</span>
                         </label>
                         <input
@@ -552,11 +555,11 @@ function CheckoutPage() {
                           onChange={handleInputChange}
                           placeholder="e.g. Maharashtra"
                           required
-                          className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium outline-none transition-all"
+                          className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#0F4C81] focus:ring-2 focus:ring-[#0F4C81]/20 text-sm outline-none transition-all bg-white"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-darkgray uppercase tracking-wider mb-1.5">
+                        <label className="block text-xs font-semibold text-gray-700 mb-1.5">
                           Pincode <span className="text-red-500">*</span>
                         </label>
                         <input
@@ -567,19 +570,19 @@ function CheckoutPage() {
                           placeholder="6-digit code"
                           required
                           maxLength={6}
-                          className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium outline-none transition-all"
+                          className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#0F4C81] focus:ring-2 focus:ring-[#0F4C81]/20 text-sm outline-none transition-all bg-white"
                         />
                       </div>
                     </div>
 
                     {/* Save Address Checkbox */}
                     <div className="pt-2">
-                      <label className="flex items-center gap-2.5 cursor-pointer text-sm font-medium text-gray-700">
+                      <label className="flex items-center gap-2.5 cursor-pointer text-sm text-gray-600">
                         <input
                           type="checkbox"
                           checked={saveForFuture}
                           onChange={(e) => setSaveForFuture(e.target.checked)}
-                          className="w-4 h-4 rounded text-primary border-gray-300 focus:ring-primary"
+                          className="w-4 h-4 rounded text-[#0F4C81] border-gray-300 focus:ring-[#0F4C81]"
                         />
                         <span>Save this address for future orders</span>
                       </label>
@@ -589,13 +592,13 @@ function CheckoutPage() {
               </div>
 
               {/* 2. Payment Method Section */}
-              <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-card border border-gray-100 space-y-6">
+              <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-100 space-y-6">
                 <div className="flex items-center gap-3 border-b border-gray-100 pb-4">
-                  <div className="w-10 h-10 rounded-2xl bg-lightblue text-primary flex items-center justify-center font-bold">
+                  <div className="w-10 h-10 rounded-xl bg-gray-100 text-[#0F4C81] flex items-center justify-center font-bold">
                     <FiCreditCard className="w-5 h-5" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-darkgray">2. Select Payment Method</h2>
+                    <h2 className="text-xl font-bold text-gray-900">2. Select Payment Method</h2>
                     <p className="text-xs text-gray-400">Choose how you wish to pay for your order</p>
                   </div>
                 </div>
@@ -604,32 +607,34 @@ function CheckoutPage() {
                   {/* COD Option */}
                   <div
                     onClick={() => setPaymentMethod('COD')}
-                    className={`cursor-pointer p-5 rounded-2xl border-2 transition-all flex flex-col justify-between space-y-4 ${
+                    className={`cursor-pointer p-5 rounded-xl border transition-all ${
                       paymentMethod === 'COD'
-                        ? 'border-primary bg-lightblue/20 shadow-brand-sm'
+                        ? 'border-[#0F4C81] bg-[#F8FBFD]'
                         : 'border-gray-200 hover:border-gray-300 bg-white'
                     }`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-teal/10 text-teal flex items-center justify-center">
-                          <FiDollarSign className="w-6 h-6" />
+                        <div className="w-10 h-10 rounded-lg bg-teal/10 text-teal flex items-center justify-center">
+                          <FiDollarSign className="w-5 h-5" />
                         </div>
                         <div>
-                          <p className="font-bold text-darkgray text-base">Cash on Delivery</p>
+                          <p className="font-semibold text-gray-900 text-sm">Cash on Delivery</p>
                           <p className="text-xs text-gray-500">Pay cash upon delivery</p>
                         </div>
                       </div>
                       <div
-                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                          paymentMethod === 'COD' ? 'border-primary bg-primary text-white' : 'border-gray-300'
+                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                          paymentMethod === 'COD' ? 'border-[#0F4C81]' : 'border-gray-300'
                         }`}
                       >
-                        {paymentMethod === 'COD' && <FiCheck className="w-3.5 h-3.5" />}
+                        {paymentMethod === 'COD' && (
+                          <div className="w-2.5 h-2.5 rounded-full bg-[#0F4C81]" />
+                        )}
                       </div>
                     </div>
 
-                    <div className="bg-white/80 p-2.5 rounded-xl border border-gray-100 text-[11px] text-gray-500 font-medium">
+                    <div className="mt-3 bg-white p-2.5 rounded-lg border border-gray-100 text-[11px] text-gray-500">
                       ✓ Zero pre-payment required. Hand over cash to our delivery driver.
                     </div>
                   </div>
@@ -637,32 +642,34 @@ function CheckoutPage() {
                   {/* Online / Razorpay Option */}
                   <div
                     onClick={() => setPaymentMethod('ONLINE')}
-                    className={`cursor-pointer p-5 rounded-2xl border-2 transition-all flex flex-col justify-between space-y-4 ${
+                    className={`cursor-pointer p-5 rounded-xl border transition-all ${
                       paymentMethod === 'ONLINE'
-                        ? 'border-primary bg-lightblue/20 shadow-brand-sm'
+                        ? 'border-[#0F4C81] bg-[#F8FBFD]'
                         : 'border-gray-200 hover:border-gray-300 bg-white'
                     }`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-lg bg-[#0F4C81]/10 text-[#0F4C81] flex items-center justify-center">
                           <FiLock className="w-5 h-5" />
                         </div>
                         <div>
-                          <p className="font-bold text-darkgray text-base">UPI / Card / NetBanking</p>
+                          <p className="font-semibold text-gray-900 text-sm">UPI / Card / NetBanking</p>
                           <p className="text-xs text-gray-500">Instant secure online payment</p>
                         </div>
                       </div>
                       <div
-                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                          paymentMethod === 'ONLINE' ? 'border-primary bg-primary text-white' : 'border-gray-300'
+                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                          paymentMethod === 'ONLINE' ? 'border-[#0F4C81]' : 'border-gray-300'
                         }`}
                       >
-                        {paymentMethod === 'ONLINE' && <FiCheck className="w-3.5 h-3.5" />}
+                        {paymentMethod === 'ONLINE' && (
+                          <div className="w-2.5 h-2.5 rounded-full bg-[#0F4C81]" />
+                        )}
                       </div>
                     </div>
 
-                    <div className="bg-white/80 p-2.5 rounded-xl border border-gray-100 text-[11px] text-gray-500 font-medium flex items-center gap-1.5">
+                    <div className="mt-3 bg-white p-2.5 rounded-lg border border-gray-100 text-[11px] text-gray-500 flex items-center gap-1.5">
                       <FiShield className="w-3.5 h-3.5 text-teal flex-shrink-0" />
                       <span>Razorpay 256-bit encrypted checkout (GPay, PhonePe, Cards)</span>
                     </div>
@@ -674,10 +681,10 @@ function CheckoutPage() {
 
             {/* Right Column: Order Summary & Place Order */}
             <div className="lg:col-span-5">
-              <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-card border border-gray-100 space-y-6 sticky top-24">
-                <h3 className="text-xl font-bold text-darkgray border-b border-gray-100 pb-4 flex items-center justify-between">
+              <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-100 space-y-6 sticky top-24">
+                <h3 className="text-xl font-bold text-gray-900 border-b border-gray-100 pb-4 flex items-center justify-between">
                   <span>Order Summary</span>
-                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-lightblue text-primary">
+                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-100 text-[#0F4C81]">
                     {validCartItems.reduce((acc, i) => acc + (i.quantity || 1), 0)} Item{validCartItems.reduce((acc, i) => acc + (i.quantity || 1), 0) !== 1 ? 's' : ''}
                   </span>
                 </h3>
@@ -690,15 +697,15 @@ function CheckoutPage() {
                     const pId = getProductIdStr(item) || index
                     return (
                       <div key={pId} className="pt-3 flex items-center gap-3">
-                        <div className="w-14 h-14 rounded-xl bg-lightblue/40 border border-gray-100 p-1 flex-shrink-0 flex items-center justify-center">
+                        <div className="w-14 h-14 rounded-lg bg-gray-50 border border-gray-100 p-1 flex-shrink-0 flex items-center justify-center">
                           <img src={product.image || '/placeholder.png'} alt={product.name || 'Product'} className="w-full h-full object-contain"
                             onError={(e) => { e.target.src = 'https://placehold.co/200x200/e8f4fd/0B4F6C?text=Water' }} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs font-bold text-darkgray truncate">{product.name || 'Mineral Water'}</p>
+                          <p className="text-xs font-semibold text-gray-900 truncate">{product.name || 'Mineral Water'}</p>
                           <p className="text-[11px] text-gray-400">{product.size || ''} × {item.quantity || 1}</p>
                         </div>
-                        <p className="text-xs font-extrabold text-darkgray">
+                        <p className="text-xs font-bold text-gray-900">
                           {formatCurrency((product.price || 0) * (item.quantity || 1))}
                         </p>
                       </div>
@@ -707,37 +714,37 @@ function CheckoutPage() {
                 </div>
 
                 {/* Price Breakdown */}
-                <div className="border-t border-gray-100 pt-4 space-y-3 text-sm font-medium text-gray-600">
+                <div className="border-t border-gray-100 pt-4 space-y-3 text-sm text-gray-600">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span className="font-bold text-darkgray">{formatCurrency(effectiveSubtotal)}</span>
+                    <span className="font-semibold text-gray-900">{formatCurrency(effectiveSubtotal)}</span>
                   </div>
 
                   <div className="flex justify-between items-center">
                     <span className="flex items-center gap-1">
-                      <FiTruck className="w-4 h-4 text-primary" /> Delivery Charges
+                      <FiTruck className="w-4 h-4 text-[#0F4C81]" /> Delivery Charges
                     </span>
                     {DELIVERY_CHARGE === 0 ? (
-                      <span className="font-bold text-teal">FREE</span>
+                      <span className="font-semibold text-teal">FREE</span>
                     ) : (
-                      <span className="font-bold text-darkgray">{formatCurrency(DELIVERY_CHARGE)}</span>
+                      <span className="font-semibold text-gray-900">{formatCurrency(DELIVERY_CHARGE)}</span>
                     )}
                   </div>
 
-                  <div className="border-t border-gray-100 pt-4 flex justify-between items-center text-lg font-black text-darkgray">
+                  <div className="border-t border-gray-100 pt-4 flex justify-between items-center text-lg font-black text-gray-900">
                     <span>Total Amount</span>
-                    <span className="text-2xl text-primary font-black">{formatCurrency(finalTotal)}</span>
+                    <span className="text-2xl text-[#0F4C81] font-black">{formatCurrency(finalTotal)}</span>
                   </div>
                 </div>
 
                 {/* Secure Trust Badges */}
-                <div className="bg-gray-50 p-3.5 rounded-2xl space-y-2 text-[11px] text-gray-500 font-medium border border-gray-100">
+                <div className="bg-gray-50 p-3.5 rounded-xl space-y-2 text-[11px] text-gray-500 border border-gray-100">
                   <div className="flex items-center gap-2">
                     <FiCheckCircle className="w-4 h-4 text-teal flex-shrink-0" />
                     <span>Tested for purity & sealed for freshness guarantee</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <FiShield className="w-4 h-4 text-primary flex-shrink-0" />
+                    <FiShield className="w-4 h-4 text-[#0F4C81] flex-shrink-0" />
                     <span>Encrypted & secure checkout transaction</span>
                   </div>
                 </div>
@@ -746,7 +753,7 @@ function CheckoutPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full btn-primary !py-4 text-base font-bold flex items-center justify-center gap-2 shadow-brand-md hover:shadow-brand-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="w-full bg-[#0F4C81] text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-2 shadow-sm hover:bg-[#0F4C81]/90 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
                   {isSubmitting ? (
                     <>
