@@ -15,6 +15,7 @@ import {
 import productService from '@services/productService'
 import useAuth from '@hooks/useAuth'
 import useCart from '@hooks/useCart'
+import useBuyNow from '@hooks/useBuyNow'
 import { ROUTES } from '@constants/routes'
 import ProductCard from '@components/products/ProductCard'
 
@@ -24,6 +25,7 @@ function ProductDetailsPage() {
   const location = useLocation()
   const { isAuthenticated } = useAuth()
   const { addToCart } = useCart()
+  const { setBuyNow: setBuyNowProduct } = useBuyNow()
 
   const [product, setProduct] = useState(null)
   const [relatedProducts, setRelatedProducts] = useState([])
@@ -93,19 +95,16 @@ function ProductDetailsPage() {
       navigate(ROUTES.LOGIN, { state: { from: location } })
       return
     }
-    navigate(ROUTES.CHECKOUT, {
-      state: {
-        buyNowProduct: {
-          productId: product._id,
-          _id: product._id,
-          quantity: quantity,
-          name: product.name,
-          price: product.price,
-          image: product.image,
-          size: product.size,
-        },
-      },
+    setBuyNowProduct({
+      productId: product._id,
+      _id: product._id,
+      quantity: quantity,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      size: product.size,
     })
+    navigate(ROUTES.CHECKOUT)
   }
 
   if (loading) {
@@ -282,7 +281,7 @@ function ProductDetailsPage() {
                   key={p._id}
                   product={p}
                   onAddToCart={showToast}
-                  onBuyNow={(prod) => navigate(ROUTES.CHECKOUT, { state: { buyNowProduct: { ...prod, productId: prod._id, quantity: 1 } } })}
+                  onBuyNow={(prod) => setBuyNowProduct({ ...prod, productId: prod._id, quantity: 1 })}
                 />
               ))}
             </div>

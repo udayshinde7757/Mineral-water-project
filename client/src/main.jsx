@@ -4,12 +4,15 @@ import '@styles/index.css'
 import AppRouter from '@/routes/AppRouter'
 import { AuthProvider } from '@context/AuthContext'
 import { CartProvider } from '@context/CartContext'
+import { BuyNowProvider } from '@context/BuyNowContext'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
       <CartProvider>
-        <AppRouter />
+        <BuyNowProvider>
+          <AppRouter />
+        </BuyNowProvider>
       </CartProvider>
     </AuthProvider>
   </StrictMode>

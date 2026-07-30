@@ -17,6 +17,7 @@ import {
 } from 'react-icons/fi'
 import useAuth from '@hooks/useAuth'
 import useCart from '@hooks/useCart'
+import { useBuyNow } from '@hooks/useBuyNow'
 import addressService from '@services/addressService'
 import orderService from '@services/orderService'
 import paymentService from '@services/paymentService'
@@ -72,24 +73,30 @@ const getProductObject = (item) => {
 function CheckoutPage() {
   const { user } = useAuth()
   const { cartItems, cartSubtotal, fetchCart } = useCart()
+  const { buyNowItem, clearBuyNow } = useBuyNow()
   const navigate = useNavigate()
   const location = useLocation()
 
-  // Support Buy Now flow if passed via location state
-  const buyNowItem = location.state?.buyNowProduct
+  // Determine checkout mode: 'buynow' or 'cart'
+  const isBuyNowFlow = !!buyNowItem
+  const isCartFlow = !isBuyNowFlow && cartItems && cartItems.length > 0
 
-  // Merge & validate active checkout items (Filter out nulls or invalid items)
-  const rawItems = (cartItems && cartItems.length > 0)
-    ? cartItems
-    : (buyNowItem ? [buyNowItem] : [])
+  // Get active checkout items based on flow
+  const rawItems = isBuyNowFlow ? [buyNowItem] : (cartItems || [])
 
+  // Validate items
   const validCartItems = rawItems.filter((item) => {
     const pId = getProductIdStr(item)
     if (pId === null) {
-      console.warn('🧹 CheckoutPage: Filtering out cart item with no valid productId (product was likely deleted from DB):', item)
+      console.warn('🧹 CheckoutPage: Filtering out item with no valid productId:', item)
     }
     return pId !== null && (item.quantity === undefined || item.quantity > 0)
   })
+
+  // If neither flow has valid items, redirect
+  if (validCartItems.length === 0 && !isSubmitting) {
+    // We'll handle this in the render
+  }
 
   // Delivery & Subtotal calculations
   const calculatedSubtotal = validCartItems.reduce((acc, item) => {
@@ -99,7 +106,7 @@ function CheckoutPage() {
     return acc + price * qty
   }, 0)
 
-  const effectiveSubtotal = cartSubtotal > 0 ? cartSubtotal : calculatedSubtotal
+  const effectiveSubtotal = isCartFlow ? cartSubtotal : calculatedSubtotal
   const FREE_DELIVERY_THRESHOLD = 500
   const DELIVERY_CHARGE = effectiveSubtotal >= FREE_DELIVERY_THRESHOLD || effectiveSubtotal === 0 ? 0 : 50
   const GST = 0
@@ -242,7 +249,12 @@ function CheckoutPage() {
         const res = await orderService.createOrder(orderData)
 
         if (res.success) {
-          await fetchCart() // Sync cart state
+          // Clear appropriate state based on flow
+          if (isBuyNowFlow) {
+            clearBuyNow()
+          } else {
+            await fetchCart() // Sync cart state (clears cart on backend)
+          }
           navigate(ROUTES.ORDER_SUCCESS, {
             state: { order: res.order },
             replace: true,
@@ -300,7 +312,12 @@ function CheckoutPage() {
               })
 
               if (verifyRes.success) {
-                await fetchCart()
+                // Clear appropriate state based on flow
+                if (isBuyNowFlow) {
+                  clearBuyNow()
+                } else {
+                  await fetchCart()
+                }
                 navigate(ROUTES.ORDER_SUCCESS, {
                   state: { order: verifyRes.order },
                   replace: true,
@@ -338,8 +355,14 @@ function CheckoutPage() {
     }
   }
 
-  // Redirect if cart is empty and not submitting
+  // Redirect if no valid items and not submitting
   if (validCartItems.length === 0 && !isSubmitting) {
+    const message = isBuyNowFlow
+      ? 'The selected product is no longer available.'
+      : 'Your cart is empty. Please add items to your cart before proceeding to checkout.'
+    const buttonText = isBuyNowFlow ? 'Explore Products' : 'Explore Products'
+    const buttonLink = isBuyNowFlow ? ROUTES.PRODUCTS : ROUTES.PRODUCTS
+
     return (
       <div className="min-h-screen bg-gradient-to-b from-lightblue/20 to-white flex items-center justify-center py-16 px-4">
         <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-card border border-gray-100 space-y-6">
@@ -347,11 +370,13 @@ function CheckoutPage() {
             <FiShoppingBag className="w-8 h-8" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-darkgray">Your cart is empty</h2>
-            <p className="text-gray-500 text-sm">Please add items to your cart before proceeding to checkout.</p>
+            <h2 className="text-2xl font-bold text-darkgray">
+              {isBuyNowFlow ? 'Product Unavailable' : 'Your cart is empty'}
+            </h2>
+            <p className="text-gray-500 text-sm">{message}</p>
           </div>
-          <Link to={ROUTES.PRODUCTS} className="btn-primary w-full inline-block !py-3 font-bold">
-            Explore Products
+          <Link to={buttonLink} className="btn-primary w-full inline-block !py-3 font-bold">
+            {buttonText}
           </Link>
         </div>
       </div>
@@ -364,11 +389,11 @@ function CheckoutPage() {
         {/* Navigation back link */}
         <div className="mb-6">
           <Link
-            to={ROUTES.CART}
+            to={isBuyNowFlow ? ROUTES.PRODUCTS : ROUTES.CART}
             className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-primary transition-colors"
           >
             <FiArrowLeft className="w-4 h-4" />
-            <span>Back to Shopping Cart</span>
+            <span>{isBuyNowFlow ? 'Back to Products' : 'Back to Shopping Cart'}</span>
           </Link>
         </div>
 
@@ -378,7 +403,9 @@ function CheckoutPage() {
             Checkout & Delivery
           </h1>
           <p className="text-sm text-gray-500 mt-1">
-            Complete your order details below to receive your pure mineral water.
+            {isBuyNowFlow
+              ? 'Complete your purchase for the selected product.'
+              : 'Complete your order details below to receive your pure mineral water.'}
           </p>
         </div>
 
@@ -651,7 +678,7 @@ function CheckoutPage() {
                 <h3 className="text-xl font-bold text-darkgray border-b border-gray-100 pb-4 flex items-center justify-between">
                   <span>Order Summary</span>
                   <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-lightblue text-primary">
-                    {validCartItems.reduce((acc, i) => acc + (i.quantity || 1), 0)} Items
+                    {validCartItems.reduce((acc, i) => acc + (i.quantity || 1), 0)} Item{validCartItems.reduce((acc, i) => acc + (i.quantity || 1), 0) !== 1 ? 's' : ''}
                   </span>
                 </h3>
 
