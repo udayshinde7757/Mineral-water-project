@@ -16,6 +16,7 @@ const orderRoutes = require("./routes/orderRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const addressRoutes = require("./routes/addressRoutes");
 const contactRoutes = require("./routes/contactRoutes");
+const enquiryRoutes = require("./routes/enquiryRoutes");
 
 dotenv.config();
 
@@ -51,6 +52,8 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/address", addressRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/enquiry", enquiryRoutes);
+
 
 app.get("/", (req, res) => {
   res.send("Backend Running — AquaPure API Active");

@@ -6,7 +6,7 @@ export const enquiryService = {
    * @param {Object} enquiryData - { name, email, phone, productId, quantity, message }
    */
   submitEnquiry: async (enquiryData) => {
-    const response = await apiClient.post('/enquiries', enquiryData)
+    const response = await apiClient.post('/enquiry', enquiryData)
     return response.data
   },
 
@@ -15,7 +15,7 @@ export const enquiryService = {
    * @param {Object} params - { search, status, page, limit }
    */
   getEnquiries: async (params = {}) => {
-    const response = await apiClient.get('/enquiries', { params })
+    const response = await apiClient.get('/enquiry', { params })
     return response.data
   },
 
@@ -24,7 +24,7 @@ export const enquiryService = {
    * @param {string} id
    */
   completeEnquiry: async (id) => {
-    const response = await apiClient.put(`/enquiries/${id}`)
+    const response = await apiClient.put(`/enquiry/${id}`)
     return response.data
   },
 
@@ -33,7 +33,7 @@ export const enquiryService = {
    * @param {string} id
    */
   deleteEnquiry: async (id) => {
-    const response = await apiClient.delete(`/enquiries/${id}`)
+    const response = await apiClient.delete(`/enquiry/${id}`)
     return response.data
   },
 
@@ -41,7 +41,7 @@ export const enquiryService = {
    * Fetch Dashboard analytics and statistics (Admin)
    */
   getDashboardStats: async () => {
-    const response = await apiClient.get('/enquiries/stats')
+    const response = await apiClient.get('/enquiry/stats')
     return response.data
   },
 }

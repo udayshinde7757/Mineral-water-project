@@ -20,9 +20,14 @@ export default defineConfig({
       '@assets': path.resolve(__dirname, './src/assets'),
     },
   },
+
   server: {
+    host: true,
     port: 5173,
     open: true,
+
+    allowedHosts: true,
+
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
@@ -30,6 +35,7 @@ export default defineConfig({
       },
     },
   },
+
   build: {
     outDir: 'dist',
     sourcemap: false,
