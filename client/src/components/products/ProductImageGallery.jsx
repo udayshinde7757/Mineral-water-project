@@ -1,5 +1,4 @@
 import { useState, useRef } from 'react'
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 
 function ProductImageGallery({ images, productName }) {
   const imageList = Array.isArray(images) && images.length > 0 ? images : [images].filter(Boolean)

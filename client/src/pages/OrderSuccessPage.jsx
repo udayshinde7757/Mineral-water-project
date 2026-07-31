@@ -1,15 +1,12 @@
-import { useLocation, Link, Navigate } from 'react-router-dom'
+import { useLocation, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   FiCheckCircle,
   FiPackage,
   FiShoppingBag,
   FiMapPin,
-  FiClock,
   FiCalendar,
-  FiTruck,
   FiCreditCard,
-  FiDroplet,
   FiCheck,
 } from 'react-icons/fi'
 import { ROUTES } from '@constants/routes'

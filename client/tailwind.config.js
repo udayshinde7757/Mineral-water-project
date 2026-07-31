@@ -66,7 +66,7 @@ export default {
       // ─── Typography ────────────────────────────────────────────────────
       fontFamily: {
         sans:    ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        display: ['Sora', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['Poppins', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         'display-xl': ['clamp(2.75rem, 6vw, 4.25rem)', { lineHeight: '1.08', fontWeight: '800' }],

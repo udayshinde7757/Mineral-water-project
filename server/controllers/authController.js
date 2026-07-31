@@ -1,11 +1,20 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-// Helper function to generate JWT
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || "default_jwt_secret", {
-    expiresIn: "7d",
-  });
+// Helper function to generate JWT with user details & role
+const generateToken = (user) => {
+  return jwt.sign(
+    {
+      id: user._id,
+      fullname: user.fullname,
+      email: user.email,
+      role: user.role || "user",
+    },
+    process.env.JWT_SECRET || "default_jwt_secret",
+    {
+      expiresIn: "7d",
+    }
+  );
 };
 
 /**
@@ -41,15 +50,16 @@ const signup = async (req, res) => {
       });
     }
 
-    // Create user
+    // Create user (Strictly enforce role="user", ignore any role from request body)
     const user = await User.create({
       fullname: fullname.trim(),
       email: email.toLowerCase().trim(),
       password,
+      role: "user",
     });
 
-    // Generate Token
-    const token = generateToken(user._id);
+    // Generate Token with payload
+    const token = generateToken(user);
 
     return res.status(201).json({
       success: true,
@@ -59,6 +69,7 @@ const signup = async (req, res) => {
         id: user._id,
         fullname: user.fullname,
         email: user.email,
+        role: user.role,
         createdAt: user.createdAt,
       },
     });
@@ -107,7 +118,7 @@ const login = async (req, res) => {
     }
 
     // Generate Token
-    const token = generateToken(user._id);
+    const token = generateToken(user);
 
     return res.status(200).json({
       success: true,
@@ -117,6 +128,7 @@ const login = async (req, res) => {
         id: user._id,
         fullname: user.fullname,
         email: user.email,
+        role: user.role || "user",
         createdAt: user.createdAt,
       },
     });
@@ -162,6 +174,7 @@ const getMe = async (req, res) => {
         id: req.user._id,
         fullname: req.user.fullname,
         email: req.user.email,
+        role: req.user.role || "user",
         createdAt: req.user.createdAt,
       },
     });

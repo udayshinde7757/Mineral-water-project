@@ -32,6 +32,7 @@ export default [
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       'react/jsx-uses-react': 'off',
+      'react/jsx-uses-vars': 'error',
       'react/self-closing-comp': 'warn',
       'react/jsx-no-duplicate-props': 'error',
       'react/jsx-key': 'error',
@@ -47,6 +48,21 @@ export default [
     },
     settings: {
       react: { version: 'detect' },
+    },
+  },
+  {
+    // Vite config runs in Node — needs Node globals (__dirname, path, etc.)
+    files: ['vite.config.js'],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
+  {
+    // Context files export a Context object + Provider/hook from one module —
+    // standard React pattern; Fast Refresh exception doesn't apply here.
+    files: ['src/context/*.jsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
     },
   },
 ]

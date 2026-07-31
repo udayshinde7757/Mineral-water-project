@@ -47,6 +47,30 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    images: {
+      type: [String],
+      default: [],
+    },
+    originalPrice: {
+      type: Number,
+      default: null,
+    },
+    discountPercent: {
+      type: Number,
+      default: 0,
+    },
+    isOffer: {
+      type: Boolean,
+      default: false,
+    },
+    offerText: {
+      type: String,
+      default: "",
+    },
+    isVisible: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,

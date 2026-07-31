@@ -3,18 +3,14 @@ import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   FiPackage,
-  FiClock,
-  FiCheckCircle,
   FiXCircle,
-  FiTruck,
   FiMapPin,
-  FiShoppingBag,
   FiRefreshCw,
   FiEye,
   FiCalendar,
   FiAlertCircle,
   FiX,
-  FiDollarSign,
+  FiInfo,
 } from 'react-icons/fi'
 import orderService from '@services/orderService'
 import { ROUTES } from '@constants/routes'
@@ -28,7 +24,9 @@ function MyOrdersPage() {
   // Selected Order for Details Modal
   const [selectedOrder, setSelectedOrder] = useState(null)
 
-  // Cancelling State
+  // Cancellation Modal State
+  const [cancelModalOrder, setCancelModalOrder] = useState(null)
+  const [cancelReason, setCancelReason] = useState('')
   const [cancellingId, setCancellingId] = useState(null)
   const [cancelError, setCancelError] = useState('')
 
@@ -76,27 +74,38 @@ function MyOrdersPage() {
     loadUserOrders()
   }, [])
 
-  // Cancel Order Handler
-  const handleCancelOrder = async (orderId) => {
-    if (!window.confirm('Are you sure you want to cancel this order?')) return
+  // Open the cancellation confirmation modal
+  const openCancelModal = (order) => {
+    setCancelError('')
+    setCancelReason('')
+    setCancelModalOrder(order)
+  }
+
+  const closeCancelModal = () => {
+    setCancelModalOrder(null)
+    setCancelReason('')
+    setCancelError('')
+  }
+
+  // Confirm Cancellation
+  const confirmCancelOrder = async () => {
+    if (!cancelModalOrder) return
 
     try {
-      setCancellingId(orderId)
+      setCancellingId(cancelModalOrder._id)
       setCancelError('')
-      const res = await orderService.cancelOrder(orderId)
+      const res = await orderService.cancelOrder(cancelModalOrder._id, cancelReason)
 
       if (res.success) {
-        // Update order in local state
+        const updatedOrder = res.order
+        // Update order in local state with the full server response
         setOrders((prev) =>
-          prev.map((o) => (o._id === orderId ? { ...o, orderStatus: 'Cancelled', paymentStatus: o.paymentStatus === 'Paid' ? 'Refunded' : o.paymentStatus } : o))
+          prev.map((o) => (o._id === cancelModalOrder._id ? updatedOrder : o))
         )
-        if (selectedOrder?._id === orderId) {
-          setSelectedOrder((prev) => ({
-            ...prev,
-            orderStatus: 'Cancelled',
-            paymentStatus: prev.paymentStatus === 'Paid' ? 'Refunded' : prev.paymentStatus,
-          }))
+        if (selectedOrder?._id === cancelModalOrder._id) {
+          setSelectedOrder(updatedOrder)
         }
+        closeCancelModal()
       } else {
         setCancelError(res.message || 'Failed to cancel order.')
       }
@@ -113,12 +122,22 @@ function MyOrdersPage() {
     switch (status) {
       case 'Placed':
         return <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700">Order Placed</span>
+      case 'Pending':
+        return <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-600">Pending</span>
       case 'Confirmed':
         return <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-700">Confirmed</span>
+      case 'Processing':
+        return <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-violet-50 text-violet-700">Processing</span>
+      case 'Packed':
+        return <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-cyan-50 text-cyan-700">Packed</span>
       case 'Shipped':
+        return <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700">Shipped</span>
+      case 'Out For Delivery':
         return <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700">Out for Delivery</span>
       case 'Delivered':
         return <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700">Delivered</span>
+      case 'Completed':
+        return <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700">Completed</span>
       case 'Cancelled':
         return <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-red-50 text-red-600">Cancelled</span>
       default:
@@ -126,10 +145,27 @@ function MyOrdersPage() {
     }
   }
 
+  // Refund Status Badge
+  const getRefundBadge = (refundStatus) => {
+    switch (refundStatus) {
+      case 'Completed':
+        return <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-600">Refund Completed</span>
+      case 'Initiated':
+        return <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700">Refund Initiated</span>
+      case 'Failed':
+        return <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-red-50 text-red-600">Refund Failed</span>
+      default:
+        return null
+    }
+  }
+
+  // Whether the order can currently be cancelled
+  const canCancelOrder = (order) => ['Placed', 'Pending', 'Confirmed', 'Processing'].includes(order.orderStatus)
+
   // Filter Orders based on active tab
   const filteredOrders = orders.filter((order) => {
-    if (activeTab === 'active') return ['Placed', 'Confirmed', 'Shipped'].includes(order.orderStatus)
-    if (activeTab === 'delivered') return order.orderStatus === 'Delivered'
+    if (activeTab === 'active') return ['Placed', 'Pending', 'Confirmed', 'Processing', 'Packed', 'Shipped', 'Out For Delivery'].includes(order.orderStatus)
+    if (activeTab === 'delivered') return ['Delivered', 'Completed'].includes(order.orderStatus)
     if (activeTab === 'cancelled') return order.orderStatus === 'Cancelled'
     return true // 'all'
   })
@@ -167,12 +203,12 @@ function MyOrdersPage() {
             {
               id: 'active',
               label: 'In Progress',
-              count: orders.filter((o) => ['Placed', 'Confirmed', 'Shipped'].includes(o.orderStatus)).length,
+              count: orders.filter((o) => ['Placed', 'Pending', 'Confirmed', 'Processing', 'Packed', 'Shipped', 'Out For Delivery'].includes(o.orderStatus)).length,
             },
             {
               id: 'delivered',
               label: 'Delivered',
-              count: orders.filter((o) => o.orderStatus === 'Delivered').length,
+              count: orders.filter((o) => ['Delivered', 'Completed'].includes(o.orderStatus)).length,
             },
             {
               id: 'cancelled',
@@ -248,7 +284,7 @@ function MyOrdersPage() {
           /* Order Cards List */
           <div className="space-y-6">
             {filteredOrders.map((order) => {
-              const canCancel = ['Placed', 'Confirmed'].includes(order.orderStatus)
+              const canCancel = canCancelOrder(order)
 
               return (
                 <motion.div
@@ -278,6 +314,7 @@ function MyOrdersPage() {
                     <div className="text-right">
                       <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider">Total Amount</p>
                       <p className="text-lg font-black text-primary">{formatCurrency(order.totalAmount)}</p>
+                      {getRefundBadge(order.refundStatus)}
                     </div>
                   </div>
 
@@ -318,15 +355,10 @@ function MyOrdersPage() {
                       {canCancel && (
                         <button
                           type="button"
-                          onClick={() => handleCancelOrder(order._id)}
-                          disabled={cancellingId === order._id}
-                          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-red-50 text-red-600 text-xs font-semibold hover:bg-red-100 transition-colors disabled:opacity-50"
+                          onClick={() => openCancelModal(order)}
+                          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-red-50 text-red-600 text-xs font-semibold hover:bg-red-100 transition-colors"
                         >
-                          {cancellingId === order._id ? (
-                            <FiRefreshCw className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <FiXCircle className="w-4 h-4" />
-                          )}
+                          <FiXCircle className="w-4 h-4" />
                           <span>Cancel Order</span>
                         </button>
                       )}
@@ -366,6 +398,29 @@ function MyOrdersPage() {
                   </div>
                   <p className="text-xs text-gray-400">Placed on {formatDate(selectedOrder.createdAt)}</p>
                 </div>
+
+                {/* Cancellation / Refund Banner */}
+                {selectedOrder.orderStatus === 'Cancelled' && (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 space-y-1.5">
+                    <p className="text-sm font-bold text-red-700 flex items-center gap-1.5">
+                      <FiInfo className="w-4 h-4" />
+                      <span>Order Cancelled {formatDate(selectedOrder.cancelledAt)}</span>
+                    </p>
+                    {selectedOrder.cancellationReason && (
+                      <p className="text-xs text-red-600">Reason: {selectedOrder.cancellationReason}</p>
+                    )}
+                    {selectedOrder.refundStatus && selectedOrder.refundStatus !== 'None' && (
+                      <div className="flex flex-wrap items-center gap-2 pt-1">
+                        {getRefundBadge(selectedOrder.refundStatus)}
+                        {selectedOrder.refundStatus === 'Failed' && (
+                          <span className="text-xs text-red-600 font-semibold">
+                            Refund failed — our team is resolving this.
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Shipping Address */}
                 <div className="bg-[#F8FBFD] rounded-xl p-4 border border-gray-100/80 space-y-1 text-xs text-gray-600">
@@ -410,6 +465,20 @@ function MyOrdersPage() {
                     <span>Payment Status</span>
                     <span className="font-bold text-primary">{selectedOrder.paymentStatus}</span>
                   </div>
+                  {selectedOrder.refundStatus && selectedOrder.refundStatus !== 'None' && (
+                    <>
+                      <div className="flex justify-between">
+                        <span>Refund Status</span>
+                        <span className="font-bold text-primary">{selectedOrder.refundStatus}</span>
+                      </div>
+                      {selectedOrder.refundId && (
+                        <div className="flex justify-between">
+                          <span>Refund ID</span>
+                          <span className="font-bold text-darkgray font-mono">{selectedOrder.refundId}</span>
+                        </div>
+                      )}
+                    </>
+                  )}
                   <div className="flex justify-between">
                     <span>Subtotal</span>
                     <span className="font-bold text-darkgray">{formatCurrency(selectedOrder.subtotal)}</span>
@@ -426,11 +495,10 @@ function MyOrdersPage() {
 
                 {/* Modal Footer Actions */}
                 <div className="flex items-center justify-end gap-3 pt-2">
-                  {['Placed', 'Confirmed'].includes(selectedOrder.orderStatus) && (
+                  {canCancelOrder(selectedOrder) && (
                     <button
                       type="button"
-                      onClick={() => handleCancelOrder(selectedOrder._id)}
-                      disabled={cancellingId === selectedOrder._id}
+                      onClick={() => { openCancelModal(selectedOrder); setSelectedOrder(null) }}
                       className="btn-secondary !py-2.5 !px-4 text-xs font-semibold text-red-600 hover:bg-red-50"
                     >
                       Cancel Order
@@ -442,6 +510,97 @@ function MyOrdersPage() {
                     className="btn-primary !py-2.5 !px-5 text-xs font-semibold"
                   >
                     Close Window
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Cancel Confirmation Modal */}
+        <AnimatePresence>
+          {cancelModalOrder && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-white rounded-2xl max-w-md w-full shadow-xl border border-gray-100/80 p-6 sm:p-8 space-y-5"
+              >
+                {/* Header */}
+                <div className="flex items-start gap-3">
+                  <div className="w-11 h-11 rounded-xl bg-red-50 text-red-500 flex items-center justify-center flex-shrink-0">
+                    <FiXCircle className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-extrabold text-darkgray">Cancel Order?</h3>
+                    <p className="text-sm text-gray-500 mt-0.5">
+                      Order <span className="font-mono font-bold text-darkgray">#{cancelModalOrder._id}</span>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800 leading-relaxed">
+                  Are you sure you want to cancel this order? This action cannot be undone.
+                </div>
+
+                {cancelModalOrder.paymentMethod !== 'COD' && cancelModalOrder.paymentStatus === 'Paid' && (
+                  <p className="text-xs text-gray-500 leading-relaxed">
+                    A full refund of <span className="font-bold text-darkgray">{formatCurrency(cancelModalOrder.totalAmount)}</span>{' '}
+                    will be initiated to your original payment method.
+                  </p>
+                )}
+
+                {/* Optional Reason */}
+                <div className="space-y-1.5">
+                  <label htmlFor="cancel-reason" className="text-xs font-bold text-gray-500 uppercase tracking-wide">
+                    Reason (optional)
+                  </label>
+                  <textarea
+                    id="cancel-reason"
+                    rows="3"
+                    maxLength="500"
+                    value={cancelReason}
+                    onChange={(e) => setCancelReason(e.target.value)}
+                    placeholder="e.g. Changed my mind, ordered by mistake..."
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-darkgray bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary transition-all resize-none"
+                  />
+                </div>
+
+                {cancelError && (
+                  <div className="p-3 rounded-xl bg-red-50 border border-red-200 flex items-center gap-2 text-red-700 text-sm font-medium">
+                    <FiAlertCircle className="w-4 h-4 flex-shrink-0" />
+                    <span>{cancelError}</span>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex items-center justify-end gap-3 pt-1">
+                  <button
+                    type="button"
+                    onClick={closeCancelModal}
+                    disabled={cancellingId === cancelModalOrder._id}
+                    className="px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                  >
+                    Keep Order
+                  </button>
+                  <button
+                    type="button"
+                    onClick={confirmCancelOrder}
+                    disabled={cancellingId === cancelModalOrder._id}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors disabled:opacity-60"
+                  >
+                    {cancellingId === cancelModalOrder._id ? (
+                      <>
+                        <FiRefreshCw className="w-4 h-4 animate-spin" />
+                        <span>Cancelling...</span>
+                      </>
+                    ) : (
+                      <>
+                        <FiXCircle className="w-4 h-4" />
+                        <span>Confirm Cancellation</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </motion.div>

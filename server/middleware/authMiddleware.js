@@ -28,6 +28,13 @@ const protect = async (req, res, next) => {
         });
       }
 
+      if (req.user.status === "blocked") {
+        return res.status(403).json({
+          success: false,
+          message: "Your account has been suspended by an administrator.",
+        });
+      }
+
       next();
     } catch (error) {
       console.error("JWT Verification Error:", error.message);
@@ -52,17 +59,13 @@ const admin = (req, res, next) => {
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean);
 
-  if (adminEmails.length === 0) {
-    return res.status(403).json({
-      success: false,
-      message: "Admin access is not configured on the server.",
-    });
-  }
+  const isAdminRole = req.user && req.user.role === "admin";
+  const isEmailAdmin = req.user && adminEmails.includes(req.user.email.toLowerCase());
 
-  if (!req.user || !adminEmails.includes(req.user.email.toLowerCase())) {
+  if (!req.user || (!isAdminRole && !isEmailAdmin)) {
     return res.status(403).json({
       success: false,
-      message: "Not authorized as admin.",
+      message: "Access denied. Admin privileges required.",
     });
   }
 
@@ -70,3 +73,4 @@ const admin = (req, res, next) => {
 };
 
 module.exports = { protect, admin };
+

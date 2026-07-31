@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import {
   FiArrowLeft,
   FiShoppingCart,

@@ -1,198 +1,132 @@
-/**
- * Create a reusable transporter using SMTP credentials from .env
- */
-const createTransporter = () => {
-  const nodemailer = require("nodemailer");
-  return nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.SMTP_EMAIL,
-      pass: process.env.SMTP_PASSWORD,
-    },
-  });
-};
+const nodemailer = require("nodemailer");
+const NotificationLog = require("../models/NotificationLog");
+const SiteSettings = require("../models/SiteSettings");
 
 /**
- * Format currency in INR
+ * Creates Nodemailer transporter from DB settings or environment variables.
  */
-const formatCurrency = (amount) => {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0,
-  }).format(amount);
-};
+async function getTransporter() {
+  try {
+    const settings = await SiteSettings.findOne();
+    if (settings && settings.smtpUser && settings.smtpPass) {
+      return nodemailer.createTransport({
+        host: settings.smtpHost || "smtp.gmail.com",
+        port: settings.smtpPort || 587,
+        secure: settings.smtpPort === 465,
+        auth: {
+          user: settings.smtpUser,
+          pass: settings.smtpPass,
+        },
+      });
+    }
+  } catch (err) {
+    console.warn("Could not fetch SMTP settings from DB, using fallback:", err.message);
+  }
+
+  if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+    return nodemailer.createTransport({
+      host: process.env.SMTP_HOST || "smtp.gmail.com",
+      port: Number(process.env.SMTP_PORT) || 587,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+  }
+
+  return null; // Return null if no transporter configured
+}
 
 /**
- * Generate branded HTML email template for order confirmation
+ * Sends order status update email to customer & logs in NotificationLog DB.
  */
-const generateOrderEmailHTML = (order) => {
-  const productsHTML = order.products
-    .map(
-      (item) => `
-      <tr>
-        <td style="padding: 12px; border-bottom: 1px solid #f0f0f0;">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <img src="${item.image}" alt="${item.name}" 
-              style="width: 50px; height: 50px; object-fit: contain; border-radius: 8px; background: #E6F7FF; padding: 4px;" />
-            <span style="font-weight: 600; color: #333;">${item.name}</span>
-          </div>
-        </td>
-        <td style="padding: 12px; text-align: center; border-bottom: 1px solid #f0f0f0; color: #555;">${item.quantity}</td>
-        <td style="padding: 12px; text-align: right; border-bottom: 1px solid #f0f0f0; font-weight: 600; color: #333;">${formatCurrency(item.price * item.quantity)}</td>
-      </tr>`
-    )
+async function sendOrderStatusEmail(order, statusEvent, customNotes = "") {
+  const recipient = order.shippingAddress?.email || "customer@example.com";
+  const customerName = order.shippingAddress?.fullName || "Valued Customer";
+  const orderIdStr = order._id ? order._id.toString() : "ORD-UNKNOWN";
+  const productsList = (order.products || [])
+    .map((p) => `<li>${p.name} (x${p.quantity}) - ₹${p.price * p.quantity}</li>`)
     .join("");
 
-  const estimatedDate = new Date(order.estimatedDelivery).toLocaleDateString(
-    "en-IN",
-    {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }
-  );
+  const subject = `[AquaPure] Order #${orderIdStr.slice(-6).toUpperCase()} Update: ${statusEvent}`;
 
-  return `
-  <!DOCTYPE html>
-  <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  </head>
-  <body style="margin: 0; padding: 0; background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-    <div style="max-width: 600px; margin: 0 auto; background: #ffffff;">
-      <!-- Header -->
-      <div style="background: linear-gradient(135deg, #0A77B7 0%, #00B8A9 100%); padding: 32px; text-align: center;">
-        <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">💧 AquaPure</h1>
-        <p style="color: rgba(255,255,255,0.85); margin: 8px 0 0; font-size: 14px;">Pure from Source to Bottle</p>
+  const htmlContent = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; background: #ffffff;">
+      <div style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); padding: 24px; text-align: center; color: #ffffff;">
+        <h1 style="margin: 0; font-size: 24px;">AquaPure Mineral Water</h1>
+        <p style="margin: 6px 0 0 0; font-size: 14px; opacity: 0.9;">Pure & Refreshing Hydration Delivered to Your Doorstep</p>
       </div>
+      <div style="padding: 24px; color: #333333;">
+        <h2 style="color: #0284c7; margin-top: 0;">Hello ${customerName},</h2>
+        <p style="font-size: 15px; line-height: 1.6;">
+          Your order status has been updated to: <strong><span style="color: #0369a1;">${statusEvent}</span></strong>.
+        </p>
 
-      <!-- Success Badge -->
-      <div style="text-align: center; padding: 32px 24px 16px;">
-        <div style="display: inline-block; background: #E6F7FF; border-radius: 50%; width: 64px; height: 64px; line-height: 64px; font-size: 32px;">✅</div>
-        <h2 style="color: #333; margin: 16px 0 4px; font-size: 22px;">Order Confirmed!</h2>
-        <p style="color: #777; margin: 0; font-size: 14px;">Thank you for choosing AquaPure, <strong>${order.shippingAddress.fullName}</strong>!</p>
-      </div>
+        ${customNotes ? `<div style="background: #f0f9ff; border-left: 4px solid #0284c7; padding: 12px; margin: 16px 0; font-size: 14px; color: #0369a1;"><strong>Note:</strong> ${customNotes}</div>` : ""}
 
-      <!-- Order Info -->
-      <div style="margin: 0 24px; padding: 16px 20px; background: #f8fafb; border-radius: 12px; border: 1px solid #e8ecef;">
-        <table style="width: 100%; font-size: 13px; color: #555;">
-          <tr>
-            <td style="padding: 4px 0;"><strong>Order ID:</strong></td>
-            <td style="text-align: right; font-weight: 700; color: #0A77B7;">#${order._id.toString().slice(-8).toUpperCase()}</td>
-          </tr>
-          <tr>
-            <td style="padding: 4px 0;"><strong>Order Date:</strong></td>
-            <td style="text-align: right;">${new Date(order.orderDate).toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" })}</td>
-          </tr>
-          <tr>
-            <td style="padding: 4px 0;"><strong>Payment Method:</strong></td>
-            <td style="text-align: right;">${order.paymentMethod === "COD" ? "Cash on Delivery" : order.paymentMethod}</td>
-          </tr>
-          <tr>
-            <td style="padding: 4px 0;"><strong>Payment Status:</strong></td>
-            <td style="text-align: right;">
-              <span style="background: ${order.paymentStatus === "Paid" ? "#00B8A9" : "#f59e0b"}; color: white; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;">
-                ${order.paymentStatus}
-              </span>
-            </td>
-          </tr>
-        </table>
-      </div>
+        <div style="background: #f8fafc; border-radius: 8px; padding: 16px; margin: 20px 0;">
+          <h3 style="margin-top: 0; font-size: 16px; color: #1e293b;">Order Details:</h3>
+          <p style="margin: 4px 0; font-size: 14px;"><strong>Order ID:</strong> #${orderIdStr}</p>
+          <p style="margin: 4px 0; font-size: 14px;"><strong>Order Total:</strong> ₹${order.totalAmount}</p>
+          <p style="margin: 4px 0; font-size: 14px;"><strong>Payment Method:</strong> ${order.paymentMethod}</p>
+          <p style="margin: 4px 0; font-size: 14px;"><strong>Expected Delivery:</strong> ${order.estimatedDelivery ? new Date(order.estimatedDelivery).toLocaleDateString("en-IN") : "3-4 Business Days"}</p>
+        </div>
 
-      <!-- Products Table -->
-      <div style="margin: 20px 24px;">
-        <h3 style="color: #333; font-size: 16px; margin-bottom: 12px;">📦 Order Items</h3>
-        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-          <thead>
-            <tr style="background: #f0f7fb;">
-              <th style="padding: 10px 12px; text-align: left; color: #0A77B7; font-weight: 700;">Product</th>
-              <th style="padding: 10px 12px; text-align: center; color: #0A77B7; font-weight: 700;">Qty</th>
-              <th style="padding: 10px 12px; text-align: right; color: #0A77B7; font-weight: 700;">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${productsHTML}
-          </tbody>
-        </table>
-      </div>
+        <h4 style="margin-bottom: 8px; font-size: 15px; color: #1e293b;">Items Ordered:</h4>
+        <ul style="padding-left: 20px; font-size: 14px; color: #475569;">
+          ${productsList || "<li>AquaPure Mineral Water Bottled Package</li>"}
+        </ul>
 
-      <!-- Price Summary -->
-      <div style="margin: 0 24px; padding: 16px 20px; background: #f8fafb; border-radius: 12px; border: 1px solid #e8ecef;">
-        <table style="width: 100%; font-size: 13px; color: #555;">
-          <tr>
-            <td style="padding: 4px 0;">Subtotal</td>
-            <td style="text-align: right;">${formatCurrency(order.subtotal)}</td>
-          </tr>
-          <tr>
-            <td style="padding: 4px 0;">Delivery Charges</td>
-            <td style="text-align: right;">${order.deliveryCharges === 0 ? '<span style="color: #00B8A9; font-weight: 700;">FREE</span>' : formatCurrency(order.deliveryCharges)}</td>
-          </tr>
-          ${order.gst > 0 ? `<tr><td style="padding: 4px 0;">GST</td><td style="text-align: right;">${formatCurrency(order.gst)}</td></tr>` : ""}
-          <tr>
-            <td style="padding: 8px 0 4px; border-top: 2px solid #e0e0e0; font-weight: 800; font-size: 15px; color: #333;">Total Amount</td>
-            <td style="padding: 8px 0 4px; border-top: 2px solid #e0e0e0; text-align: right; font-weight: 800; font-size: 18px; color: #0A77B7;">${formatCurrency(order.totalAmount)}</td>
-          </tr>
-        </table>
-      </div>
-
-      <!-- Shipping Address -->
-      <div style="margin: 20px 24px; padding: 16px 20px; background: #f8fafb; border-radius: 12px; border: 1px solid #e8ecef;">
-        <h3 style="color: #333; font-size: 14px; margin: 0 0 8px;">🚚 Shipping Address</h3>
-        <p style="color: #555; font-size: 13px; margin: 0; line-height: 1.6;">
-          ${order.shippingAddress.fullName}<br>
-          ${order.shippingAddress.addressLine1}${order.shippingAddress.addressLine2 ? ", " + order.shippingAddress.addressLine2 : ""}<br>
-          ${order.shippingAddress.city}, ${order.shippingAddress.state} — ${order.shippingAddress.pincode}<br>
-          ${order.shippingAddress.country}<br>
-          📱 ${order.shippingAddress.phone}
+        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
+        <p style="font-size: 13px; color: #64748b; text-align: center;">
+          Thank you for choosing AquaPure. If you have any questions, contact support at support@aquapure.com.
         </p>
       </div>
-
-      <!-- Estimated Delivery -->
-      <div style="margin: 20px 24px; text-align: center; padding: 20px; background: linear-gradient(135deg, #E6F7FF 0%, #e0f8f6 100%); border-radius: 12px;">
-        <p style="color: #555; font-size: 13px; margin: 0 0 4px;">Estimated Delivery</p>
-        <p style="color: #0A77B7; font-size: 18px; font-weight: 800; margin: 0;">${estimatedDate}</p>
-      </div>
-
-      <!-- Footer -->
-      <div style="background: #333; padding: 24px; text-align: center; margin-top: 20px;">
-        <p style="color: rgba(255,255,255,0.7); font-size: 12px; margin: 0;">© ${new Date().getFullYear()} AquaPure. All rights reserved.</p>
-        <p style="color: rgba(255,255,255,0.5); font-size: 11px; margin: 8px 0 0;">Pure hydration delivered to your doorstep.</p>
-      </div>
     </div>
-  </body>
-  </html>`;
-};
+  `;
 
-/**
- * Send order confirmation email
- * @param {Object} order - The order document from MongoDB
- */
-const sendOrderConfirmationEmail = async (order) => {
+  let status = "Sent";
+  let errorMsg = null;
+
   try {
-    if (!process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {
-      console.warn("⚠️  SMTP credentials not configured. Skipping email notification.");
-      return { success: false, message: "SMTP not configured" };
+    const transporter = await getTransporter();
+    if (transporter) {
+      await transporter.sendMail({
+        from: '"AquaPure Admin" <no-reply@aquapure.com>',
+        to: recipient,
+        subject,
+        html: htmlContent,
+      });
+      console.log(`[Email Service] Email sent successfully to ${recipient} for event: ${statusEvent}`);
+    } else {
+      console.log(`[Email Service Mock] Transporter not configured. Simulated sending email to ${recipient}`);
     }
-
-    const transporter = createTransporter();
-
-    const mailOptions = {
-      from: `"AquaPure" <${process.env.SMTP_EMAIL}>`,
-      to: order.shippingAddress.email,
-      subject: `✅ AquaPure Order Confirmed — #${order._id.toString().slice(-8).toUpperCase()}`,
-      html: generateOrderEmailHTML(order),
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-    console.log("📧 Order confirmation email sent:", info.messageId);
-    return { success: true, messageId: info.messageId };
-  } catch (error) {
-    console.error("❌ Email sending failed:", error.message);
-    return { success: false, message: error.message };
+  } catch (err) {
+    status = "Failed";
+    errorMsg = err.message;
+    console.error(`[Email Service Error] Failed to send email to ${recipient}:`, err.message);
   }
-};
 
-module.exports = { sendOrderConfirmationEmail };
+  // Save to Notification Log DB
+  try {
+    await NotificationLog.create({
+      type: "Email",
+      recipient,
+      event: statusEvent,
+      orderId: order._id,
+      customerName,
+      messageSnippet: `Subject: ${subject} | Status: ${statusEvent}`,
+      status,
+      error: errorMsg,
+      sentAt: new Date(),
+    });
+  } catch (dbErr) {
+    console.error("Failed to record notification log:", dbErr.message);
+  }
+
+  return { success: status === "Sent", status, error: errorMsg };
+}
+
+module.exports = {
+  sendOrderStatusEmail,
+};

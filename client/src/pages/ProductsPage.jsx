@@ -12,12 +12,10 @@ import {
 } from 'react-icons/fi'
 import productService from '@services/productService'
 import ProductCard from '@components/products/ProductCard'
-import useAuth from '@hooks/useAuth'
 import useCart from '@hooks/useCart'
 import { ROUTES } from '@constants/routes'
 
 function ProductsPage() {
-  const { user } = useAuth()
   const { addToCart } = useCart()
   const navigate = useNavigate()
 
