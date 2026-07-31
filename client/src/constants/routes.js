@@ -14,5 +14,6 @@ export const ROUTES = {
   ORDER_SUCCESS: '/order-success',
   MY_ORDERS: '/my-orders',
   ENQUIRY: '/enquiry',
+  PRODUCT_DETAILS: '/products/:id',
 }
 

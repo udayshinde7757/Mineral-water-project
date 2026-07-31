@@ -9,14 +9,18 @@ import {
   FiDroplet,
   FiMail,
   FiStar,
-  FiPackage,
-  FiAlertCircle
+  FiAlertCircle,
+  FiChevronRight,
+  FiHome,
 } from 'react-icons/fi'
 import productService from '@services/productService'
 import useAuth from '@hooks/useAuth'
 import useCart from '@hooks/useCart'
 import useBuyNow from '@hooks/useBuyNow'
 import { ROUTES } from '@constants/routes'
+import ProductImageGallery from '@components/products/ProductImageGallery'
+import DeliveryInfo from '@components/products/DeliveryInfo'
+import SpecificationsTable from '@components/products/SpecificationsTable'
 import ProductCard from '@components/products/ProductCard'
 
 function ProductDetailsPage() {
@@ -156,26 +160,21 @@ function ProductDetailsPage() {
       )}
 
       <div className="container-app py-10 space-y-14">
-        {/* Back Link */}
-        <div>
-          <Link
-            to={ROUTES.PRODUCTS}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-gray-400 hover:text-[#0F4C81] transition-colors"
-          >
-            <FiArrowLeft className="w-4 h-4" /> Back to All Products
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-2 text-xs sm:text-sm font-medium text-muted">
+          <Link to={ROUTES.HOME} className="hover:text-primary transition-colors flex items-center gap-1">
+            <FiHome className="w-3.5 h-3.5" /> Home
           </Link>
-        </div>
+          <FiChevronRight className="w-3 h-3" />
+          <Link to={ROUTES.PRODUCTS} className="hover:text-primary transition-colors">Products</Link>
+          <FiChevronRight className="w-3 h-3" />
+          <span className="text-heading font-semibold truncate max-w-[180px] sm:max-w-xs">{product.name}</span>
+        </nav>
 
         {/* Product Details Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 bg-white rounded-3xl p-8 sm:p-12 border border-gray-100 shadow-lg">
-          {/* Left Side: Product Image Display */}
-          <div className="bg-gradient-to-b from-[#0F4C81]/[0.06] to-transparent p-8 rounded-2xl flex items-center justify-center min-h-[450px] lg:min-h-[550px]">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="max-h-[420px] sm:max-h-[480px] object-contain hover:scale-105 transition-transform duration-500"
-            />
-          </div>
+          {/* Left Side: Product Image Gallery */}
+          <ProductImageGallery images={product.image} productName={product.name} />
 
           {/* Right Side: Product Meta & Purchase Panel */}
           <div className="space-y-8 flex flex-col justify-between">
@@ -269,6 +268,46 @@ function ProductDetailsPage() {
               </Link>
             </div>
           </div>
+        </div>
+
+        {/* Delivery Information */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-4">
+            <div className="h-px flex-1 bg-gradient-to-r from-gray-200 to-transparent" />
+            <h3 className="text-2xl font-extrabold text-heading tracking-tight">Delivery & Quality</h3>
+            <div className="h-px flex-1 bg-gradient-to-l from-gray-200 to-transparent" />
+          </div>
+          <DeliveryInfo />
+        </div>
+
+        {/* Description & Specifications */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+          <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 sm:p-8 space-y-6">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-primary-50 text-primary flex items-center justify-center">
+                <FiDroplet className="w-4 h-4" />
+              </div>
+              <h3 className="text-lg font-bold text-heading">Product Overview</h3>
+            </div>
+            <p className="text-sm text-body leading-relaxed">
+              {product.description || "Premium AquaPure natural mineral water sourced from protected spring aquifers, enriched with essential health minerals for your daily hydration needs."}
+            </p>
+            <div className="space-y-4 pt-2">
+              <div>
+                <h4 className="text-sm font-bold text-heading mb-1">Benefits</h4>
+                <p className="text-sm text-body leading-relaxed">Naturally balanced pH, enriched with essential minerals like calcium, magnesium, and potassium for optimal hydration and wellness.</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-heading mb-1">Packaging</h4>
+                <p className="text-sm text-body leading-relaxed">Food-grade BPA-free bottles designed to preserve purity and freshness. Recyclable packaging committed to environmental sustainability.</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-heading mb-1">Storage Instructions</h4>
+                <p className="text-sm text-body leading-relaxed">Store in a cool, dry place away from direct sunlight. Refrigerate after opening for best taste. Consume within 48 hours of opening.</p>
+              </div>
+            </div>
+          </div>
+          <SpecificationsTable product={product} />
         </div>
 
         {/* Related Products Grid */}

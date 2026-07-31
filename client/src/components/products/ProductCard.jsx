@@ -20,7 +20,12 @@ function ProductCard({ product, onAddToCart, onBuyNow }) {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const handleAddToCart = async () => {
+  const handleCardClick = () => {
+    navigate(`/products/${product._id}`)
+  }
+
+  const handleAddToCart = async (e) => {
+    e.stopPropagation()
     if (!isAuthenticated) {
       alert("Please login to add products to cart")
       navigate(ROUTES.LOGIN, { state: { from: location } })
@@ -54,7 +59,8 @@ function ProductCard({ product, onAddToCart, onBuyNow }) {
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4 }}
       transition={{ duration: 0.3 }}
-      className="group flex flex-col justify-between overflow-hidden bg-white rounded-3xl border border-gray-100/80 shadow-sm hover:shadow-md transition-all duration-300"
+      onClick={handleCardClick}
+      className="group flex flex-col justify-between overflow-hidden bg-white rounded-3xl border border-gray-100/80 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
     >
       {/* Top Image Container */}
       <div className="relative h-56 sm:h-64 bg-gradient-to-b from-primary-50/40 via-white to-white p-4 flex items-center justify-center overflow-hidden">
@@ -150,7 +156,7 @@ function ProductCard({ product, onAddToCart, onBuyNow }) {
             {/* Buy Now Button */}
             <button
               type="button"
-              onClick={() => onBuyNow(product)}
+              onClick={(e) => { e.stopPropagation(); onBuyNow(product) }}
               className="w-full py-2.5 px-3 rounded-xl bg-[#0F4C81] hover:bg-[#0d3f6a] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-200 shadow-sm hover:shadow-md"
             >
               <FiZap className="w-4 h-4 fill-white" />

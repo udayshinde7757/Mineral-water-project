@@ -215,7 +215,7 @@ function ProductsPage() {
             </button>
           </div>
         ) : products.length === 0 ? (
-          {/* Empty Search / Filter State */}
+          /* Empty Search / Filter State */
           <div className="text-center py-20 bg-white rounded-3xl shadow-sm border border-gray-100 space-y-4 max-w-lg mx-auto px-8">
             <div className="w-16 h-16 rounded-full bg-primary/10 text-primary mx-auto flex items-center justify-center">
               <FiFilter className="w-8 h-8" />
