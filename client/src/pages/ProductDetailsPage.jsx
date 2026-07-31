@@ -261,7 +261,7 @@ function ProductDetailsPage() {
               {/* Enquiry Redirect Button */}
               <Link
                 to={`${ROUTES.ENQUIRY}?productId=${product._id}`}
-                className="w-full inline-flex items-center justify-center gap-2 text-gray-400 hover:text-[#0F4C81] font-semibold py-3 rounded-xl border border-gray-200 hover:border-[#0F4C81]/30 transition-all text-sm"
+                className="w-full inline-flex items-center justify-center px-6 gap-2 text-gray-400 hover:text-[#0F4C81] font-semibold py-3 rounded-xl border border-gray-200 hover:border-[#0F4C81]/30 transition-all text-sm"
               >
                 <FiMail className="w-4 h-4" />
                 <span>Submit Custom Enquiry / Bulk Quote for {product.name}</span>
