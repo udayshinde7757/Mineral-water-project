@@ -423,22 +423,22 @@ function HomePage() {
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {[
               {
-                name: 'Priya Sharma',
+                name: 'Yash Thale',
                 role: 'Regular Customer',
                 text: 'AquaPure has completely changed how I think about drinking water. The taste is incredibly fresh and clean — I can tell the difference immediately. Highly recommended!',
-                rating: 5,
+                rating: 4.8,
               },
               {
-                name: 'Rahul Mehta',
+                name: 'Sairaj Deshmukh',
                 role: 'Fitness Enthusiast',
                 text: 'As someone who drinks over 3 litres of water daily, quality matters. AquaPure delivers consistently pure water with free home delivery. A game-changer for my hydration.',
                 rating: 5,
               },
               {
-                name: 'Ananya Gupta',
+                name: 'Vidhi Surve',
                 role: 'Home Chef',
                 text: 'I use AquaPure for all my cooking and beverages. The natural mineral content enhances the flavour of everything I prepare. It is now the only water in my kitchen.',
-                rating: 4,
+                rating: 4.5,
               },
             ].map((t, i) => (
               <motion.div
