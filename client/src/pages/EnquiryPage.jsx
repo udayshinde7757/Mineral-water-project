@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
   FiSend,
   FiCheckCircle,
   FiAlertCircle,
-  FiDroplet,
   FiPhone,
   FiMail,
   FiPackage,

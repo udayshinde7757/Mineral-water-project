@@ -18,11 +18,14 @@ const addressRoutes = require("./routes/addressRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const enquiryRoutes = require("./routes/enquiryRoutes");
 
+const adminRoutes = require("./routes/adminRoutes");
+const seedAdminUser = require("./utils/seedAdmin");
+
 dotenv.config();
 
 const app = express();
 
-// Connect DB & auto-seed products if collection is empty
+// Connect DB & auto-seed products & admin
 connectDB().then(async () => {
   try {
     const count = await Product.countDocuments();
@@ -31,6 +34,7 @@ connectDB().then(async () => {
       await Product.insertMany(initialProducts);
       console.log("Initial products seeded successfully!");
     }
+    await seedAdminUser();
   } catch (err) {
     console.error("Auto-seeding error:", err.message);
   }
@@ -53,6 +57,7 @@ app.use("/api/payment", paymentRoutes);
 app.use("/api/address", addressRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/enquiry", enquiryRoutes);
+app.use("/api/admin", adminRoutes);
 
 
 app.get("/", (req, res) => {

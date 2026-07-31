@@ -4,9 +4,7 @@ import {
   FiShoppingCart,
   FiZap,
   FiStar,
-  FiCheckCircle,
   FiDroplet,
-  FiPackage,
 } from 'react-icons/fi'
 import { useNavigate, useLocation } from 'react-router-dom'
 import useAuth from '@hooks/useAuth'

@@ -216,6 +216,16 @@ function Navbar() {
                     </div>
 
                     <div className="p-1">
+                      {user?.role === 'admin' && (
+                        <Link
+                          to={ROUTES.ADMIN_DASHBOARD}
+                          onClick={() => setDropdownOpen(false)}
+                          className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm font-bold text-cyan-600 hover:bg-cyan-50 rounded-xl transition-colors"
+                        >
+                          <FiDroplet className="w-4 h-4 text-cyan-600" />
+                          <span>Admin Dashboard</span>
+                        </Link>
+                      )}
                       <Link
                         to={ROUTES.MY_ORDERS}
                         onClick={() => setDropdownOpen(false)}
@@ -233,6 +243,7 @@ function Navbar() {
                         <span>Logout</span>
                       </button>
                     </div>
+
                   </motion.div>
                 )}
               </AnimatePresence>

@@ -47,7 +47,7 @@ const orderSchema = new mongoose.Schema(
     paymentMethod: {
       type: String,
       required: true,
-      enum: ["COD", "UPI", "Card", "NetBanking", "Razorpay / Online"],
+      enum: ["COD", "UPI", "Card", "NetBanking", "Razorpay / Online", "Stripe"],
     },
     paymentStatus: {
       type: String,
@@ -58,9 +58,24 @@ const orderSchema = new mongoose.Schema(
     orderStatus: {
       type: String,
       required: true,
-      enum: ["Placed", "Confirmed", "Shipped", "Delivered", "Cancelled"],
+      enum: ["Placed", "Pending", "Confirmed", "Processing", "Packed", "Shipped", "Out For Delivery", "Delivered", "Completed", "Cancelled"],
       default: "Placed",
     },
+    confirmedAt: { type: Date, default: null },
+    processingAt: { type: Date, default: null },
+    packedAt: { type: Date, default: null },
+    shippedAt: { type: Date, default: null },
+    outForDeliveryAt: { type: Date, default: null },
+    deliveredAt: { type: Date, default: null },
+    completedAt: { type: Date, default: null },
+    statusHistory: [
+      {
+        status: { type: String, required: true },
+        timestamp: { type: Date, default: Date.now },
+        updatedBy: { type: String, default: "system" },
+        notes: { type: String, default: "" },
+      },
+    ],
     subtotal: {
       type: Number,
       required: true,
@@ -98,6 +113,48 @@ const orderSchema = new mongoose.Schema(
     estimatedDelivery: {
       type: Date,
     },
+
+    // ── Cancellation tracking ──────────────────────────────────────────────
+    cancellationReason: {
+      type: String,
+      default: null,
+    },
+    cancelledAt: {
+      type: Date,
+      default: null,
+    },
+    cancelledBy: {
+      type: String,
+      enum: ["customer", "admin"],
+      default: null,
+    },
+
+    // ── Refund tracking (online payments only) ─────────────────────────────
+    refundId: {
+      type: String,
+      default: null,
+    },
+    refundAmount: {
+      type: Number,
+      default: null,
+    },
+    refundedAt: {
+      type: Date,
+      default: null,
+    },
+    refundStatus: {
+      type: String,
+      enum: ["None", "Initiated", "Completed", "Failed"],
+      default: "None",
+    },
+    refundAttempts: {
+      type: Number,
+      default: 0,
+    },
+    refundErrorMessage: {
+      type: String,
+      default: null,
+    },
   },
   {
     timestamps: true,
@@ -110,6 +167,18 @@ orderSchema.pre("save", async function () {
     const deliveryDate = new Date(this.orderDate || Date.now());
     deliveryDate.setDate(deliveryDate.getDate() + 4); // 4 days estimated
     this.estimatedDelivery = deliveryDate;
+  }
+
+  // Seed the initial status history entry when an order is first created.
+  if (!this.statusHistory || this.statusHistory.length === 0) {
+    this.statusHistory = [
+      {
+        status: this.orderStatus,
+        timestamp: this.orderDate || new Date(),
+        updatedBy: "system",
+        notes: "Order placed",
+      },
+    ];
   }
 });
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useLocation, Link } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   FiMapPin,
@@ -10,7 +10,6 @@ import {
   FiArrowLeft,
   FiShoppingBag,
   FiShield,
-  FiCheck,
   FiDollarSign,
   FiAlertCircle,
   FiRefreshCw,
@@ -75,7 +74,6 @@ function CheckoutPage() {
   const { cartItems, cartSubtotal, fetchCart } = useCart()
   const { buyNowItem, clearBuyNow } = useBuyNow()
   const navigate = useNavigate()
-  const location = useLocation()
 
   // Determine checkout mode: 'buynow' or 'cart'
   const isBuyNowFlow = !!buyNowItem

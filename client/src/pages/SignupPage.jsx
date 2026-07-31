@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiAlertCircle, FiCheckCircle, FiDroplet } from 'react-icons/fi'
+import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiAlertCircle, FiCheckCircle } from 'react-icons/fi'
 import useAuth from '@hooks/useAuth'
 import { ROUTES } from '@constants/routes'
 
@@ -40,7 +40,7 @@ function SignupPage() {
       return
     }
 
-    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/
     if (!emailRegex.test(email)) {
       setError('Please enter a valid email address.')
       return

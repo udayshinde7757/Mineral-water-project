@@ -1,13 +1,197 @@
+const mongoose = require("mongoose");
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 const User = require("../models/User");
-const { sendOrderConfirmationEmail } = require("../services/emailService");
-const { sendOrderConfirmationSMS } = require("../services/smsService");
+const {
+  sendAllOrderNotifications,
+  sendAllCancellationNotifications,
+  sendRefundCompletedNotifications,
+} = require("../services/notificationService");
+const {
+  isRefundable,
+  initiateRefund,
+  fetchRefundStatus,
+  mapRefundStatus,
+} = require("../services/refundService");
 
 // Delivery configuration (must match frontend)
 const FREE_DELIVERY_THRESHOLD = 500;
 const DELIVERY_CHARGE = 50;
 const GST_RATE = 0; // Set to 0.18 for 18% GST if needed
+
+// Full order lifecycle (must match Order model enum)
+const ALL_ORDER_STATUSES = [
+  "Placed",
+  "Pending",
+  "Confirmed",
+  "Processing",
+  "Packed",
+  "Shipped",
+  "Out For Delivery",
+  "Delivered",
+  "Completed",
+  "Cancelled",
+];
+
+// Statuses a customer/admin may cancel from (Pending, Confirmed, Processing).
+// "Placed" is kept for backward compatibility with orders created earlier.
+const CANCELLABLE_STATUSES = ["Placed", "Pending", "Confirmed", "Processing"];
+
+// Maps each status to its dedicated timestamp field (null = none).
+const STATUS_TIMESTAMP_MAP = {
+  Placed: "orderDate",
+  Pending: null,
+  Confirmed: "confirmedAt",
+  Processing: "processingAt",
+  Packed: "packedAt",
+  Shipped: "shippedAt",
+  "Out For Delivery": "outForDeliveryAt",
+  Delivered: "deliveredAt",
+  Completed: "completedAt",
+  Cancelled: "cancelledAt",
+};
+
+// ─── Internal helpers ─────────────────────────────────────────────────────────
+
+/**
+ * Normalize an optional cancellation reason string.
+ */
+const normalizeReason = (value) => {
+  if (typeof value !== "string") return "";
+  return value.trim().slice(0, 500);
+};
+
+/**
+ * Record an order status transition: update orderStatus, stamp the matching
+ * timestamp field, and append an entry to statusHistory.
+ */
+const recordStatusChange = (order, status, updatedBy = "system", notes = "") => {
+  order.orderStatus = status;
+
+  const tsField = STATUS_TIMESTAMP_MAP[status];
+  if (tsField && !order[tsField]) {
+    order[tsField] = new Date();
+  }
+
+  order.statusHistory = order.statusHistory || [];
+  order.statusHistory.push({
+    status,
+    timestamp: new Date(),
+    updatedBy,
+    notes,
+  });
+};
+
+/**
+ * Perform the shared cancellation routine: set cancellation fields, process
+ * the refund (online only), persist, and restore product stock.
+ *
+ * @returns {Promise<{order:Object, refund:Object}>}
+ */
+const performCancellation = async (order, cancelledBy, reason) => {
+  order.cancelledBy = cancelledBy;
+  if (reason) {
+    order.cancellationReason = reason;
+  }
+  recordStatusChange(order, "Cancelled", cancelledBy, reason ? `Cancelled — ${reason}` : "Order cancelled");
+
+  let refund = { attempted: false };
+
+  if (isRefundable(order)) {
+    refund = { attempted: true };
+    order.refundAttempts = (order.refundAttempts || 0) + 1;
+
+    try {
+      const result = await initiateRefund(order);
+      order.paymentStatus = "Refunded";
+      order.refundId = result.refundId;
+      order.refundAmount = result.amount;
+      order.refundedAt = new Date();
+      order.refundStatus = mapRefundStatus(result.status);
+      order.refundErrorMessage = null;
+
+      refund.success = true;
+      refund.refundId = result.refundId;
+      refund.refundStatus = order.refundStatus;
+      refund.completed = order.refundStatus === "Completed";
+    } catch (err) {
+      // Refund failed → keep order cancelled, mark refund failed for retry.
+      order.refundStatus = "Failed";
+      order.refundErrorMessage = err.message;
+      refund.success = false;
+      refund.error = err.message;
+    }
+  } else if (order.paymentMethod !== "COD") {
+    // Online order with no captured payment to refund (Pending/Failed payment).
+    order.refundStatus = "None";
+  }
+
+  await order.save();
+
+  // Restore stock for each product
+  for (const item of order.products) {
+    await Product.findByIdAndUpdate(item.productId, {
+      $inc: { stock: item.quantity },
+    });
+  }
+
+  return { order, refund };
+};
+
+/**
+ * Fire cancellation + (optional) refund-completed notifications non-blocking.
+ */
+const fireCancellationNotifications = (order, refund) => {
+  sendAllCancellationNotifications(order).catch((err) =>
+    console.error("Cancellation notification error:", err.message)
+  );
+  if (refund && refund.completed) {
+    sendRefundCompletedNotifications(order).catch((err) =>
+      console.error("Refund-completed notification error:", err.message)
+    );
+  }
+};
+
+/**
+ * Shared query builder for admin order listing (search/filter/pagination).
+ */
+const queryOrders = async ({ search, status, paymentMethod, refundStatus, page = 1, limit = 10 }) => {
+  const query = {};
+
+  if (status && status !== "All") query.orderStatus = status;
+  if (paymentMethod && paymentMethod !== "All") query.paymentMethod = paymentMethod;
+  if (refundStatus && refundStatus !== "All") query.refundStatus = refundStatus;
+
+  if (search && String(search).trim()) {
+    const term = String(search).trim();
+    const orClauses = [
+      { "shippingAddress.fullName": { $regex: term, $options: "i" } },
+      { "shippingAddress.email": { $regex: term, $options: "i" } },
+      { "shippingAddress.phone": { $regex: term, $options: "i" } },
+      { "shippingAddress.city": { $regex: term, $options: "i" } },
+      { refundId: { $regex: term, $options: "i" } },
+    ];
+    if (mongoose.isValidObjectId(term)) {
+      orClauses.push({ _id: term });
+    }
+    query.$or = orClauses;
+  }
+
+  const pageNum = Math.max(1, Number(page) || 1);
+  const limitNum = Math.min(50, Math.max(1, Number(limit) || 10));
+  const skip = (pageNum - 1) * limitNum;
+
+  const total = await Order.countDocuments(query);
+  const orders = await Order.find(query)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limitNum)
+    .lean();
+
+  return { total, page: pageNum, pages: Math.ceil(total / limitNum), orders };
+};
+
+// ─── Customer-facing endpoints ────────────────────────────────────────────────
 
 /**
  * @desc    Create a new order (COD)
@@ -168,12 +352,11 @@ exports.createOrder = async (req, res) => {
 
     console.log(`✅ Order #${order._id} created successfully for user ${req.user._id}`);
 
-    // Send email & SMS notifications (non-blocking)
-    sendOrderConfirmationEmail(order).catch((err) =>
-      console.error("Email notification error:", err.message)
-    );
-    sendOrderConfirmationSMS(order).catch((err) =>
-      console.error("SMS notification error:", err.message)
+    // Send notifications (non-blocking) — fires after the order is saved:
+    // Owner Email → Customer Email → Customer WhatsApp → Owner WhatsApp → Customer SMS.
+    // Notification failures never fail or roll back the order.
+    sendAllOrderNotifications(order).catch((err) =>
+      console.error("Notification error:", err.message)
     );
 
     return res.status(201).json({
@@ -272,12 +455,14 @@ exports.getOrderById = async (req, res) => {
 };
 
 /**
- * @desc    Cancel order (only if not shipped)
+ * @desc    Cancel order (customer) — only when Pending/Confirmed/Processing
  * @route   PUT /api/orders/:id/cancel
  * @access  Private
  */
 exports.cancelOrder = async (req, res) => {
   try {
+    const reason = normalizeReason(req.body && req.body.cancellationReason);
+
     const order = await Order.findById(req.params.id);
 
     if (!order) {
@@ -295,31 +480,23 @@ exports.cancelOrder = async (req, res) => {
       });
     }
 
-    // Only allow cancellation if not shipped/delivered
-    if (!["Placed", "Confirmed"].includes(order.orderStatus)) {
+    // Only cancellable from Placed / Confirmed / Processing
+    if (!CANCELLABLE_STATUSES.includes(order.orderStatus)) {
       return res.status(400).json({
         success: false,
         message: `Cannot cancel order. Current status: ${order.orderStatus}`,
       });
     }
 
-    order.orderStatus = "Cancelled";
-    if (order.paymentStatus === "Paid") {
-      order.paymentStatus = "Refunded";
-    }
-    await order.save();
+    const { order: cancelledOrder, refund } = await performCancellation(order, "customer", reason);
 
-    // Restore stock for each product
-    for (const item of order.products) {
-      await Product.findByIdAndUpdate(item.productId, {
-        $inc: { stock: item.quantity },
-      });
-    }
+    fireCancellationNotifications(cancelledOrder, refund);
 
     return res.status(200).json({
       success: true,
       message: "Order cancelled successfully",
-      order,
+      order: cancelledOrder,
+      refund,
     });
   } catch (error) {
     console.error("Cancel Order Error:", error);
@@ -330,10 +507,282 @@ exports.cancelOrder = async (req, res) => {
   }
 };
 
+// ─── Admin endpoints ──────────────────────────────────────────────────────────
+
+/**
+ * @desc    Get all orders with search / filter / pagination (Admin)
+ * @route   GET /api/orders/admin
+ * @access  Private/Admin
+ */
+exports.getAdminOrders = async (req, res) => {
+  try {
+    const { search, status, paymentMethod, refundStatus, page, limit } = req.query;
+    const result = await queryOrders({ search, status, paymentMethod, refundStatus, page, limit });
+
+    return res.status(200).json({ success: true, ...result });
+  } catch (error) {
+    console.error("Get Admin Orders Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error while fetching orders",
+    });
+  }
+};
+
+/**
+ * @desc    Get cancelled orders with refund info (Admin)
+ * @route   GET /api/orders/admin/cancelled
+ * @access  Private/Admin
+ */
+exports.getAdminCancelledOrders = async (req, res) => {
+  try {
+    const { search, refundStatus, page, limit } = req.query;
+    const result = await queryOrders({ search, status: "Cancelled", refundStatus, page, limit });
+
+    return res.status(200).json({ success: true, ...result });
+  } catch (error) {
+    console.error("Get Cancelled Orders Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error while fetching cancelled orders",
+    });
+  }
+};
+
+/**
+ * @desc    Get single order by ID (Admin)
+ * @route   GET /api/orders/admin/:id
+ * @access  Private/Admin
+ */
+exports.getAdminOrderById = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id).lean();
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      order,
+    });
+  } catch (error) {
+    console.error("Get Admin Order By ID Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error while fetching order",
+    });
+  }
+};
+
+/**
+ * @desc    Cancel an order from the admin dashboard
+ * @route   PUT /api/orders/admin/:id/cancel
+ * @access  Private/Admin
+ */
+exports.adminCancelOrder = async (req, res) => {
+  try {
+    const reason = normalizeReason(req.body && req.body.cancellationReason);
+
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    if (!CANCELLABLE_STATUSES.includes(order.orderStatus)) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot cancel order. Current status: ${order.orderStatus}`,
+      });
+    }
+
+    const { order: cancelledOrder, refund } = await performCancellation(order, "admin", reason);
+
+    fireCancellationNotifications(cancelledOrder, refund);
+
+    return res.status(200).json({
+      success: true,
+      message: "Order cancelled successfully",
+      order: cancelledOrder,
+      refund,
+    });
+  } catch (error) {
+    console.error("Admin Cancel Order Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error while cancelling order",
+    });
+  }
+};
+
+/**
+ * @desc    Retry a failed refund for a cancelled order (Admin)
+ * @route   POST /api/orders/admin/:id/refund/retry
+ * @access  Private/Admin
+ */
+exports.retryRefund = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    if (order.orderStatus !== "Cancelled") {
+      return res.status(400).json({
+        success: false,
+        message: "Only cancelled orders can be refunded",
+      });
+    }
+
+    if (order.paymentMethod === "COD") {
+      return res.status(400).json({
+        success: false,
+        message: "Cash on Delivery orders do not require a refund",
+      });
+    }
+
+    if (order.refundStatus === "Completed") {
+      return res.status(400).json({
+        success: false,
+        message: "Refund has already been completed",
+      });
+    }
+
+    if (order.refundStatus !== "Failed") {
+      return res.status(400).json({
+        success: false,
+        message: "Only failed refunds can be retried",
+      });
+    }
+
+    order.refundAttempts = (order.refundAttempts || 0) + 1;
+
+    try {
+      const result = await initiateRefund(order);
+      order.paymentStatus = "Refunded";
+      order.refundId = result.refundId;
+      order.refundAmount = result.amount;
+      order.refundedAt = new Date();
+      order.refundStatus = mapRefundStatus(result.status);
+      order.refundErrorMessage = null;
+      await order.save();
+
+      if (order.refundStatus === "Completed") {
+        sendRefundCompletedNotifications(order).catch((err) =>
+          console.error("Refund-completed notification error:", err.message)
+        );
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Refund retried successfully",
+        order,
+        refund: { success: true, refundId: result.refundId, refundStatus: order.refundStatus },
+      });
+    } catch (err) {
+      order.refundStatus = "Failed";
+      order.refundErrorMessage = err.message;
+      await order.save();
+
+      return res.status(502).json({
+        success: false,
+        message: "Refund attempt failed. Please try again.",
+        error: err.message,
+        order,
+      });
+    }
+  } catch (error) {
+    console.error("Retry Refund Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error while retrying refund",
+    });
+  }
+};
+
+/**
+ * @desc    Re-check status of an in-flight refund and complete it if done (Admin)
+ * @route   POST /api/orders/admin/:id/refund/check
+ * @access  Private/Admin
+ */
+exports.checkRefundStatus = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    if (order.refundStatus !== "Initiated") {
+      return res.status(400).json({
+        success: false,
+        message: "No pending refund to check",
+      });
+    }
+
+    const status = await fetchRefundStatus(order);
+
+    if (status.status === "processed" || status.status === "succeeded") {
+      order.refundStatus = "Completed";
+      order.refundedAt = new Date();
+      await order.save();
+
+      sendRefundCompletedNotifications(order).catch((err) =>
+        console.error("Refund-completed notification error:", err.message)
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Refund completed",
+        order,
+      });
+    }
+
+    if (status.status === "failed") {
+      order.refundStatus = "Failed";
+      order.refundErrorMessage = "Refund was rejected by the payment gateway";
+      await order.save();
+
+      return res.status(200).json({
+        success: true,
+        message: "Refund failed at payment gateway. You can retry it.",
+        order,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Refund is still pending at the payment gateway",
+      gatewayStatus: status.status,
+      order,
+    });
+  } catch (error) {
+    console.error("Check Refund Status Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Could not check refund status. Please try again later.",
+    });
+  }
+};
+
 /**
  * @desc    Update order status (for admin use)
  * @route   PUT /api/orders/:id/status
- * @access  Private
+ * @access  Private/Admin
  */
 exports.updateOrderStatus = async (req, res) => {
   try {
@@ -346,11 +795,10 @@ exports.updateOrderStatus = async (req, res) => {
       });
     }
 
-    const validStatuses = ["Placed", "Confirmed", "Shipped", "Delivered", "Cancelled"];
-    if (!validStatuses.includes(orderStatus)) {
+    if (!ALL_ORDER_STATUSES.includes(orderStatus)) {
       return res.status(400).json({
         success: false,
-        message: `Invalid status. Must be one of: ${validStatuses.join(", ")}`,
+        message: `Invalid status. Must be one of: ${ALL_ORDER_STATUSES.join(", ")}`,
       });
     }
 
@@ -362,7 +810,21 @@ exports.updateOrderStatus = async (req, res) => {
       });
     }
 
-    order.orderStatus = orderStatus;
+    // Cancelling via the status updater still restores stock + processes refunds.
+    if (orderStatus === "Cancelled" && order.orderStatus !== "Cancelled") {
+      const reason = normalizeReason(req.body && req.body.cancellationReason);
+      const { order: cancelledOrder, refund } = await performCancellation(order, "admin", reason);
+      fireCancellationNotifications(cancelledOrder, refund);
+
+      return res.status(200).json({
+        success: true,
+        message: "Order cancelled successfully",
+        order: cancelledOrder,
+        refund,
+      });
+    }
+
+    recordStatusChange(order, orderStatus, "admin");
     if (orderStatus === "Delivered" && order.paymentMethod === "COD") {
       order.paymentStatus = "Paid";
     }

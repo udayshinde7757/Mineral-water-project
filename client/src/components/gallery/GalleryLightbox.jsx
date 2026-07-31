@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiX, FiChevronLeft, FiChevronRight, FiTag, FiMaximize2 } from 'react-icons/fi'
+import { FiX, FiChevronLeft, FiChevronRight, FiTag } from 'react-icons/fi'
 
 function GalleryLightbox({ image, images, currentIndex, onClose, onNext, onPrev }) {
   const totalCount = images ? images.length : 0

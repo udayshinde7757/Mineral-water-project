@@ -5,12 +5,14 @@ import {
   FiSearch, FiCheckCircle, FiTrash2, FiEdit2, FiPlus,
   FiX, FiRefreshCw, FiAlertCircle, FiUsers, FiBarChart2,
   FiLoader, FiEye, FiClock, FiTrendingUp, FiZap,
+  FiShoppingCart, FiXCircle, FiInfo,
 } from 'react-icons/fi'
 import { AuthContext } from '@context/AuthContext'
 import enquiryService from '@services/enquiryService'
 import productService from '@services/productService'
 import galleryService from '@services/galleryService'
 import testimonialService from '@services/testimonialService'
+import orderService from '@services/orderService'
 
 // ─── Reusable Modal ────────────────────────────────────────────────────────────
 function Modal({ title, children, onClose }) {
@@ -1038,10 +1040,605 @@ function TestimonialsTab() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// ORDERS TAB
+// ═══════════════════════════════════════════════════════════════════════════════
+const ORDER_STATUSES = [
+  'Placed', 'Pending', 'Confirmed', 'Processing', 'Packed',
+  'Shipped', 'Out For Delivery', 'Delivered', 'Completed', 'Cancelled',
+]
+
+const ORDER_STATUS_BADGE = {
+  Placed: 'bg-blue-50 text-blue-600',
+  Pending: 'bg-gray-100 text-gray-600',
+  Confirmed: 'bg-indigo-50 text-indigo-600',
+  Processing: 'bg-violet-50 text-violet-600',
+  Packed: 'bg-cyan-50 text-cyan-600',
+  Shipped: 'bg-amber-50 text-amber-600',
+  'Out For Delivery': 'bg-amber-50 text-amber-600',
+  Delivered: 'bg-emerald-50 text-emerald-600',
+  Completed: 'bg-emerald-50 text-emerald-600',
+  Cancelled: 'bg-red-50 text-red-600',
+}
+
+const REFUND_STATUS_BADGE = {
+  None: 'bg-gray-100 text-gray-500',
+  Initiated: 'bg-amber-50 text-amber-600',
+  Completed: 'bg-emerald-50 text-emerald-600',
+  Failed: 'bg-red-50 text-red-600',
+}
+
+function AdminStatusBadge({ status }) {
+  return (
+    <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${ORDER_STATUS_BADGE[status] || 'bg-gray-100 text-gray-500'}`}>
+      {status}
+    </span>
+  )
+}
+
+function RefundStatusBadge({ status }) {
+  return (
+    <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${REFUND_STATUS_BADGE[status] || 'bg-gray-100 text-gray-500'}`}>
+      {status}
+    </span>
+  )
+}
+
+const formatINR = (amount) =>
+  new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount || 0)
+
+const formatDateTime = (dateStr) =>
+  dateStr ? new Date(dateStr).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'
+
+const shortOrderId = (id) => (id ? `#${id.toString().slice(-8).toUpperCase()}` : '—')
+
+function OrdersTab() {
+  const [orders, setOrders] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('All')
+  const [paymentFilter, setPaymentFilter] = useState('All')
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [total, setTotal] = useState(0)
+  const [error, setError] = useState('')
+  const [updatingId, setUpdatingId] = useState('')
+  const [selectedOrder, setSelectedOrder] = useState(null)
+
+  const loadOrders = useCallback(async () => {
+    try {
+      setLoading(true)
+      setError('')
+      const params = { page, limit: 10 }
+      if (search.trim()) params.search = search.trim()
+      if (statusFilter !== 'All') params.status = statusFilter
+      if (paymentFilter !== 'All') params.paymentMethod = paymentFilter
+      const data = await orderService.getAdminOrders(params)
+      if (data.success) {
+        setOrders(data.orders)
+        setTotal(data.total)
+        setTotalPages(data.pages)
+      } else {
+        setError('Failed to load orders.')
+      }
+    } catch {
+      setError('Server error fetching orders.')
+    } finally {
+      setLoading(false)
+    }
+  }, [page, search, statusFilter, paymentFilter])
+
+  useEffect(() => {
+    loadOrders()
+  }, [loadOrders])
+
+  const handleStatusChange = async (order, newStatus) => {
+    if (newStatus === order.orderStatus) return
+    if (newStatus === 'Cancelled') {
+      const ok = window.confirm(`Cancel order ${shortOrderId(order._id)}?\n\nStock will be restored and online payments refunded. This cannot be undone.`)
+      if (!ok) return
+    }
+    try {
+      setUpdatingId(order._id)
+      const data = await orderService.updateOrderStatus(order._id, newStatus)
+      if (data.success) {
+        await loadOrders()
+      } else {
+        alert(data.message || 'Failed to update status.')
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update status.')
+    } finally {
+      setUpdatingId('')
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Controls */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input
+            type="text"
+            id="order-search"
+            placeholder="Search by order ID, name, email, phone, city..."
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm text-darkgray bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+          />
+        </div>
+        <select
+          id="order-status-filter"
+          value={statusFilter}
+          onChange={(e) => { setStatusFilter(e.target.value); setPage(1) }}
+          className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-darkgray bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+        >
+          <option value="All">All Status</option>
+          {ORDER_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+        </select>
+        <select
+          id="order-payment-filter"
+          value={paymentFilter}
+          onChange={(e) => { setPaymentFilter(e.target.value); setPage(1) }}
+          className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-darkgray bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+        >
+          <option value="All">All Payments</option>
+          <option value="COD">Cash on Delivery</option>
+          <option value="Razorpay / Online">Razorpay / Online</option>
+          <option value="UPI">UPI</option>
+          <option value="Card">Card</option>
+          <option value="NetBanking">NetBanking</option>
+        </select>
+        <button
+          onClick={loadOrders}
+          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors"
+        >
+          <FiRefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          Refresh
+        </button>
+      </div>
+
+      {error && (
+        <div className="flex items-center gap-2 text-red-500 text-sm font-bold p-3 bg-red-50 rounded-xl">
+          <FiAlertCircle className="w-4 h-4" /> {error}
+        </div>
+      )}
+
+      {/* Table */}
+      {loading ? (
+        <div className="flex justify-center py-10">
+          <FiLoader className="animate-spin w-6 h-6 text-primary" />
+        </div>
+      ) : orders.length === 0 ? (
+        <EmptyState icon={FiShoppingCart} message="No orders found matching your criteria." />
+      ) : (
+        <div className="overflow-x-auto rounded-2xl border border-gray-100">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wide">
+              <tr>
+                <th className="px-4 py-3 text-left">Order ID</th>
+                <th className="px-4 py-3 text-left">Customer</th>
+                <th className="px-4 py-3 text-center hidden lg:table-cell">Items</th>
+                <th className="px-4 py-3 text-right">Amount</th>
+                <th className="px-4 py-3 text-center hidden md:table-cell">Payment</th>
+                <th className="px-4 py-3 text-center">Status</th>
+                <th className="px-4 py-3 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {orders.map((order) => (
+                <tr key={order._id} className="bg-white hover:bg-gray-50/60 transition-colors">
+                  <td className="px-4 py-3 font-mono font-bold text-primary">{shortOrderId(order._id)}</td>
+                  <td className="px-4 py-3">
+                    <p className="font-bold text-darkgray">{order.shippingAddress?.fullName}</p>
+                    <p className="text-xs text-gray-400">{order.shippingAddress?.phone}</p>
+                  </td>
+                  <td className="px-4 py-3 text-center text-gray-600 hidden lg:table-cell">
+                    {order.products?.reduce((sum, p) => sum + p.quantity, 0) || 0}
+                  </td>
+                  <td className="px-4 py-3 text-right font-bold text-darkgray">{formatINR(order.totalAmount)}</td>
+                  <td className="px-4 py-3 text-center text-gray-600 hidden md:table-cell">
+                    {order.paymentMethod === 'COD' ? 'COD' : order.paymentMethod}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <AdminStatusBadge status={order.orderStatus} />
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-center gap-2">
+                      <button
+                        onClick={() => setSelectedOrder(order)}
+                        title="View Details"
+                        className="w-8 h-8 rounded-xl bg-blue-50 hover:bg-blue-100 text-primary flex items-center justify-center transition-colors"
+                      >
+                        <FiEye className="w-3.5 h-3.5" />
+                      </button>
+                      <select
+                        value={order.orderStatus}
+                        onChange={(e) => handleStatusChange(order, e.target.value)}
+                        disabled={updatingId === order._id}
+                        className="text-xs font-bold px-2 py-1.5 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer disabled:opacity-50"
+                        title="Update status"
+                      >
+                        {ORDER_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between text-sm">
+          <p className="text-gray-400">Showing {orders.length} of {total} orders</p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm font-bold disabled:opacity-40 hover:bg-gray-50 transition-colors"
+            >
+              Prev
+            </button>
+            <span className="px-3 py-1.5 bg-primary text-white rounded-lg text-sm font-bold">{page}</span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm font-bold disabled:opacity-40 hover:bg-gray-50 transition-colors"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Order Detail Modal */}
+      {selectedOrder && (
+        <Modal title={`Order ${shortOrderId(selectedOrder._id)}`} onClose={() => setSelectedOrder(null)}>
+          <OrderDetails order={selectedOrder} />
+        </Modal>
+      )}
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CANCELLED ORDERS TAB
+// ═══════════════════════════════════════════════════════════════════════════════
+function CancelledOrdersTab() {
+  const [orders, setOrders] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [refundFilter, setRefundFilter] = useState('All')
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [total, setTotal] = useState(0)
+  const [error, setError] = useState('')
+  const [actionLoading, setActionLoading] = useState('')
+  const [notice, setNotice] = useState('')
+  const [selectedOrder, setSelectedOrder] = useState(null)
+
+  const loadCancelled = useCallback(async () => {
+    try {
+      setLoading(true)
+      setError('')
+      setNotice('')
+      const params = { page, limit: 10 }
+      if (search.trim()) params.search = search.trim()
+      if (refundFilter !== 'All') params.refundStatus = refundFilter
+      const data = await orderService.getAdminCancelledOrders(params)
+      if (data.success) {
+        setOrders(data.orders)
+        setTotal(data.total)
+        setTotalPages(data.pages)
+      } else {
+        setError('Failed to load cancelled orders.')
+      }
+    } catch {
+      setError('Server error fetching cancelled orders.')
+    } finally {
+      setLoading(false)
+    }
+  }, [page, search, refundFilter])
+
+  useEffect(() => {
+    loadCancelled()
+  }, [loadCancelled])
+
+  const handleRetryRefund = async (orderId) => {
+    if (!window.confirm('Retry the refund for this order?')) return
+    try {
+      setActionLoading(orderId + '-retry')
+      setNotice('')
+      const data = await orderService.retryRefund(orderId)
+      if (data.success) {
+        setNotice(data.message || 'Refund retried successfully.')
+      } else {
+        setNotice(data.message || 'Refund retry failed.')
+      }
+      await loadCancelled()
+    } catch (err) {
+      setNotice(err.response?.data?.message || 'Refund retry failed.')
+      await loadCancelled()
+    } finally {
+      setActionLoading('')
+    }
+  }
+
+  const handleCheckRefund = async (orderId) => {
+    try {
+      setActionLoading(orderId + '-check')
+      setNotice('')
+      const data = await orderService.checkRefundStatus(orderId)
+      setNotice(data.message || 'Refund status checked.')
+      await loadCancelled()
+    } catch (err) {
+      setNotice(err.response?.data?.message || 'Could not check refund status.')
+    } finally {
+      setActionLoading('')
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Controls */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input
+            type="text"
+            id="cancelled-search"
+            placeholder="Search by order ID, name, email, phone..."
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm text-darkgray bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+          />
+        </div>
+        <select
+          id="cancelled-refund-filter"
+          value={refundFilter}
+          onChange={(e) => { setRefundFilter(e.target.value); setPage(1) }}
+          className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-darkgray bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+        >
+          <option value="All">All Refund Status</option>
+          <option value="None">No Refund (COD)</option>
+          <option value="Initiated">Initiated</option>
+          <option value="Completed">Completed</option>
+          <option value="Failed">Failed</option>
+        </select>
+        <button
+          onClick={loadCancelled}
+          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors"
+        >
+          <FiRefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          Refresh
+        </button>
+      </div>
+
+      {notice && (
+        <div className="flex items-center gap-2 text-primary text-sm font-bold p-3 bg-blue-50 rounded-xl">
+          <FiInfo className="w-4 h-4" /> {notice}
+        </div>
+      )}
+
+      {error && (
+        <div className="flex items-center gap-2 text-red-500 text-sm font-bold p-3 bg-red-50 rounded-xl">
+          <FiAlertCircle className="w-4 h-4" /> {error}
+        </div>
+      )}
+
+      {/* Table */}
+      {loading ? (
+        <div className="flex justify-center py-10">
+          <FiLoader className="animate-spin w-6 h-6 text-primary" />
+        </div>
+      ) : orders.length === 0 ? (
+        <EmptyState icon={FiXCircle} message="No cancelled orders found." />
+      ) : (
+        <div className="overflow-x-auto rounded-2xl border border-gray-100">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wide">
+              <tr>
+                <th className="px-4 py-3 text-left">Order ID</th>
+                <th className="px-4 py-3 text-left">Customer</th>
+                <th className="px-4 py-3 text-right">Amount</th>
+                <th className="px-4 py-3 text-center">Payment</th>
+                <th className="px-4 py-3 text-center">Refund Status</th>
+                <th className="px-4 py-3 text-center hidden lg:table-cell">Refund ID</th>
+                <th className="px-4 py-3 text-center hidden md:table-cell">Cancelled At</th>
+                <th className="px-4 py-3 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {orders.map((order) => (
+                <tr key={order._id} className="bg-white hover:bg-gray-50/60 transition-colors">
+                  <td className="px-4 py-3 font-mono font-bold text-primary">{shortOrderId(order._id)}</td>
+                  <td className="px-4 py-3">
+                    <p className="font-bold text-darkgray">{order.shippingAddress?.fullName}</p>
+                    <p className="text-xs text-gray-400">{order.shippingAddress?.phone}</p>
+                  </td>
+                  <td className="px-4 py-3 text-right font-bold text-darkgray">{formatINR(order.totalAmount)}</td>
+                  <td className="px-4 py-3 text-center text-gray-600">{order.paymentMethod === 'COD' ? 'COD' : order.paymentMethod}</td>
+                  <td className="px-4 py-3 text-center">
+                    <RefundStatusBadge status={order.refundStatus || 'None'} />
+                  </td>
+                  <td className="px-4 py-3 text-center text-xs font-mono text-gray-500 hidden lg:table-cell">
+                    {order.refundId || '—'}
+                  </td>
+                  <td className="px-4 py-3 text-center text-xs text-gray-500 hidden md:table-cell">
+                    {formatDateTime(order.cancelledAt)}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-center gap-2">
+                      <button
+                        onClick={() => setSelectedOrder(order)}
+                        title="View Details"
+                        className="w-8 h-8 rounded-xl bg-blue-50 hover:bg-blue-100 text-primary flex items-center justify-center transition-colors"
+                      >
+                        <FiEye className="w-3.5 h-3.5" />
+                      </button>
+                      {order.refundStatus === 'Failed' && (
+                        <button
+                          onClick={() => handleRetryRefund(order._id)}
+                          disabled={actionLoading === order._id + '-retry'}
+                          title="Retry Refund"
+                          className="w-8 h-8 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-600 flex items-center justify-center transition-colors disabled:opacity-50"
+                        >
+                          {actionLoading === order._id + '-retry'
+                            ? <FiLoader className="w-3.5 h-3.5 animate-spin" />
+                            : <FiRefreshCw className="w-3.5 h-3.5" />}
+                        </button>
+                      )}
+                      {order.refundStatus === 'Initiated' && (
+                        <button
+                          onClick={() => handleCheckRefund(order._id)}
+                          disabled={actionLoading === order._id + '-check'}
+                          title="Check Refund Status"
+                          className="w-8 h-8 rounded-xl bg-blue-50 hover:bg-blue-100 text-primary flex items-center justify-center transition-colors disabled:opacity-50"
+                        >
+                          {actionLoading === order._id + '-check'
+                            ? <FiLoader className="w-3.5 h-3.5 animate-spin" />
+                            : <FiClock className="w-3.5 h-3.5" />}
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between text-sm">
+          <p className="text-gray-400">Showing {orders.length} of {total} cancelled orders</p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm font-bold disabled:opacity-40 hover:bg-gray-50 transition-colors"
+            >
+              Prev
+            </button>
+            <span className="px-3 py-1.5 bg-primary text-white rounded-lg text-sm font-bold">{page}</span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm font-bold disabled:opacity-40 hover:bg-gray-50 transition-colors"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Order Detail Modal */}
+      {selectedOrder && (
+        <Modal title={`Order ${shortOrderId(selectedOrder._id)}`} onClose={() => setSelectedOrder(null)}>
+          <OrderDetails order={selectedOrder} />
+        </Modal>
+      )}
+    </div>
+  )
+}
+
+// ─── Shared Order Details (used by Orders + Cancelled tabs) ───────────────────
+function OrderDetails({ order }) {
+  return (
+    <div className="space-y-4 text-sm">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+        {[
+          ['Order ID', shortOrderId(order._id)],
+          ['Customer', order.shippingAddress?.fullName],
+          ['Email', order.shippingAddress?.email],
+          ['Phone', order.shippingAddress?.phone],
+          ['Placed On', formatDateTime(order.orderDate || order.createdAt)],
+          ['Order Status', order.orderStatus],
+          ['Payment Method', order.paymentMethod === 'COD' ? 'Cash on Delivery' : order.paymentMethod],
+          ['Payment Status', order.paymentStatus],
+          ['Refund Status', order.refundStatus || 'None'],
+        ].map(([label, val]) => (
+          <div key={label}>
+            <p className="text-gray-400 font-bold text-xs">{label}</p>
+            <p className="text-darkgray font-semibold">{val}</p>
+          </div>
+        ))}
+      </div>
+
+      {order.cancellationReason && (
+        <div>
+          <p className="text-gray-400 font-bold text-xs">Cancellation Reason</p>
+          <p className="text-darkgray bg-gray-50 p-3 rounded-xl text-sm">{order.cancellationReason}</p>
+        </div>
+      )}
+
+      {order.refundId && (
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+          {[
+            ['Refund ID', order.refundId],
+            ['Refund Amount', formatINR(order.refundAmount)],
+            ['Refunded At', formatDateTime(order.refundedAt)],
+            ['Refund Attempts', order.refundAttempts || 0],
+          ].map(([label, val]) => (
+            <div key={label}>
+              <p className="text-gray-400 font-bold text-xs">{label}</p>
+              <p className="text-darkgray font-semibold">{val}</p>
+            </div>
+          ))}
+          {order.refundErrorMessage && (
+            <div className="col-span-2">
+              <p className="text-gray-400 font-bold text-xs">Refund Error</p>
+              <p className="text-red-600 bg-red-50 p-3 rounded-xl text-sm">{order.refundErrorMessage}</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div>
+        <p className="text-gray-400 font-bold text-xs mb-1">Shipping Address</p>
+        <p className="text-darkgray bg-gray-50 p-3 rounded-xl leading-relaxed">
+          {order.shippingAddress?.addressLine1}
+          {order.shippingAddress?.addressLine2 ? `, ${order.shippingAddress.addressLine2}` : ''}
+          <br />
+          {order.shippingAddress?.city}, {order.shippingAddress?.state} — {order.shippingAddress?.pincode}
+        </p>
+      </div>
+
+      <div>
+        <p className="text-gray-400 font-bold text-xs mb-1">Products ({order.products?.length || 0})</p>
+        <div className="divide-y divide-gray-100 border border-gray-100 rounded-xl p-3 max-h-48 overflow-y-auto">
+          {order.products?.map((item, idx) => (
+            <div key={idx} className="py-2 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <img src={item.image} alt={item.name} className="w-8 h-8 object-contain rounded-lg bg-[#F8FBFD] p-0.5" loading="lazy"
+                  onError={(e) => { e.target.src = 'https://placehold.co/200x200/e8f4fd/0B4F6C?text=Water' }} />
+                <span className="font-bold text-darkgray">{item.name} × {item.quantity}</span>
+              </div>
+              <span className="font-extrabold text-darkgray">{formatINR(item.price * item.quantity)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex justify-between border-t border-gray-100 pt-3">
+        <span className="font-extrabold text-darkgray">Total Amount</span>
+        <span className="font-black text-primary text-base">{formatINR(order.totalAmount)}</span>
+      </div>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // ADMIN PAGE CONTAINER
 // ═══════════════════════════════════════════════════════════════════════════════
 const TABS = [
   { key: 'dashboard',    label: 'Dashboard',    icon: FiGrid },
+  { key: 'orders',       label: 'Orders',       icon: FiShoppingCart },
+  { key: 'cancelled',    label: 'Cancelled',    icon: FiXCircle },
   { key: 'enquiries',   label: 'Enquiries',    icon: FiMessageSquare },
   { key: 'products',    label: 'Products',     icon: FiPackage },
   { key: 'gallery',     label: 'Gallery',      icon: FiImage },
@@ -1101,6 +1698,8 @@ function AdminPage() {
               transition={{ duration: 0.18 }}
             >
               {activeTab === 'dashboard'    && <DashboardTab />}
+              {activeTab === 'orders'       && <OrdersTab />}
+              {activeTab === 'cancelled'    && <CancelledOrdersTab />}
               {activeTab === 'enquiries'   && <EnquiriesTab />}
               {activeTab === 'products'    && <ProductsTab />}
               {activeTab === 'gallery'     && <GalleryTab />}

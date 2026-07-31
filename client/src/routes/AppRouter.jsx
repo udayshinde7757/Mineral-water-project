@@ -18,6 +18,8 @@ const CheckoutPage     = lazy(() => import('@pages/CheckoutPage'))
 const OrderSuccessPage = lazy(() => import('@pages/OrderSuccessPage'))
 const MyOrdersPage     = lazy(() => import('@pages/MyOrdersPage'))
 const EnquiryPage      = lazy(() => import('@pages/EnquiryPage'))
+// Reserved Admin entry — not exposed as a public route.
+// eslint-disable-next-line no-unused-vars
 const AdminPage        = lazy(() => import('@pages/AdminPage'))
 const ProductDetailsPage = lazy(() => import('@pages/ProductDetailsPage'))
 const NotFoundPage     = lazy(() => import('@pages/NotFoundPage'))

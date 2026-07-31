@@ -40,6 +40,28 @@ const userSchema = new mongoose.Schema({
     pincode: { type: String, default: "" },
     country: { type: String, default: "India" },
   },
+  role: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user",
+  },
+  status: {
+    type: String,
+    enum: ["active", "blocked"],
+    default: "active",
+  },
+  avatar: {
+    type: String,
+    default: "",
+  },
+  lastLogin: {
+    type: Date,
+    default: null,
+  },
+  twoFactorEnabled: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

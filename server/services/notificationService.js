@@ -74,6 +74,27 @@ const getEstimatedDeliveryString = (order) => {
 };
 
 /**
+ * Compact single-line address (for WhatsApp template params)
+ */
+const formatAddressCompact = (address) => {
+  return `${address.fullName}, ${address.addressLine1}${
+    address.addressLine2 ? ", " + address.addressLine2 : ""
+  }, ${address.city}, ${address.state} ${address.pincode}`;
+};
+
+/**
+ * AquaPure support contact shown to customers
+ */
+const getSupportContact = () => {
+  return (
+    process.env.WHATSAPP_SUPPORT_NUMBER ||
+    process.env.SUPPORT_PHONE ||
+    process.env.OWNER_PHONE ||
+    "919356212824"
+  );
+};
+
+/**
  * Send Customer Email Notification
  */
 const sendCustomerEmail = async (order) => {
@@ -236,6 +257,7 @@ const sendCustomerWhatsApp = async (order) => {
     const orderId = order._id.toString().slice(-8).toUpperCase();
     const productsText = generateProductsWhatsApp(order.products);
     const estimatedDate = getEstimatedDeliveryString(order);
+    const supportContact = getSupportContact();
 
     // Format phone number
     let phoneNumber = order.shippingAddress.phone;
@@ -246,13 +268,20 @@ const sendCustomerWhatsApp = async (order) => {
 
     // Use template or custom message
     const templateName = WHATSAPP_TEMPLATE_NAME || "order_confirmation";
-    
+
+    // Expected template placeholders (update your Meta template to match):
+    // {{1}} Customer name | {{2}} Order ID | {{3}} Products (name × qty — amount)
+    // {{4}} Total amount | {{5}} Delivery address | {{6}} Payment status
+    // {{7}} Estimated delivery | {{8}} AquaPure support contact
     const templateParams = [
       { type: "text", text: order.shippingAddress.fullName }, // {{1}} - Customer name
       { type: "text", text: orderId }, // {{2}} - Order ID
-      { type: "text", text: productsText }, // {{3}} - Products
-      { type: "text", text: formatCurrency(order.totalAmount) }, // {{4}} - Total
-      { type: "text", text: estimatedDate }, // {{5}} - Estimated delivery
+      { type: "text", text: productsText }, // {{3}} - Products (name × qty — amount)
+      { type: "text", text: formatCurrency(order.totalAmount) }, // {{4}} - Total amount
+      { type: "text", text: formatAddressCompact(order.shippingAddress) }, // {{5}} - Delivery address
+      { type: "text", text: order.paymentStatus }, // {{6}} - Payment status
+      { type: "text", text: estimatedDate }, // {{7}} - Estimated delivery
+      { type: "text", text: supportContact }, // {{8}} - AquaPure support contact
     ];
 
     const response = await fetch(
@@ -470,6 +499,13 @@ const sendAdminWhatsApp = async (order) => {
     const orderId = order._id.toString().slice(-8).toUpperCase();
     const productsText = generateProductsWhatsApp(order.products);
     const addressFormatted = formatAddress(order.shippingAddress);
+    const orderDateTime = new Date(order.orderDate || Date.now()).toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
     // Format admin phone number
     let adminPhone = ADMIN_WHATSAPP_NUMBER.replace(/\D/g, "");
@@ -479,6 +515,10 @@ const sendAdminWhatsApp = async (order) => {
 
     const templateName = WHATSAPP_ADMIN_TEMPLATE || "admin_new_order";
 
+    // Expected template placeholders (update your Meta template to match):
+    // {{1}} Customer name | {{2}} Phone | {{3}} Email | {{4}} Address
+    // {{5}} Products | {{6}} Total | {{7}} Payment status | {{8}} Payment method
+    // {{9}} Order ID | {{10}} Date & time
     const templateParams = [
       { type: "text", text: order.shippingAddress.fullName }, // {{1}} Customer name
       { type: "text", text: order.shippingAddress.phone }, // {{2}} Phone
@@ -486,8 +526,10 @@ const sendAdminWhatsApp = async (order) => {
       { type: "text", text: addressFormatted }, // {{4}} Address
       { type: "text", text: productsText }, // {{5}} Products
       { type: "text", text: formatCurrency(order.totalAmount) }, // {{6}} Total
-      { type: "text", text: order.paymentMethod === "COD" ? "Cash on Delivery" : order.paymentMethod }, // {{7}} Payment method
-      { type: "text", text: orderId }, // {{8}} Order ID
+      { type: "text", text: order.paymentStatus }, // {{7}} Payment status
+      { type: "text", text: order.paymentMethod === "COD" ? "Cash on Delivery" : order.paymentMethod }, // {{8}} Payment method
+      { type: "text", text: orderId }, // {{9}} Order ID
+      { type: "text", text: orderDateTime }, // {{10}} Date & time
     ];
 
     const response = await fetch(
@@ -531,33 +573,660 @@ const sendAdminWhatsApp = async (order) => {
 };
 
 /**
- * Send ALL notifications for a new order
- * This is the main function called from order controller
+ * Send ALL notifications for a new order.
+ * This is the main function called from order controllers.
+ *
+ * Channels run SEQUENTIALLY in the required order:
+ *   1. Owner Email
+ *   2. Customer Email
+ *   3. Customer WhatsApp
+ *   4. Owner WhatsApp
+ *   5. Customer SMS (existing channel, preserved)
+ *
+ * Every step is isolated — a failure in one channel is logged and the next
+ * channel still runs. Notifications NEVER fail or roll back the order.
  */
 const sendAllOrderNotifications = async (order) => {
-  console.log(`📢 Sending notifications for order #${order._id.toString().slice(-8).toUpperCase()}`);
+  const shortId = order._id.toString().slice(-8).toUpperCase();
+  console.log(`📢 Sending notifications for order #${shortId}`);
 
-  // Send all notifications in parallel (non-blocking)
-  const results = await Promise.allSettled([
-    sendCustomerEmail(order),
-    sendCustomerWhatsApp(order),
-    sendAdminEmail(order),
-    sendAdminWhatsApp(order),
-  ]);
+  const steps = [
+    { name: "Owner Email", fn: () => sendAdminEmail(order) },
+    { name: "Customer Email", fn: () => sendCustomerEmail(order) },
+    { name: "Customer WhatsApp", fn: () => sendCustomerWhatsApp(order) },
+    { name: "Owner WhatsApp", fn: () => sendAdminWhatsApp(order) },
+    { name: "Customer SMS", fn: () => sendOrderConfirmationSMS(order) },
+  ];
 
-  // Log results
-  const notificationTypes = ["Customer Email", "Customer WhatsApp", "Admin Email", "Admin WhatsApp"];
-  results.forEach((result, index) => {
-    if (result.status === "fulfilled") {
-      if (result.value.success) {
-        console.log(`✅ ${notificationTypes[index]}: Sent successfully`);
+  const results = [];
+
+  for (const step of steps) {
+    try {
+      const result = await step.fn();
+      if (result && result.success) {
+        console.log(`✅ ${step.name}: Sent successfully`);
+        results.push({
+          channel: step.name,
+          status: "sent",
+          reference: result.messageId || result.messageSid || null,
+        });
       } else {
-        console.warn(`⚠️ ${notificationTypes[index]}: ${result.value.message}`);
+        console.warn(`⚠️ ${step.name}: ${result?.message || "unknown error"}`);
+        results.push({ channel: step.name, status: "skipped", message: result?.message });
       }
-    } else {
-      console.error(`❌ ${notificationTypes[index]}: Failed - ${result.reason?.message}`);
+    } catch (err) {
+      console.error(`❌ ${step.name}: Failed - ${err.message}`);
+      results.push({ channel: step.name, status: "failed", message: err.message });
     }
+  }
+
+  console.log(
+    `📬 Notification summary for order #${shortId}:`,
+    results.map((r) => `${r.channel}=${r.status}`).join(", ")
+  );
+
+  return results;
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ORDER CANCELLATION + REFUND NOTIFICATIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * AquaPure support email shown to customers in emails.
+ */
+const getSupportEmail = () => {
+  return process.env.AQUAPURE_SUPPORT_EMAIL || "support@aquapure.com";
+};
+
+/**
+ * Long date formatter (e.g. "31 July 2026").
+ */
+const formatDateLong = (date) => {
+  return new Date(date).toLocaleDateString("en-IN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
+};
+
+/**
+ * Reusable Meta WhatsApp Business Cloud API sender for template messages.
+ */
+const sendWhatsAppMessage = async ({ to, templateName, params, label = "WhatsApp" }) => {
+  try {
+    const { WHATSAPP_TOKEN, WHATSAPP_PHONE_NUMBER_ID } = process.env;
+
+    if (!WHATSAPP_TOKEN || !WHATSAPP_PHONE_NUMBER_ID) {
+      console.warn(`⚠️  WhatsApp credentials not configured. Skipping ${label}.`);
+      return { success: false, message: "WhatsApp not configured" };
+    }
+
+    if (!templateName) {
+      console.warn(`⚠️  No WhatsApp template name configured for ${label}. Skipping.`);
+      return { success: false, message: "WhatsApp template not configured" };
+    }
+
+    // Format phone number with country code
+    let phoneNumber = String(to).replace(/\D/g, "");
+    if (!phoneNumber.startsWith("91") && phoneNumber.length === 10) {
+      phoneNumber = "91" + phoneNumber;
+    }
+
+    const response = await fetch(
+      `https://graph.facebook.com/v19.0/${WHATSAPP_PHONE_NUMBER_ID}/messages`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${WHATSAPP_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messaging_product: "whatsapp",
+          to: phoneNumber,
+          type: "template",
+          template: {
+            name: templateName,
+            language: { code: "en" },
+            components: [{ type: "body", parameters: params }],
+          },
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error?.message || "WhatsApp API error");
+    }
+
+    console.log(`📱 ${label} sent:`, data.messages?.[0]?.id);
+    return { success: true, messageId: data.messages?.[0]?.id };
+  } catch (error) {
+    console.error(`❌ ${label} failed:`, error.message);
+    return { success: false, message: error.message };
+  }
+};
+
+/**
+ * Branded AquaPure email shell used by all cancellation/refund emails.
+ */
+const buildBrandedEmail = ({ badge, title, subtitle, contentHTML, footerText }) => {
+  return `
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body style="margin: 0; padding: 0; background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <div style="max-width: 600px; margin: 0 auto; background: #ffffff;">
+      <!-- Header -->
+      <div style="background: linear-gradient(135deg, #0A77B7 0%, #00B8A9 100%); padding: 32px; text-align: center;">
+        <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">💧 AquaPure</h1>
+        <p style="color: rgba(255,255,255,0.85); margin: 8px 0 0; font-size: 14px;">Pure from Source to Bottle</p>
+      </div>
+
+      <!-- Badge & Title -->
+      <div style="text-align: center; padding: 32px 24px 16px;">
+        <div style="display: inline-block; background: #E6F7FF; border-radius: 50%; width: 64px; height: 64px; line-height: 64px; font-size: 32px;">${badge}</div>
+        <h2 style="color: #333; margin: 16px 0 4px; font-size: 22px;">${title}</h2>
+        ${subtitle ? `<p style="color: #777; margin: 0; font-size: 14px;">${subtitle}</p>` : ""}
+      </div>
+
+      ${contentHTML}
+
+      <!-- Footer -->
+      <div style="background: #333; padding: 24px; text-align: center; margin-top: 20px;">
+        <p style="color: rgba(255,255,255,0.7); font-size: 12px; margin: 0;">${footerText}</p>
+        <p style="color: rgba(255,255,255,0.5); font-size: 11px; margin: 8px 0 0;">© ${new Date().getFullYear()} AquaPure. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+  </html>`;
+};
+
+/**
+ * Shared info table rows for the customer cancellation email.
+ */
+const buildCancellationInfoRows = (order) => {
+  const refundStatus = order.refundStatus || "None";
+  const statusColor =
+    refundStatus === "Completed" ? "#00B8A9" : refundStatus === "Failed" ? "#ef4444" : "#f59e0b";
+
+  return `
+    <tr>
+      <td style="padding: 4px 0;"><strong>Order ID:</strong></td>
+      <td style="text-align: right; font-weight: 700; color: #0A77B7;">#${order._id.toString().slice(-8).toUpperCase()}</td>
+    </tr>
+    <tr>
+      <td style="padding: 4px 0;"><strong>Order Date:</strong></td>
+      <td style="text-align: right;">${formatDateLong(order.orderDate)}</td>
+    </tr>
+    <tr>
+      <td style="padding: 4px 0;"><strong>Cancelled Date:</strong></td>
+      <td style="text-align: right;">${formatDateLong(order.cancelledAt || Date.now())}</td>
+    </tr>
+    <tr>
+      <td style="padding: 4px 0;"><strong>Payment Method:</strong></td>
+      <td style="text-align: right;">${order.paymentMethod === "COD" ? "Cash on Delivery" : order.paymentMethod}</td>
+    </tr>
+    <tr>
+      <td style="padding: 4px 0;"><strong>Refund Status:</strong></td>
+      <td style="text-align: right;">
+        <span style="background: ${statusColor}; color: white; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;">
+          ${refundStatus}
+        </span>
+      </td>
+    </tr>
+    ${
+      order.cancellationReason
+        ? `<tr>
+            <td style="padding: 4px 0;"><strong>Cancellation Reason:</strong></td>
+            <td style="text-align: right; font-style: italic; color: #777;">${order.cancellationReason}</td>
+          </tr>`
+        : ""
+    }`;
+};
+
+/**
+ * Send Customer Email — Order Cancelled (subject: "Order Cancelled Successfully - AquaPure")
+ */
+const sendCustomerCancellationEmail = async (order) => {
+  try {
+    if (!process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {
+      console.warn("⚠️  SMTP credentials not configured. Skipping customer cancellation email.");
+      return { success: false, message: "SMTP not configured" };
+    }
+
+    const isOnline = order.paymentMethod !== "COD";
+
+    const refundBlock = isOnline
+      ? `<div style="margin: 20px 24px; padding: 16px 20px; background: #E6F7FF; border-radius: 12px; border: 1px solid #b3e0f7;">
+          <p style="color: #333; font-size: 14px; margin: 0 0 6px; font-weight: 700;">Your order has been cancelled successfully.</p>
+          <p style="color: #555; font-size: 13px; margin: 0; line-height: 1.6;">
+            A full refund of <strong style="color: #0A77B7;">${formatCurrency(order.totalAmount)}</strong> has been initiated.<br>
+            The amount will be credited to your original payment method within 5-7 business days.
+          </p>
+        </div>`
+      : `<div style="margin: 20px 24px; padding: 16px 20px; background: #f8fafb; border-radius: 12px; border: 1px solid #e8ecef;">
+          <p style="color: #333; font-size: 14px; margin: 0 0 6px; font-weight: 700;">Your order has been cancelled successfully.</p>
+          <p style="color: #555; font-size: 13px; margin: 0; line-height: 1.6;">
+            Since this order was Cash on Delivery, no refund was required.
+          </p>
+        </div>`;
+
+    const contentHTML = `
+      <!-- Order Info -->
+      <div style="margin: 0 24px; padding: 16px 20px; background: #f8fafb; border-radius: 12px; border: 1px solid #e8ecef;">
+        <table style="width: 100%; font-size: 13px; color: #555;">
+          ${buildCancellationInfoRows(order)}
+        </table>
+      </div>
+
+      ${refundBlock}
+
+      <!-- Products Table -->
+      <div style="margin: 20px 24px;">
+        <h3 style="color: #333; font-size: 16px; margin-bottom: 12px;">📦 Order Items</h3>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr style="background: #f0f7fb;">
+              <th style="padding: 10px 12px; text-align: left; color: #0A77B7; font-weight: 700;">Product</th>
+              <th style="padding: 10px 12px; text-align: center; color: #0A77B7; font-weight: 700;">Qty</th>
+              <th style="padding: 10px 12px; text-align: right; color: #0A77B7; font-weight: 700;">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${generateProductsHTML(order.products)}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Price Summary -->
+      <div style="margin: 0 24px; padding: 16px 20px; background: #f8fafb; border-radius: 12px; border: 1px solid #e8ecef;">
+        <table style="width: 100%; font-size: 13px; color: #555;">
+          <tr>
+            <td style="padding: 4px 0;">Subtotal</td>
+            <td style="text-align: right;">${formatCurrency(order.subtotal)}</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0;">Delivery Charges</td>
+            <td style="text-align: right;">${order.deliveryCharges === 0 ? '<span style="color: #00B8A9; font-weight: 700;">FREE</span>' : formatCurrency(order.deliveryCharges)}</td>
+          </tr>
+          ${order.gst > 0 ? `<tr><td style="padding: 4px 0;">GST</td><td style="text-align: right;">${formatCurrency(order.gst)}</td></tr>` : ""}
+          <tr>
+            <td style="padding: 8px 0 4px; border-top: 2px solid #e0e0e0; font-weight: 800; font-size: 15px; color: #333;">Total Amount</td>
+            <td style="padding: 8px 0 4px; border-top: 2px solid #e0e0e0; text-align: right; font-weight: 800; font-size: 18px; color: #0A77B7;">${formatCurrency(order.totalAmount)}</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Support -->
+      <div style="margin: 20px 24px; text-align: center; padding: 16px; background: #f8fafb; border-radius: 12px; border: 1px solid #e8ecef;">
+        <p style="color: #555; font-size: 13px; margin: 0;">Thank you for choosing AquaPure.</p>
+        <p style="color: #999; font-size: 12px; margin: 8px 0 0;">Need help? <a href="mailto:${getSupportEmail()}" style="color: #0A77B7; font-weight: 700; text-decoration: none;">${getSupportEmail()}</a></p>
+      </div>`;
+
+    const html = buildBrandedEmail({
+      badge: "❌",
+      title: "Order Cancelled",
+      subtitle: `We're sorry to see you go, <strong>${order.shippingAddress.fullName}</strong>.`,
+      contentHTML,
+      footerText: "AquaPure — Order Cancellation Notice",
+    });
+
+    const transporter = require("nodemailer").createTransport({
+      service: "gmail",
+      auth: { user: process.env.SMTP_EMAIL, pass: process.env.SMTP_PASSWORD },
+    });
+
+    const info = await transporter.sendMail({
+      from: `"AquaPure" <${process.env.SMTP_EMAIL}>`,
+      to: order.shippingAddress.email,
+      subject: "Order Cancelled Successfully - AquaPure",
+      html,
+    });
+
+    console.log("📧 Customer cancellation email sent:", info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("❌ Customer cancellation email failed:", error.message);
+    return { success: false, message: error.message };
+  }
+};
+
+/**
+ * Send Customer WhatsApp — Order Cancelled.
+ * Online orders use a template with refund details; COD uses a simpler one.
+ */
+const sendCustomerCancellationWhatsApp = async (order) => {
+  const isOnline = order.paymentMethod !== "COD";
+  const orderId = order._id.toString().slice(-8).toUpperCase();
+  const customerName = order.shippingAddress.fullName;
+  const phone = order.shippingAddress.phone;
+
+  if (isOnline) {
+    // Template placeholders:
+    //   {{1}} Customer name | {{2}} Order ID | {{3}} Refund amount
+    //   {{4}} Refund status | {{5}} Expected credit timeframe
+    return sendWhatsAppMessage({
+      to: phone,
+      templateName: process.env.WHATSAPP_CANCELLATION_TEMPLATE,
+      params: [
+        { type: "text", text: customerName },
+        { type: "text", text: orderId },
+        { type: "text", text: formatCurrency(order.totalAmount) },
+        { type: "text", text: order.refundStatus || "Initiated" },
+        { type: "text", text: "5-7 business days" },
+      ],
+      label: "Customer cancellation WhatsApp (online)",
+    });
+  }
+
+  // COD template placeholders: {{1}} Customer name | {{2}} Order ID
+  return sendWhatsAppMessage({
+    to: phone,
+    templateName: process.env.WHATSAPP_CANCELLATION_COD_TEMPLATE,
+    params: [
+      { type: "text", text: customerName },
+      { type: "text", text: orderId },
+    ],
+    label: "Customer cancellation WhatsApp (COD)",
+  });
+};
+
+/**
+ * Send Admin Email — Order Cancelled by Customer.
+ */
+const sendAdminCancellationEmail = async (order) => {
+  try {
+    const adminEmail = process.env.ADMIN_EMAIL || process.env.COMPANY_EMAIL;
+
+    if (!adminEmail) {
+      console.warn("⚠️  Admin email not configured. Skipping admin cancellation email.");
+      return { success: false, message: "Admin email not configured" };
+    }
+    if (!process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {
+      console.warn("⚠️  SMTP credentials not configured. Skipping admin cancellation email.");
+      return { success: false, message: "SMTP not configured" };
+    }
+
+    const contentHTML = `
+      <!-- Customer & Order Details -->
+      <div style="margin: 0 24px; padding: 16px 20px; background: #f8fafb; border-radius: 12px; border: 1px solid #e8ecef;">
+        <table style="width: 100%; font-size: 13px; color: #555;">
+          <tr>
+            <td style="padding: 4px 0;"><strong>Customer Name:</strong></td>
+            <td style="text-align: right;">${order.shippingAddress.fullName}</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0;"><strong>Customer Email:</strong></td>
+            <td style="text-align: right;">${order.shippingAddress.email}</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0;"><strong>Customer Phone:</strong></td>
+            <td style="text-align: right;">${order.shippingAddress.phone}</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0;"><strong>Order ID:</strong></td>
+            <td style="text-align: right; font-weight: 700; color: #0A77B7;">#${order._id.toString().slice(-8).toUpperCase()}</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0;"><strong>Total Amount:</strong></td>
+            <td style="text-align: right; font-weight: 700; color: #0A77B7;">${formatCurrency(order.totalAmount)}</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0;"><strong>Payment Method:</strong></td>
+            <td style="text-align: right;">${order.paymentMethod === "COD" ? "Cash on Delivery" : order.paymentMethod}</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0;"><strong>Refund Status:</strong></td>
+            <td style="text-align: right;">${order.refundStatus || "None"}</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0;"><strong>Cancellation Time:</strong></td>
+            <td style="text-align: right;">${new Date(order.cancelledAt || Date.now()).toLocaleString("en-IN")}</td>
+          </tr>
+          ${
+            order.cancellationReason
+              ? `<tr>
+                  <td style="padding: 4px 0;"><strong>Reason:</strong></td>
+                  <td style="text-align: right; font-style: italic; color: #777;">${order.cancellationReason}</td>
+                </tr>`
+              : ""
+          }
+        </table>
+      </div>
+
+      <!-- Products -->
+      <div style="margin: 20px 24px;">
+        <h3 style="color: #333; font-size: 15px; margin-bottom: 12px;">📦 Products Cancelled</h3>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr style="background: #f0f7fb;">
+              <th style="padding: 10px 12px; text-align: left; color: #0A77B7; font-weight: 700;">Product</th>
+              <th style="padding: 10px 12px; text-align: center; color: #0A77B7; font-weight: 700;">Qty</th>
+              <th style="padding: 10px 12px; text-align: right; color: #0A77B7; font-weight: 700;">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${generateProductsHTML(order.products)}
+          </tbody>
+        </table>
+      </div>`;
+
+    const html = buildBrandedEmail({
+      badge: "❌",
+      title: "Order Cancelled by Customer",
+      subtitle: `Customer #${order._id.toString().slice(-8).toUpperCase()} requested cancellation.`,
+      contentHTML,
+      footerText: "AquaPure — Admin Notification",
+    });
+
+    const transporter = require("nodemailer").createTransport({
+      service: "gmail",
+      auth: { user: process.env.SMTP_EMAIL, pass: process.env.SMTP_PASSWORD },
+    });
+
+    const info = await transporter.sendMail({
+      from: `"AquaPure Admin" <${process.env.SMTP_EMAIL}>`,
+      to: adminEmail,
+      subject: `Order Cancelled by Customer — #${order._id.toString().slice(-8).toUpperCase()}`,
+      html,
+    });
+
+    console.log("📧 Admin cancellation email sent:", info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("❌ Admin cancellation email failed:", error.message);
+    return { success: false, message: error.message };
+  }
+};
+
+/**
+ * Send Admin WhatsApp — Order Cancelled.
+ * Template placeholders:
+ *   {{1}} Customer name | {{2}} Phone | {{3}} Order ID | {{4}} Amount
+ *   {{5}} Payment method | {{6}} Refund status
+ */
+const sendAdminCancellationWhatsApp = async (order) => {
+  const adminPhone = process.env.ADMIN_WHATSAPP_NUMBER;
+  if (!adminPhone) {
+    console.warn("⚠️  ADMIN_WHATSAPP_NUMBER not configured. Skipping admin cancellation WhatsApp.");
+    return { success: false, message: "Admin WhatsApp not configured" };
+  }
+
+  return sendWhatsAppMessage({
+    to: adminPhone,
+    templateName: process.env.WHATSAPP_ADMIN_CANCELLATION_TEMPLATE,
+    params: [
+      { type: "text", text: order.shippingAddress.fullName },
+      { type: "text", text: order.shippingAddress.phone },
+      { type: "text", text: order._id.toString().slice(-8).toUpperCase() },
+      { type: "text", text: formatCurrency(order.totalAmount) },
+      { type: "text", text: order.paymentMethod === "COD" ? "Cash on Delivery" : order.paymentMethod },
+      { type: "text", text: order.refundStatus || "None" },
+    ],
+    label: "Admin cancellation WhatsApp",
+  });
+};
+
+/**
+ * Send Customer Email — Refund Completed (subject: "Refund Completed - AquaPure")
+ */
+const sendRefundCompletedEmail = async (order) => {
+  try {
+    if (!process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {
+      console.warn("⚠️  SMTP credentials not configured. Skipping refund-completed email.");
+      return { success: false, message: "SMTP not configured" };
+    }
+
+    const contentHTML = `
+      <div style="margin: 0 24px; padding: 16px 20px; background: #E6F7FF; border-radius: 12px; border: 1px solid #b3e0f7;">
+        <table style="width: 100%; font-size: 13px; color: #555;">
+          <tr>
+            <td style="padding: 6px 0;"><strong>Refund Amount:</strong></td>
+            <td style="text-align: right; font-weight: 800; font-size: 18px; color: #0A77B7;">${formatCurrency(order.refundAmount || order.totalAmount)}</td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 0;"><strong>Refund ID:</strong></td>
+            <td style="text-align: right; font-family: monospace; color: #0A77B7;">${order.refundId || "—"}</td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 0;"><strong>Order ID:</strong></td>
+            <td style="text-align: right; font-weight: 700; color: #0A77B7;">#${order._id.toString().slice(-8).toUpperCase()}</td>
+          </tr>
+        </table>
+      </div>
+
+      <div style="margin: 20px 24px; padding: 16px 20px; background: #f8fafb; border-radius: 12px; border: 1px solid #e8ecef;">
+        <p style="color: #555; font-size: 13px; margin: 0; line-height: 1.6;">
+          The amount has been credited to your original payment method.<br>
+          Thank you for shopping with AquaPure.
+        </p>
+      </div>
+
+      <div style="margin: 20px 24px; text-align: center;">
+        <p style="color: #999; font-size: 12px; margin: 0;">Need help? <a href="mailto:${getSupportEmail()}" style="color: #0A77B7; font-weight: 700; text-decoration: none;">${getSupportEmail()}</a></p>
+      </div>`;
+
+    const html = buildBrandedEmail({
+      badge: "💸",
+      title: "Refund Completed",
+      subtitle: `Hello <strong>${order.shippingAddress.fullName}</strong> — great news!`,
+      contentHTML,
+      footerText: "AquaPure — Refund Notification",
+    });
+
+    const transporter = require("nodemailer").createTransport({
+      service: "gmail",
+      auth: { user: process.env.SMTP_EMAIL, pass: process.env.SMTP_PASSWORD },
+    });
+
+    const info = await transporter.sendMail({
+      from: `"AquaPure" <${process.env.SMTP_EMAIL}>`,
+      to: order.shippingAddress.email,
+      subject: "Refund Completed - AquaPure",
+      html,
+    });
+
+    console.log("📧 Refund-completed email sent:", info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("❌ Refund-completed email failed:", error.message);
+    return { success: false, message: error.message };
+  }
+};
+
+/**
+ * Send Customer WhatsApp — Refund Completed.
+ * Template placeholders: {{1}} Customer name | {{2}} Amount | {{3}} Order ID
+ */
+const sendRefundCompletedWhatsApp = async (order) => {
+  return sendWhatsAppMessage({
+    to: order.shippingAddress.phone,
+    templateName: process.env.WHATSAPP_REFUND_COMPLETED_TEMPLATE,
+    params: [
+      { type: "text", text: order.shippingAddress.fullName },
+      { type: "text", text: formatCurrency(order.refundAmount || order.totalAmount) },
+      { type: "text", text: order._id.toString().slice(-8).toUpperCase() },
+    ],
+    label: "Refund-completed WhatsApp",
+  });
+};
+
+/**
+ * Send ALL notifications after an order is cancelled.
+ * Sequential & isolated: a failure in one channel never blocks the next.
+ *   1. Admin Email | 2. Customer Email | 3. Customer WhatsApp | 4. Admin WhatsApp
+ */
+const sendAllCancellationNotifications = async (order) => {
+  const shortId = order._id.toString().slice(-8).toUpperCase();
+  console.log(`📢 Sending cancellation notifications for order #${shortId}`);
+
+  const steps = [
+    { name: "Admin Email", fn: () => sendAdminCancellationEmail(order) },
+    { name: "Customer Email", fn: () => sendCustomerCancellationEmail(order) },
+    { name: "Customer WhatsApp", fn: () => sendCustomerCancellationWhatsApp(order) },
+    { name: "Admin WhatsApp", fn: () => sendAdminCancellationWhatsApp(order) },
+  ];
+
+  const results = [];
+
+  for (const step of steps) {
+    try {
+      const result = await step.fn();
+      if (result && result.success) {
+        console.log(`✅ ${step.name}: Sent successfully`);
+        results.push({ channel: step.name, status: "sent", reference: result.messageId || null });
+      } else {
+        console.warn(`⚠️ ${step.name}: ${result?.message || "unknown error"}`);
+        results.push({ channel: step.name, status: "skipped", message: result?.message });
+      }
+    } catch (err) {
+      console.error(`❌ ${step.name}: Failed - ${err.message}`);
+      results.push({ channel: step.name, status: "failed", message: err.message });
+    }
+  }
+
+  console.log(
+    `📬 Cancellation notification summary for order #${shortId}:`,
+    results.map((r) => `${r.channel}=${r.status}`).join(", ")
+  );
+
+  return results;
+};
+
+/**
+ * Send refund-completed notifications (customer email + customer WhatsApp).
+ */
+const sendRefundCompletedNotifications = async (order) => {
+  const shortId = order._id.toString().slice(-8).toUpperCase();
+  console.log(`💸 Sending refund-completed notifications for order #${shortId}`);
+
+  const steps = [
+    { name: "Refund Customer Email", fn: () => sendRefundCompletedEmail(order) },
+    { name: "Refund Customer WhatsApp", fn: () => sendRefundCompletedWhatsApp(order) },
+  ];
+
+  const results = [];
+
+  for (const step of steps) {
+    try {
+      const result = await step.fn();
+      if (result && result.success) {
+        console.log(`✅ ${step.name}: Sent successfully`);
+        results.push({ channel: step.name, status: "sent", reference: result.messageId || null });
+      } else {
+        console.warn(`⚠️ ${step.name}: ${result?.message || "unknown error"}`);
+        results.push({ channel: step.name, status: "skipped", message: result?.message });
+      }
+    } catch (err) {
+      console.error(`❌ ${step.name}: Failed - ${err.message}`);
+      results.push({ channel: step.name, status: "failed", message: err.message });
+    }
+  }
 
   return results;
 };
@@ -568,4 +1237,12 @@ module.exports = {
   sendCustomerWhatsApp,
   sendAdminEmail,
   sendAdminWhatsApp,
+  sendAllCancellationNotifications,
+  sendCustomerCancellationEmail,
+  sendCustomerCancellationWhatsApp,
+  sendAdminCancellationEmail,
+  sendAdminCancellationWhatsApp,
+  sendRefundCompletedNotifications,
+  sendRefundCompletedEmail,
+  sendRefundCompletedWhatsApp,
 };

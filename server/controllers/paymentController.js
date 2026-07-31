@@ -2,8 +2,7 @@ const crypto = require("crypto");
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 const User = require("../models/User");
-const { sendOrderConfirmationEmail } = require("../services/emailService");
-const { sendOrderConfirmationSMS } = require("../services/smsService");
+const { sendAllOrderNotifications } = require("../services/notificationService");
 
 // Delivery configuration (must match frontend and orderController)
 const FREE_DELIVERY_THRESHOLD = 500;
@@ -273,12 +272,11 @@ exports.verifyPayment = async (req, res) => {
     user.cart = [];
     await user.save();
 
-    // Send notifications (non-blocking)
-    sendOrderConfirmationEmail(order).catch((err) =>
-      console.error("Email notification error:", err.message)
-    );
-    sendOrderConfirmationSMS(order).catch((err) =>
-      console.error("SMS notification error:", err.message)
+    // Send notifications (non-blocking) — fires after the order is saved:
+    // Owner Email → Customer Email → Customer WhatsApp → Owner WhatsApp → Customer SMS.
+    // Notification failures never fail or roll back the order.
+    sendAllOrderNotifications(order).catch((err) =>
+      console.error("Notification error:", err.message)
     );
 
     return res.status(201).json({

@@ -10,9 +10,7 @@ import {
   FiCheck,
   FiGlobe,
   FiCpu,
-  FiTrendingUp,
   FiUsers,
-  FiFeather,
   FiZap,
 } from 'react-icons/fi'
 import { ROUTES } from '@constants/routes'
