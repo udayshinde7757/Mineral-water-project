@@ -5,15 +5,18 @@ import AppRouter from '@/routes/AppRouter'
 import { AuthProvider } from '@context/AuthContext'
 import { CartProvider } from '@context/CartContext'
 import { BuyNowProvider } from '@context/BuyNowContext'
+import { SettingsProvider } from '@context/SettingsContext'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <AuthProvider>
-      <CartProvider>
-        <BuyNowProvider>
-          <AppRouter />
-        </BuyNowProvider>
-      </CartProvider>
-    </AuthProvider>
+    <SettingsProvider>
+      <AuthProvider>
+        <CartProvider>
+          <BuyNowProvider>
+            <AppRouter />
+          </BuyNowProvider>
+        </CartProvider>
+      </AuthProvider>
+    </SettingsProvider>
   </StrictMode>
 )

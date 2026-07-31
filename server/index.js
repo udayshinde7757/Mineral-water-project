@@ -19,6 +19,7 @@ const contactRoutes = require("./routes/contactRoutes");
 const enquiryRoutes = require("./routes/enquiryRoutes");
 
 const adminRoutes = require("./routes/adminRoutes");
+const settingsRoutes = require("./routes/settingsRoutes");
 const seedAdminUser = require("./utils/seedAdmin");
 
 dotenv.config();
@@ -58,6 +59,7 @@ app.use("/api/address", addressRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/enquiry", enquiryRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/settings", settingsRoutes);
 
 
 app.get("/", (req, res) => {

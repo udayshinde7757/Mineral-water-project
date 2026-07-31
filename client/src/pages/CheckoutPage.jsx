@@ -16,6 +16,7 @@ import {
 } from 'react-icons/fi'
 import useAuth from '@hooks/useAuth'
 import useCart from '@hooks/useCart'
+import useSettings from '@hooks/useSettings'
 import { useBuyNow } from '@hooks/useBuyNow'
 import addressService from '@services/addressService'
 import orderService from '@services/orderService'
@@ -91,11 +92,6 @@ function CheckoutPage() {
     return pId !== null && (item.quantity === undefined || item.quantity > 0)
   })
 
-  // If neither flow has valid items, redirect
-  if (validCartItems.length === 0 && !isSubmitting) {
-    // We'll handle this in the render
-  }
-
   // Delivery & Subtotal calculations
   const calculatedSubtotal = validCartItems.reduce((acc, item) => {
     const prod = getProductObject(item)
@@ -105,9 +101,12 @@ function CheckoutPage() {
   }, 0)
 
   const effectiveSubtotal = isCartFlow ? cartSubtotal : calculatedSubtotal
-  const FREE_DELIVERY_THRESHOLD = 500
-  const DELIVERY_CHARGE = effectiveSubtotal >= FREE_DELIVERY_THRESHOLD || effectiveSubtotal === 0 ? 0 : 50
-  const GST = 0
+
+  // Delivery & tax pulled from the database-driven site settings.
+  // The backend independently recalculates these values when the order is created.
+  const { taxPercentage, getDeliveryCharge, getGstAmount } = useSettings()
+  const DELIVERY_CHARGE = getDeliveryCharge(effectiveSubtotal)
+  const GST = getGstAmount(effectiveSubtotal)
   const finalTotal = effectiveSubtotal + DELIVERY_CHARGE + GST
 
   // Address State
@@ -728,6 +727,13 @@ function CheckoutPage() {
                       <span className="font-semibold text-gray-900">{formatCurrency(DELIVERY_CHARGE)}</span>
                     )}
                   </div>
+
+                  {GST > 0 && (
+                    <div className="flex justify-between">
+                      <span>GST ({taxPercentage}%)</span>
+                      <span className="font-semibold text-gray-900">{formatCurrency(GST)}</span>
+                    </div>
+                  )}
 
                   <div className="border-t border-gray-100 pt-4 flex justify-between items-center text-lg font-black text-gray-900">
                     <span>Total Amount</span>

@@ -4,7 +4,6 @@ import { motion } from 'framer-motion'
 import { FiLock, FiMail, FiShield, FiArrowRight, FiDroplet, FiAlertCircle } from 'react-icons/fi'
 import { AuthContext } from '@context/AuthContext'
 import { ROUTES } from '@constants/routes'
-import adminService from '@services/adminService'
 
 export default function AdminLoginPage() {
   const { login } = useContext(AuthContext)
@@ -24,12 +23,10 @@ export default function AdminLoginPage() {
     setLoading(true)
 
     try {
-      const data = await adminService.adminLogin({ email, password })
-      if (data.success && data.token) {
-        // Sync login state in AuthContext
-        if (login) login(data.token, data.admin)
-        navigate(from, { replace: true })
-      }
+      // Use the standard auth flow so AuthContext holds the full user (with role).
+      // The AdminRoute guard enforces admin-only access to the /admin pages.
+      await login(email, password)
+      navigate(from, { replace: true })
     } catch (err) {
       setError(err.message || 'Invalid admin credentials')
     } finally {

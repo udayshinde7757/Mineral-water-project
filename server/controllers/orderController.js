@@ -14,10 +14,9 @@ const {
   mapRefundStatus,
 } = require("../services/refundService");
 
-// Delivery configuration (must match frontend)
-const FREE_DELIVERY_THRESHOLD = 500;
-const DELIVERY_CHARGE = 50;
-const GST_RATE = 0; // Set to 0.18 for 18% GST if needed
+// Delivery & tax configuration now comes from the SiteSettings collection
+// (see services/settingsService.js). Never hardcode these values.
+const { getSiteSettings, computeOrderTotals } = require("../services/settingsService");
 
 // Full order lifecycle (must match Order model enum)
 const ALL_ORDER_STATUSES = [
@@ -319,10 +318,9 @@ exports.createOrder = async (req, res) => {
       });
     }
 
-    // Calculate charges
-    const deliveryCharges = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_CHARGE;
-    const gst = Math.round(subtotal * GST_RATE);
-    const totalAmount = subtotal + deliveryCharges + gst;
+    // Calculate charges from current database settings (never trust frontend)
+    const { merged: siteSettings } = await getSiteSettings();
+    const { deliveryCharges, gst, totalAmount } = computeOrderTotals(subtotal, siteSettings);
 
     // Create order
     const order = await Order.create({

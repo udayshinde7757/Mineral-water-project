@@ -6,6 +6,7 @@ const Product = require("../models/Product");
 const ActivityLog = require("../models/ActivityLog");
 const SiteSettings = require("../models/SiteSettings");
 const NotificationLog = require("../models/NotificationLog");
+const { getSiteSettings } = require("../services/settingsService");
 const { sendOrderStatusEmail } = require("../services/emailService");
 const { sendOrderStatusWhatsApp } = require("../services/whatsappService");
 
@@ -874,8 +875,56 @@ exports.retryNotification = async (req, res) => {
 
 exports.getActivityLogs = async (req, res) => {
   try {
-    const logs = await ActivityLog.find().sort({ createdAt: -1 }).limit(100);
-    return res.status(200).json({ success: true, logs });
+    const { search, module, startDate, endDate, page = 1, limit = 10 } = req.query;
+
+    const query = {};
+
+    // Filter by module (targetResource) e.g. Orders, Products, Settings
+    if (module && module !== "All") {
+      query.targetResource = module;
+    }
+
+    // Filter by action date range
+    if (startDate || endDate) {
+      query.createdAt = {};
+      if (startDate) query.createdAt.$gte = new Date(startDate);
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        query.createdAt.$lte = end;
+      }
+    }
+
+    // Free-text search across admin, action and details
+    if (search) {
+      const searchRegex = new RegExp(search.trim(), "i");
+      query.$or = [
+        { adminName: searchRegex },
+        { adminEmail: searchRegex },
+        { action: searchRegex },
+        { details: searchRegex },
+      ];
+    }
+
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+
+    const [logs, total] = await Promise.all([
+      ActivityLog.find(query).sort({ createdAt: -1 }).skip(skip).limit(limitNum),
+      ActivityLog.countDocuments(query),
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      logs,
+      pagination: {
+        total,
+        page: pageNum,
+        pages: Math.ceil(total / limitNum),
+        limit: limitNum,
+      },
+    });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
@@ -885,11 +934,8 @@ exports.getActivityLogs = async (req, res) => {
 
 exports.getSettings = async (req, res) => {
   try {
-    let settings = await SiteSettings.findOne();
-    if (!settings) {
-      settings = await SiteSettings.create({});
-    }
-    return res.status(200).json({ success: true, settings });
+    const { merged } = await getSiteSettings();
+    return res.status(200).json({ success: true, settings: merged });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
@@ -907,7 +953,8 @@ exports.updateSettings = async (req, res) => {
     await settings.save();
     await logAdminActivity(req, "Settings Updated", "Admin updated site system settings", "Settings");
 
-    return res.status(200).json({ success: true, message: "Settings updated successfully", settings });
+    const { merged } = await getSiteSettings();
+    return res.status(200).json({ success: true, message: "Settings updated successfully", settings: merged });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }

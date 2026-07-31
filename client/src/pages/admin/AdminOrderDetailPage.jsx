@@ -59,8 +59,7 @@ export default function AdminOrderDetailPage() {
       }
     } catch (err) {
       alert(err.message)
-    } font-semibold
-    finally {
+    } finally {
       setUpdating(false)
     }
   }

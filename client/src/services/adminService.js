@@ -257,9 +257,9 @@ const adminService = {
     }
   },
 
-  getActivityLogs: async () => {
+  getActivityLogs: async (params = {}) => {
     try {
-      const response = await apiClient.get('/admin/logs')
+      const response = await apiClient.get('/admin/activity-logs', { params })
       return response.data
     } catch (error) {
       throw new Error(getApiErrorMessage(error, 'Failed to fetch activity logs'))

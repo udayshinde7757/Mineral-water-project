@@ -3,11 +3,7 @@ const Order = require("../models/Order");
 const Product = require("../models/Product");
 const User = require("../models/User");
 const { sendAllOrderNotifications } = require("../services/notificationService");
-
-// Delivery configuration (must match frontend and orderController)
-const FREE_DELIVERY_THRESHOLD = 500;
-const DELIVERY_CHARGE = 50;
-const GST_RATE = 0;
+const { getSiteSettings, computeOrderTotals } = require("../services/settingsService");
 
 /**
  * Initialize Razorpay instance
@@ -81,9 +77,9 @@ exports.createRazorpayOrder = async (req, res) => {
       });
     }
 
-    const deliveryCharges = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_CHARGE;
-    const gst = Math.round(subtotal * GST_RATE);
-    const totalAmount = subtotal + deliveryCharges + gst;
+    // Calculate charges from current database settings (never trust frontend)
+    const { merged: siteSettings } = await getSiteSettings();
+    const { deliveryCharges, gst, totalAmount } = computeOrderTotals(subtotal, siteSettings);
 
     // Create Razorpay order (amount in paise)
     const razorpay = getRazorpayInstance();
@@ -237,9 +233,9 @@ exports.verifyPayment = async (req, res) => {
       });
     }
 
-    const deliveryCharges = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_CHARGE;
-    const gst = Math.round(subtotal * GST_RATE);
-    const totalAmount = subtotal + deliveryCharges + gst;
+    // Calculate charges from current database settings (never trust frontend)
+    const { merged: siteSettings } = await getSiteSettings();
+    const { deliveryCharges, gst, totalAmount } = computeOrderTotals(subtotal, siteSettings);
 
     // Create order with payment details
     const order = await Order.create({

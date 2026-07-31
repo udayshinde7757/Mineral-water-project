@@ -52,7 +52,8 @@ router.post("/refunds/:id/retry", adminController.retryRefund);
 // Notifications & Activity Logs
 router.get("/notifications", adminController.getNotifications);
 router.post("/notifications/:id/retry", adminController.retryNotification);
-router.get("/logs", adminController.getActivityLogs);
+router.get("/activity-logs", adminController.getActivityLogs);
+router.get("/logs", adminController.getActivityLogs); // backward-compatible alias
 
 // Settings
 router.get("/settings", adminController.getSettings);

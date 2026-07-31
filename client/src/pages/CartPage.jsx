@@ -13,6 +13,7 @@ import {
   FiRefreshCw,
 } from 'react-icons/fi'
 import useCart from '@hooks/useCart'
+import useSettings from '@hooks/useSettings'
 import { ROUTES } from '@constants/routes'
 
 function CartPage() {
@@ -28,10 +29,11 @@ function CartPage() {
   const navigate = useNavigate()
   const [updatingId, setUpdatingId] = useState(null)
 
-  // Delivery configuration
-  const FREE_DELIVERY_THRESHOLD = 500
-  const DELIVERY_CHARGE = cartSubtotal >= FREE_DELIVERY_THRESHOLD || cartSubtotal === 0 ? 0 : 50
-  const finalTotal = cartSubtotal + DELIVERY_CHARGE
+  // Delivery & tax pulled from the database-driven site settings
+  const { freeDeliveryThreshold, taxPercentage, getDeliveryCharge, getGstAmount } = useSettings()
+  const DELIVERY_CHARGE = getDeliveryCharge(cartSubtotal)
+  const GST = getGstAmount(cartSubtotal)
+  const finalTotal = cartSubtotal + DELIVERY_CHARGE + GST
 
   // Formatter for Currency
   const formatCurrency = (amount) => {
@@ -234,15 +236,15 @@ function CartPage() {
                 </h3>
 
                 {/* Free delivery progress bar */}
-                {cartSubtotal < FREE_DELIVERY_THRESHOLD && (
+                {cartSubtotal < freeDeliveryThreshold && freeDeliveryThreshold > 0 && (
                   <div className="bg-[#F8FBFD] p-4 rounded-2xl border border-gray-100 space-y-2">
                     <p className="text-xs text-gray-600 font-medium leading-relaxed">
-                      Add <span className="font-bold text-primary">{formatCurrency(FREE_DELIVERY_THRESHOLD - cartSubtotal)}</span> more for <span className="font-bold text-teal">Free Delivery!</span>
+                      Add <span className="font-bold text-primary">{formatCurrency(freeDeliveryThreshold - cartSubtotal)}</span> more for <span className="font-bold text-teal">Free Delivery!</span>
                     </p>
                     <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
                       <div
                         className="bg-primary h-full transition-all duration-300 rounded-full"
-                        style={{ width: `${(cartSubtotal / FREE_DELIVERY_THRESHOLD) * 100}%` }}
+                        style={{ width: `${Math.min((cartSubtotal / freeDeliveryThreshold) * 100, 100)}%` }}
                       />
                     </div>
                   </div>
@@ -270,6 +272,13 @@ function CartPage() {
                       <span className="font-bold text-darkgray">{formatCurrency(DELIVERY_CHARGE)}</span>
                     )}
                   </div>
+
+                  {GST > 0 && (
+                    <div className="flex justify-between">
+                      <span>GST ({taxPercentage}%)</span>
+                      <span className="font-bold text-darkgray">{formatCurrency(GST)}</span>
+                    </div>
+                  )}
 
                   <div className="border-t border-gray-100 my-4 pt-4 flex justify-between text-base font-extrabold text-darkgray">
                     <span>Final Total</span>

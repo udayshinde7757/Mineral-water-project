@@ -4,6 +4,8 @@ import { ROUTES } from '@constants/routes'
 import Layout from '@components/layout/Layout'
 import PageLoader from '@components/common/PageLoader'
 import { ProtectedRoute, PublicOnlyRoute } from './ProtectedRoute'
+import AdminRoute from './AdminRoute'
+import AdminLayout from '@components/admin/AdminLayout'
 
 // ─── Lazy-loaded Pages ────────────────────────────────────────────────────────
 const HomePage         = lazy(() => import('@pages/HomePage'))
@@ -23,6 +25,22 @@ const EnquiryPage      = lazy(() => import('@pages/EnquiryPage'))
 const AdminPage        = lazy(() => import('@pages/AdminPage'))
 const ProductDetailsPage = lazy(() => import('@pages/ProductDetailsPage'))
 const NotFoundPage     = lazy(() => import('@pages/NotFoundPage'))
+
+// ─── Admin Pages (role-protected) ─────────────────────────────────────────────
+const AdminLoginPage         = lazy(() => import('@pages/admin/AdminLoginPage'))
+const AdminDashboardPage     = lazy(() => import('@pages/admin/AdminDashboardPage'))
+const AdminOrdersPage        = lazy(() => import('@pages/admin/AdminOrdersPage'))
+const AdminOrderDetailPage   = lazy(() => import('@pages/admin/AdminOrderDetailPage'))
+const AdminProductsPage      = lazy(() => import('@pages/admin/AdminProductsPage'))
+const AdminInventoryPage     = lazy(() => import('@pages/admin/AdminInventoryPage'))
+const AdminCustomersPage     = lazy(() => import('@pages/admin/AdminCustomersPage'))
+const AdminPaymentsPage      = lazy(() => import('@pages/admin/AdminPaymentsPage'))
+const AdminRefundsPage       = lazy(() => import('@pages/admin/AdminRefundsPage'))
+const AdminNotificationsPage = lazy(() => import('@pages/admin/AdminNotificationsPage'))
+const AdminAnalyticsPage     = lazy(() => import('@pages/admin/AdminAnalyticsPage'))
+const AdminReportsPage       = lazy(() => import('@pages/admin/AdminReportsPage'))
+const AdminActivityLogsPage  = lazy(() => import('@pages/admin/AdminActivityLogsPage'))
+const AdminSettingsPage      = lazy(() => import('@pages/admin/AdminSettingsPage'))
 
 // ─── App Router ───────────────────────────────────────────────────────────────
 function AppRouter() {
@@ -54,6 +72,28 @@ function AppRouter() {
 
             {/* Catch-all Not Found Route */}
             <Route path="*" element={<NotFoundPage />} />
+          </Route>
+
+          {/* Admin Login (public — no storefront layout) */}
+          <Route path={ROUTES.ADMIN_LOGIN} element={<AdminLoginPage />} />
+
+          {/* Admin Panel (requires admin role, uses its own layout) */}
+          <Route element={<AdminRoute />}>
+            <Route element={<AdminLayout />}>
+              <Route path={ROUTES.ADMIN_DASHBOARD}     element={<AdminDashboardPage />} />
+              <Route path={ROUTES.ADMIN_ORDERS}        element={<AdminOrdersPage />} />
+              <Route path={ROUTES.ADMIN_ORDER_DETAILS} element={<AdminOrderDetailPage />} />
+              <Route path={ROUTES.ADMIN_PRODUCTS}      element={<AdminProductsPage />} />
+              <Route path={ROUTES.ADMIN_INVENTORY}     element={<AdminInventoryPage />} />
+              <Route path={ROUTES.ADMIN_CUSTOMERS}     element={<AdminCustomersPage />} />
+              <Route path={ROUTES.ADMIN_PAYMENTS}      element={<AdminPaymentsPage />} />
+              <Route path={ROUTES.ADMIN_REFUNDS}       element={<AdminRefundsPage />} />
+              <Route path={ROUTES.ADMIN_NOTIFICATIONS} element={<AdminNotificationsPage />} />
+              <Route path={ROUTES.ADMIN_ANALYTICS}     element={<AdminAnalyticsPage />} />
+              <Route path={ROUTES.ADMIN_REPORTS}       element={<AdminReportsPage />} />
+              <Route path={ROUTES.ADMIN_LOGS}          element={<AdminActivityLogsPage />} />
+              <Route path={ROUTES.ADMIN_SETTINGS}      element={<AdminSettingsPage />} />
+            </Route>
           </Route>
         </Routes>
       </Suspense>

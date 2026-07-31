@@ -22,9 +22,19 @@ const siteSettingsSchema = new mongoose.Schema(
     whatsappPhoneNumberId: { type: String, default: "" },
     whatsappAccessToken: { type: String, default: "" },
     whatsappApiUrl: { type: String, default: "https://graph.facebook.com/v18.0" },
-    deliveryCharges: { type: Number, default: 40 },
-    taxPercentage: { type: Number, default: 18 },
-    minimumOrderValue: { type: Number, default: 100 },
+    // E-commerce pricing configuration (used for all order calculations)
+    deliveryCharges: { type: Number, default: 50 },
+    freeDeliveryThreshold: { type: Number, default: 500 },
+    minimumOrderAmount: { type: Number, default: 100 },
+    taxPercentage: { type: Number, default: 0 },
+    orderCancellationRules: { type: String, default: "" },
+    paymentMethods: {
+      type: [String],
+      default: ["COD", "Online"],
+      enum: ["COD", "Online"],
+    },
+    emailNotifications: { type: Boolean, default: true },
+    whatsappNotifications: { type: Boolean, default: true },
   },
   {
     timestamps: true,

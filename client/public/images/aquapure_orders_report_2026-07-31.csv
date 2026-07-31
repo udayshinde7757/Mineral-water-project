@@ -1,0 +1,8 @@
+Order ID,Customer,Phone,Total Amount,Status,Payment Method,Date
+6a6c4c2ae205434318b449f9,"shreyas lande","9356212824",3378,Placed,Razorpay / Online,2026-07-31
+6a6c433fcacb1447d3d1da03,"uday","7757841157",58,Placed,COD,2026-07-31
+6a6c431acacb1447d3d1d9f3,"uday","7757841157",58,Cancelled,COD,2026-07-31
+6a6b5c3d9acbab8cecb53cd0,"shreyas lande","9356212824",916,Cancelled,COD,2026-07-30
+6a6ae26efd0b0296a7fbb8c4,"shreyas lande","9356212824",58,Cancelled,Razorpay / Online,2026-07-30
+6a6ae179fd0b0296a7fbb8b8,"shreyas lande","9356212824",58,Placed,Razorpay / Online,2026-07-30
+6a6ae02bfd0b0296a7fbb8af,"shreyas lande","9356212824",58,Placed,COD,2026-07-30
