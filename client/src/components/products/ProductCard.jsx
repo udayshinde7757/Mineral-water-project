@@ -14,7 +14,7 @@ import useBuyNowAction from '@hooks/useBuyNowAction'
 import { ROUTES } from '@constants/routes'
 
 // ─── In-component Toast Notification ─────────────────────────────────────────
-function Toast({ message, type = 'success', onClose }) {
+function Toast({ message, type = 'success' }) {
   return (
     <AnimatePresence>
       {message && (
