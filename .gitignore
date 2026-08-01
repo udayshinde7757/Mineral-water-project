@@ -18,6 +18,8 @@ build/
 # Environment variables
 # ===========================
 .env
+.env.*
+!.env.example
 .env.local
 .env.*.local
 .env.development.local
@@ -37,6 +39,8 @@ client/.env
 client/.env.local
 client/node_modules/
 client/dist/
+# Browser-test screenshots (regenerable test output)
+client/audit-shots/
 
 # ===========================
 # Editor directories
@@ -66,6 +70,7 @@ Thumbs.db
 # Logs
 # ===========================
 *.log
+logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -76,6 +81,12 @@ pnpm-debug.log*
 # ===========================
 coverage/
 .nyc_output/
+
+# ===========================
+# Cache
+# ===========================
+.cache/
+.vite/
 
 # ===========================
 # Misc
