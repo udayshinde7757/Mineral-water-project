@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   FiSearch,
@@ -13,11 +12,9 @@ import {
 import productService from '@services/productService'
 import ProductCard from '@components/products/ProductCard'
 import useCart from '@hooks/useCart'
-import { ROUTES } from '@constants/routes'
 
 function ProductsPage() {
   const { addToCart } = useCart()
-  const navigate = useNavigate()
 
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
@@ -73,17 +70,6 @@ function ProductsPage() {
       showToast(`${product.name} added to cart!`)
     } catch (err) {
       showToast(err.message || 'Could not add product to cart')
-    }
-  }
-
-  // Buy Now Handler — Add item to cart and navigate directly to Checkout
-  const handleBuyNow = async (product) => {
-    try {
-      await addToCart(product._id)
-      navigate(ROUTES.CHECKOUT)
-    } catch (err) {
-      console.error('Buy Now error:', err)
-      navigate(ROUTES.CHECKOUT)
     }
   }
 
@@ -242,7 +228,6 @@ function ProductsPage() {
                 key={product._id}
                 product={product}
                 onAddToCart={handleAddToCart}
-                onBuyNow={handleBuyNow}
               />
             ))}
           </div>

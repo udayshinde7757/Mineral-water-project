@@ -121,6 +121,7 @@ exports.verifyPayment = async (req, res) => {
       products,
       shippingAddress,
       paymentMethod,
+      orderType,
     } = req.body;
 
     console.log("💳 Payment verification request:", JSON.stringify({ razorpay_order_id, razorpay_payment_id, productCount: products?.length }, null, 2));
@@ -240,6 +241,7 @@ exports.verifyPayment = async (req, res) => {
     // Create order with payment details
     const order = await Order.create({
       user: req.user._id,
+      orderType: orderType === "BUY_NOW" ? "BUY_NOW" : "CART",
       products: orderProducts,
       shippingAddress,
       paymentMethod: paymentMethod || "Razorpay / Online",
@@ -263,10 +265,15 @@ exports.verifyPayment = async (req, res) => {
       });
     }
 
-    // Clear user's cart
-    const user = await User.findById(req.user._id);
-    user.cart = [];
-    await user.save();
+    // Clear the user's cart ONLY for a CART checkout. A Buy Now order must
+    // leave the cart untouched — it was never part of this order.
+    if (orderType !== "BUY_NOW") {
+      const user = await User.findById(req.user._id);
+      user.cart = [];
+      await user.save();
+    } else {
+      console.log("🛒 PaymentController: BUY_NOW order → user cart left untouched");
+    }
 
     // Send notifications (non-blocking) — fires after the order is saved:
     // Owner Email → Customer Email → Customer WhatsApp → Owner WhatsApp → Customer SMS.

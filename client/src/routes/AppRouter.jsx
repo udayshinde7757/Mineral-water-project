@@ -1,11 +1,35 @@
-import { lazy, Suspense } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { lazy, Suspense, useEffect, useRef } from 'react'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { ROUTES } from '@constants/routes'
 import Layout from '@components/layout/Layout'
 import PageLoader from '@components/common/PageLoader'
 import { ProtectedRoute, PublicOnlyRoute } from './ProtectedRoute'
 import AdminRoute from './AdminRoute'
 import AdminLayout from '@components/admin/AdminLayout'
+import { useBuyNow } from '@hooks/useBuyNow'
+
+/**
+ * Wipes any in-flight Buy Now state the moment the user leaves the checkout
+ * route (cancel, browser back, "return home", etc.) — so stale Buy Now data can
+ * never survive to hijack a later checkout. StrictMode-safe: it only clears on
+ * an actual transition AWAY from /checkout, never on mount.
+ */
+function RouteChangeWatcher() {
+  const location = useLocation()
+  const { clearBuyNow } = useBuyNow()
+  const prevPath = useRef(location.pathname)
+
+  useEffect(() => {
+    const from = prevPath.current
+    prevPath.current = location.pathname
+    if (from === ROUTES.CHECKOUT && location.pathname !== ROUTES.CHECKOUT) {
+      console.log('🧹 RouteChangeWatcher: leaving checkout → clearBuyNow()')
+      clearBuyNow()
+    }
+  }, [location.pathname, clearBuyNow])
+
+  return null
+}
 
 // ─── Lazy-loaded Pages ────────────────────────────────────────────────────────
 const HomePage         = lazy(() => import('@pages/HomePage'))
@@ -46,6 +70,7 @@ const AdminSettingsPage      = lazy(() => import('@pages/admin/AdminSettingsPage
 function AppRouter() {
   return (
     <BrowserRouter>
+      <RouteChangeWatcher />
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route element={<Layout />}>

@@ -9,12 +9,14 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom'
 import useAuth from '@hooks/useAuth'
 import useCart from '@hooks/useCart'
+import useBuyNowAction from '@hooks/useBuyNowAction'
 import { ROUTES } from '@constants/routes'
 
-function ProductCard({ product, onAddToCart, onBuyNow }) {
+function ProductCard({ product, onAddToCart }) {
   const [adding, setAdding] = useState(false)
   const { isAuthenticated } = useAuth()
   const { addToCart } = useCart()
+  const { buyNow } = useBuyNowAction()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -154,7 +156,7 @@ function ProductCard({ product, onAddToCart, onBuyNow }) {
             {/* Buy Now Button */}
             <button
               type="button"
-              onClick={(e) => { e.stopPropagation(); onBuyNow(product) }}
+              onClick={(e) => { e.stopPropagation(); buyNow(product) }}
               className="w-full py-2.5 px-3 rounded-xl bg-[#0F4C81] hover:bg-[#0d3f6a] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-200 shadow-sm hover:shadow-md"
             >
               <FiZap className="w-4 h-4 fill-white" />

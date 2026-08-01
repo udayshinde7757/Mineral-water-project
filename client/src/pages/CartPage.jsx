@@ -301,7 +301,7 @@ function CartPage() {
                 {/* Checkout CTA */}
                 <button
                   type="button"
-                  onClick={() => navigate(ROUTES.CHECKOUT)}
+                  onClick={() => navigate(ROUTES.CHECKOUT, { state: { mode: 'CART' } })}
                   className="w-full bg-[#0F4C81] hover:bg-[#0F4C81]/90 text-white !py-4 text-base font-bold flex items-center justify-center gap-2 rounded-2xl shadow-md hover:shadow-lg transition-all"
                 >
                   <span>Proceed to Checkout</span>

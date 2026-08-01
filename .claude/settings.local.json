@@ -40,7 +40,15 @@
       "Bash(node \"C:\\\\Users\\\\sneha\\\\AppData\\\\Local\\\\Temp\\\\settings_e2e.mjs\")",
       "Bash(node settings_browser_test.mjs)",
       "Bash(node settings_debug.mjs)",
-      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); s=d['settings']; print\\('restored -> delivery:', s['deliveryCharges'], '| threshold:', s['freeDeliveryThreshold'], '| tax:', s['taxPercentage'], '| min:', s['minimumOrderAmount']\\)\")"
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); s=d['settings']; print\\('restored -> delivery:', s['deliveryCharges'], '| threshold:', s['freeDeliveryThreshold'], '| tax:', s['taxPercentage'], '| min:', s['minimumOrderAmount']\\)\")",
+      "Bash(curl -s http://localhost:5000/api/products)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(p['_id'], '|', p['name'], '|', p['size'], '| Rs', p['price'], '| stock', p['stock']\\) for p in d.get\\('products',[]\\)]\")",
+      "Bash(curl -s -o /dev/null -w \"settings: %{http_code}\\\\n\" http://localhost:5000/api/settings)",
+      "Bash(curl -s -o /dev/null -w \"products: %{http_code}\\\\n\" http://localhost:5000/api/products)",
+      "Bash(curl -s -o /dev/null -w \"vite: %{http_code}\\\\n\" http://localhost:5173)",
+      "Bash(curl -s -X POST http://localhost:5000/api/auth/signup -H \"Content-Type: application/json\" -d '{\"fullname\":\"BuyNow Tester\",\"email\":\"buynow.test.0801@gmail.com\",\"password\":\"testpass123\"}')",
+      "Bash(node -e \"require\\('playwright-core'\\); console.log\\('playwright-core ok'\\)\")",
+      "Bash(node *)"
     ]
   }
 }

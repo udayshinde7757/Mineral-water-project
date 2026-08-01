@@ -44,6 +44,13 @@ const orderSchema = new mongoose.Schema(
       pincode: { type: String, required: true },
       country: { type: String, required: true, default: "India" },
     },
+    // Which checkout flow created this order. BUY_NOW orders must NOT clear the
+    // user's cart; CART orders clear it (see orderController / paymentController).
+    orderType: {
+      type: String,
+      enum: ["CART", "BUY_NOW"],
+      default: "CART",
+    },
     paymentMethod: {
       type: String,
       required: true,

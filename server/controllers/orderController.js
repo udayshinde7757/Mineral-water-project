@@ -199,9 +199,10 @@ const queryOrders = async ({ search, status, paymentMethod, refundStatus, page =
  */
 exports.createOrder = async (req, res) => {
   try {
-    const { products, shippingAddress, paymentMethod } = req.body;
+    const { products, shippingAddress, paymentMethod, orderType } = req.body;
 
     console.log("📦 Incoming order request body:", JSON.stringify(req.body, null, 2));
+    console.log("📦 Order type:", orderType || "CART");
 
     // Validate required fields
     if (!products || products.length === 0) {
@@ -325,6 +326,7 @@ exports.createOrder = async (req, res) => {
     // Create order
     const order = await Order.create({
       user: req.user._id,
+      orderType: orderType === "BUY_NOW" ? "BUY_NOW" : "CART",
       products: orderProducts,
       shippingAddress,
       paymentMethod: "COD",
@@ -343,10 +345,15 @@ exports.createOrder = async (req, res) => {
       });
     }
 
-    // Clear user's cart
-    const user = await User.findById(req.user._id);
-    user.cart = [];
-    await user.save();
+    // Clear the user's cart ONLY for a CART checkout. A Buy Now order must
+    // leave the cart untouched — it was never part of this order.
+    if (orderType !== "BUY_NOW") {
+      const user = await User.findById(req.user._id);
+      user.cart = [];
+      await user.save();
+    } else {
+      console.log("🛒 OrderController: BUY_NOW order → user cart left untouched");
+    }
 
     console.log(`✅ Order #${order._id} created successfully for user ${req.user._id}`);
 

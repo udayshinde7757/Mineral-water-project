@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   FiMapPin,
@@ -73,15 +73,56 @@ const getProductObject = (item) => {
 function CheckoutPage() {
   const { user } = useAuth()
   const { cartItems, cartSubtotal, fetchCart } = useCart()
-  const { buyNowItem, clearBuyNow } = useBuyNow()
+  const { buyNowProduct, clearBuyNow } = useBuyNow()
   const navigate = useNavigate()
+  const location = useLocation()
 
-  // Determine checkout mode: 'buynow' or 'cart'
-  const isBuyNowFlow = !!buyNowItem
-  const isCartFlow = !isBuyNowFlow && cartItems && cartItems.length > 0
+  // ── Mode resolution (STEP 5/8) ─────────────────────────────────────────────
+  // Decided by EXPLICIT navigation state, never inferred from whichever data
+  // happens to be present. Cart checkout and Buy Now checkout are two
+  // independent flows that can never mix.
+  const navMode = location.state?.mode // 'BUY_NOW' | 'CART'
+  const navProductId = location.state?.productId
 
-  // Get active checkout items based on flow
-  const rawItems = isBuyNowFlow ? [buyNowItem] : (cartItems || [])
+  let checkoutMode = navMode
+  if (checkoutMode !== 'BUY_NOW' && checkoutMode !== 'CART') {
+    // Direct URL / no explicit state → fall back safely. A live Buy Now session
+    // wins; otherwise cart; otherwise no items (safe empty state below).
+    checkoutMode = buyNowProduct
+      ? 'BUY_NOW'
+      : cartItems && cartItems.length > 0
+        ? 'CART'
+        : null
+  }
+
+  const isBuyNowFlow = checkoutMode === 'BUY_NOW'
+
+  // Buy Now item — the ONLY thing a Buy Now checkout may ever read.
+  // Cross-check the productId carried in navigation state so a stale history
+  // entry (back/forward through an older Buy Now checkout) can never surface a
+  // different product. Invalid → empty → safe "product unavailable" state.
+  const buyNowValid =
+    isBuyNowFlow &&
+    !!buyNowProduct &&
+    (!navProductId || String(buyNowProduct.productId) === String(navProductId))
+
+  // STEP 2 — strict separation:
+  //   BUY_NOW → [buyNowProduct] ONLY (never cart.items)
+  //   CART    → cart.items ONLY      (never buyNowProduct)
+  const rawItems = isBuyNowFlow
+    ? buyNowValid
+      ? [buyNowProduct]
+      : []
+    : checkoutMode === 'CART'
+      ? cartItems || []
+      : []
+
+  // STEP 7 — dev log of the IDs that reached checkout.
+  console.log(
+    `🛒 CheckoutPage mode="${checkoutMode}" | items=[${rawItems
+      .map((i) => getProductIdStr(i))
+      .join(', ')}]`
+  )
 
   // Validate items
   const validCartItems = rawItems.filter((item) => {
@@ -100,7 +141,7 @@ function CheckoutPage() {
     return acc + price * qty
   }, 0)
 
-  const effectiveSubtotal = isCartFlow ? cartSubtotal : calculatedSubtotal
+  const effectiveSubtotal = isBuyNowFlow ? calculatedSubtotal : cartSubtotal
 
   // Delivery & tax pulled from the database-driven site settings.
   // The backend independently recalculates these values when the order is created.
@@ -235,12 +276,21 @@ function CheckoutPage() {
         return
       }
 
+      // STEP 7 — log the exact product IDs being sent to the backend.
+      const orderType = isBuyNowFlow ? 'BUY_NOW' : 'CART'
+      console.log(
+        `📤 CheckoutPage submitting order | orderType=${orderType} | products=[${formattedProducts
+          .map((p) => p.productId)
+          .join(', ')}]`
+      )
+
       if (paymentMethod === 'COD') {
         // Cash on Delivery flow
         const orderData = {
           products: formattedProducts,
           shippingAddress: address,
           paymentMethod: 'COD',
+          orderType,
         }
 
         const res = await orderService.createOrder(orderData)
@@ -306,6 +356,7 @@ function CheckoutPage() {
                 products: formattedProducts,
                 shippingAddress: address,
                 paymentMethod: 'Razorpay / Online',
+                orderType,
               })
 
               if (verifyRes.success) {
@@ -352,13 +403,13 @@ function CheckoutPage() {
     }
   }
 
-  // Redirect if no valid items and not submitting
+  // Safe empty-state (never shows random/wrong products — STEP 6 / TEST 4):
+  // BUY_NOW with a missing/invalid product → "product unavailable";
+  // CART with nothing in the cart → "cart empty".
   if (validCartItems.length === 0 && !isSubmitting) {
     const message = isBuyNowFlow
       ? 'The selected product is no longer available.'
       : 'Your cart is empty. Please add items to your cart before proceeding to checkout.'
-    const buttonText = isBuyNowFlow ? 'Explore Products' : 'Explore Products'
-    const buttonLink = isBuyNowFlow ? ROUTES.PRODUCTS : ROUTES.PRODUCTS
 
     return (
       <div className="min-h-screen bg-[#F8FBFD] flex items-center justify-center py-16 px-4">
@@ -373,10 +424,10 @@ function CheckoutPage() {
             <p className="text-gray-500 text-sm">{message}</p>
           </div>
           <Link
-            to={buttonLink}
+            to={ROUTES.PRODUCTS}
             className="inline-block w-full bg-[#0F4C81] text-white font-bold py-3 px-6 rounded-xl hover:bg-[#0F4C81]/90 transition-colors"
           >
-            {buttonText}
+            Explore Products
           </Link>
         </div>
       </div>
