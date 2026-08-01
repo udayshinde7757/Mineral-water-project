@@ -31,7 +31,7 @@ const useBuyNowAction = () => {
       const productId = product._id || product.productId
 
       // STEP 7 — log the ID that entered the Buy Now flow.
-      console.log(
+      console.warn(
         `⚡ Buy Now click → productId: ${productId} | quantity: ${quantity} | name: ${product.name}`
       )
 

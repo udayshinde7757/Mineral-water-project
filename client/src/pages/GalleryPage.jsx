@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { GALLERY_IMAGES } from '@data/galleryData'
 import GalleryHero from '@components/gallery/GalleryHero'
 import GalleryStats from '@components/gallery/GalleryStats'
@@ -12,6 +12,10 @@ import GalleryCTA from '@components/gallery/GalleryCTA'
 function GalleryPage() {
   const [activeCategory, setActiveCategory] = useState('All')
   const [lightboxIndex, setLightboxIndex] = useState(null)
+
+  useEffect(() => {
+    document.title = 'Gallery & Purification Process — AquaPure'
+  }, [])
 
   // Calculate image counts per category dynamically
   const categoryCounts = useMemo(() => {

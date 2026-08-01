@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { FiMail, FiLock, FiEye, FiEyeOff, FiAlertCircle, FiDroplet } from 'react-icons/fi'
 import useAuth from '@hooks/useAuth'
@@ -16,6 +16,10 @@ function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+
+  useEffect(() => {
+    document.title = 'Sign In — AquaPure'
+  }, [])
 
   // Path to redirect after login (default to home)
   const from = location.state?.from?.pathname || ROUTES.HOME
@@ -71,8 +75,13 @@ function LoginPage() {
 
         {/* Error Alert */}
         {error && (
-          <div className="flex items-center gap-3 bg-red-50 border border-red-200 p-3 rounded-xl text-red-700 text-sm">
-            <FiAlertCircle className="w-5 h-5 flex-shrink-0 text-red-500" />
+          <div
+            id="login-error"
+            role="alert"
+            aria-live="polite"
+            className="flex items-center gap-3 bg-red-50 border border-red-200 p-3 rounded-xl text-red-700 text-sm"
+          >
+            <FiAlertCircle className="w-5 h-5 flex-shrink-0 text-red-500" aria-hidden="true" />
             <span>{error}</span>
           </div>
         )}
@@ -126,6 +135,7 @@ function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                   className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-darkgray transition-colors"
                 >
                   {showPassword ? <FiEyeOff className="w-5 h-5" /> : <FiEye className="w-5 h-5" />}

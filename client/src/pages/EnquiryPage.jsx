@@ -214,7 +214,7 @@ function EnquiryPage() {
                   'Flexible payment terms for business',
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-2.5">
-                    <FiCheckCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-teal" />
+                    <FiCheckCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-[#22D3EE]" aria-hidden="true" />
                     <span className="text-white/90">{item}</span>
                   </li>
                 ))}

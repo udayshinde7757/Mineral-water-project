@@ -23,7 +23,7 @@ function RouteChangeWatcher() {
     const from = prevPath.current
     prevPath.current = location.pathname
     if (from === ROUTES.CHECKOUT && location.pathname !== ROUTES.CHECKOUT) {
-      console.log('🧹 RouteChangeWatcher: leaving checkout → clearBuyNow()')
+      console.warn('🧹 RouteChangeWatcher: leaving checkout → clearBuyNow()')
       clearBuyNow()
     }
   }, [location.pathname, clearBuyNow])

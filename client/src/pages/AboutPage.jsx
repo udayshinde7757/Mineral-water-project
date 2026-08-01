@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import {
@@ -31,6 +32,10 @@ const staggerContainer = {
 }
 
 function AboutPage() {
+  useEffect(() => {
+    document.title = 'About Us — AquaPure Mineral Water'
+  }, [])
+
   // Timeline Data
   const milestones = [
     {
