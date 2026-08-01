@@ -22,7 +22,7 @@ function ContactForm({ onSuccess }) {
 
     if (!formData.email.trim()) {
       errors.email = 'Email address is required'
-    } else if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(formData.email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(formData.email)) {
       errors.email = 'Please enter a valid email address'
     }
 
@@ -82,6 +82,8 @@ function ContactForm({ onSuccess }) {
     }
   }
 
+  const fieldError = (field) => validationErrors[field] || null
+
   return (
     <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-card">
       <h3 className="text-xl font-extrabold text-darkgray mb-6 flex items-center gap-2">
@@ -89,7 +91,7 @@ function ContactForm({ onSuccess }) {
       </h3>
 
       {apiError && (
-        <div className="mb-4 p-4 bg-red-50 text-red-700 text-sm font-semibold rounded-2xl border border-red-100 flex items-center gap-2">
+        <div role="alert" className="mb-4 p-4 bg-red-50 text-red-700 text-sm font-semibold rounded-2xl border border-red-100 flex items-center gap-2">
           <FiAlertCircle className="w-5 h-5 flex-shrink-0 text-red-400" />
           {apiError}
         </div>
@@ -108,12 +110,15 @@ function ContactForm({ onSuccess }) {
               value={formData.name}
               onChange={handleChange}
               placeholder="Your full name"
+              aria-required="true"
+              aria-invalid={!!fieldError('name')}
+              aria-describedby={fieldError('name') ? 'err-name' : undefined}
               className={`w-full px-4 py-3 rounded-2xl border text-sm text-darkgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50/50 focus:bg-white transition-all ${
-                validationErrors.name ? 'border-red-400' : 'border-gray-200'
+                fieldError('name') ? 'border-red-400' : 'border-gray-200'
               }`}
             />
-            {validationErrors.name && (
-              <p className="text-xs text-red-500 font-bold">{validationErrors.name}</p>
+            {fieldError('name') && (
+              <p id="err-name" className="text-xs text-red-500 font-bold">{fieldError('name')}</p>
             )}
           </div>
 
@@ -128,12 +133,15 @@ function ContactForm({ onSuccess }) {
               value={formData.email}
               onChange={handleChange}
               placeholder="your@email.com"
+              aria-required="true"
+              aria-invalid={!!fieldError('email')}
+              aria-describedby={fieldError('email') ? 'err-email' : undefined}
               className={`w-full px-4 py-3 rounded-2xl border text-sm text-darkgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50/50 focus:bg-white transition-all ${
-                validationErrors.email ? 'border-red-400' : 'border-gray-200'
+                fieldError('email') ? 'border-red-400' : 'border-gray-200'
               }`}
             />
-            {validationErrors.email && (
-              <p className="text-xs text-red-500 font-bold">{validationErrors.email}</p>
+            {fieldError('email') && (
+              <p id="err-email" className="text-xs text-red-500 font-bold">{fieldError('email')}</p>
             )}
           </div>
         </div>
@@ -149,13 +157,16 @@ function ContactForm({ onSuccess }) {
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              placeholder="+91 9356212824"
+              placeholder="e.g. 98765 43210"
+              aria-required="true"
+              aria-invalid={!!fieldError('phone')}
+              aria-describedby={fieldError('phone') ? 'err-phone' : undefined}
               className={`w-full px-4 py-3 rounded-2xl border text-sm text-darkgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50/50 focus:bg-white transition-all ${
-                validationErrors.phone ? 'border-red-400' : 'border-gray-200'
+                fieldError('phone') ? 'border-red-400' : 'border-gray-200'
               }`}
             />
-            {validationErrors.phone && (
-              <p className="text-xs text-red-500 font-bold">{validationErrors.phone}</p>
+            {fieldError('phone') && (
+              <p id="err-phone" className="text-xs text-red-500 font-bold">{fieldError('phone')}</p>
             )}
           </div>
 
@@ -170,12 +181,15 @@ function ContactForm({ onSuccess }) {
               value={formData.subject}
               onChange={handleChange}
               placeholder="Order inquiry, delivery support..."
+              aria-required="true"
+              aria-invalid={!!fieldError('subject')}
+              aria-describedby={fieldError('subject') ? 'err-subject' : undefined}
               className={`w-full px-4 py-3 rounded-2xl border text-sm text-darkgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50/50 focus:bg-white transition-all ${
-                validationErrors.subject ? 'border-red-400' : 'border-gray-200'
+                fieldError('subject') ? 'border-red-400' : 'border-gray-200'
               }`}
             />
-            {validationErrors.subject && (
-              <p className="text-xs text-red-500 font-bold">{validationErrors.subject}</p>
+            {fieldError('subject') && (
+              <p id="err-subject" className="text-xs text-red-500 font-bold">{fieldError('subject')}</p>
             )}
           </div>
         </div>
@@ -191,12 +205,15 @@ function ContactForm({ onSuccess }) {
             value={formData.message}
             onChange={handleChange}
             placeholder="How can we help you today?"
+            aria-required="true"
+            aria-invalid={!!fieldError('message')}
+            aria-describedby={fieldError('message') ? 'err-message' : undefined}
             className={`w-full px-4 py-3 rounded-2xl border text-sm text-darkgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50/50 focus:bg-white transition-all resize-none ${
-              validationErrors.message ? 'border-red-400' : 'border-gray-200'
+              fieldError('message') ? 'border-red-400' : 'border-gray-200'
             }`}
           />
-          {validationErrors.message && (
-            <p className="text-xs text-red-500 font-bold">{validationErrors.message}</p>
+          {fieldError('message') && (
+            <p id="err-message" className="text-xs text-red-500 font-bold">{fieldError('message')}</p>
           )}
         </div>
 

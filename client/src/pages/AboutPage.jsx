@@ -31,6 +31,7 @@ const staggerContainer = {
 }
 
 function AboutPage() {
+  document.title = 'About AquaPure — Pure Natural Mineral Water'
   // Timeline Data
   const milestones = [
     {
@@ -182,10 +183,11 @@ function AboutPage() {
             >
               <div className="relative rounded-3xl overflow-hidden shadow-card border border-gray-100 bg-gradient-to-br from-lightblue to-white p-2">
                 <img
-                  src="https://img.magnific.com/premium-photo/capped-bottles-with-purified-carbonated-mineral-water-moving-production-line-large-modern_660230-63166.jpg?ga=GA1.1.2137670955.1781590794&semt=ais_test_c&w=740&q=80"
-                  alt="Crystal Clear AquaPure Mineral Water"
+                  src="/images/purifyprocess.png"
+                  alt="AquaPure mineral water purification and production process"
                   className="w-full h-[400px] sm:h-[480px] object-cover rounded-2xl shadow-inner"
-                  loading="lazy"
+                  width="740"
+                  height="480"
                 />
               </div>
 

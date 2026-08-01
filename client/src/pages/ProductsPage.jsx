@@ -122,6 +122,7 @@ function ProductsPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Search products by name or size"
                 placeholder="Search by name, size (e.g. 1L, 20L)..."
                 className="w-full pl-11 pr-10 py-3 rounded-2xl border border-gray-200 text-sm text-navy bg-white placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
               />
@@ -160,6 +161,7 @@ function ProductsPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
+                aria-label="Sort products"
                 className="bg-white text-navy font-medium text-xs sm:text-sm rounded-2xl px-4 py-2.5 border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none cursor-pointer"
               >
                 <option value="featured">Featured First</option>

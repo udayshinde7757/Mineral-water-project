@@ -48,7 +48,21 @@
       "Bash(curl -s -o /dev/null -w \"vite: %{http_code}\\\\n\" http://localhost:5173)",
       "Bash(curl -s -X POST http://localhost:5000/api/auth/signup -H \"Content-Type: application/json\" -d '{\"fullname\":\"BuyNow Tester\",\"email\":\"buynow.test.0801@gmail.com\",\"password\":\"testpass123\"}')",
       "Bash(node -e \"require\\('playwright-core'\\); console.log\\('playwright-core ok'\\)\")",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(python *)",
+      "Bash(curl -s http://localhost:5000/api/gallery)",
+      "Bash(curl -s http://localhost:5000/api/testimonials)",
+      "Bash(echo \"---exit: $?\")",
+      "Bash(echo \"---status-grep-exit: $?\")",
+      "Bash(git check-ignore *)",
+      "Bash(git config *)",
+      "Bash(echo \"---exit: $? \\(0=ignored\\)\")",
+      "Bash(git filter-repo *)",
+      "Bash(java -version)",
+      "Bash(sed 's/=.*/=<REDACTED>/' server/.env)",
+      "Bash(sed 's/=.*/=<REDACTED>/' client/public/images/rzp-key.csv)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(grep -E \"\\\\.env$|\\\\.env\\\\.\")"
     ]
   }
 }

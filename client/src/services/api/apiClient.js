@@ -2,24 +2,25 @@ import axios from 'axios'
 
 /**
  * Ensures requests hit /api/* on the backend.
- * - Dev default: /api (Vite proxy → localhost:5000)
- * - Prod: VITE_API_URL or http://localhost:5000/api
+ * - Dev: /api (Vite proxy → localhost:5000)
+ * - Prod: VITE_API_URL or /api (same-origin behind reverse proxy)
  */
 function resolveApiBaseUrl() {
   // In development, always use Vite proxy (no CORS issues, simpler).
-  // The Vite proxy forwards /api/* → http://localhost:5000/api/*
   if (import.meta.env.DEV) {
     return '/api'
   }
 
-  // In production, use the absolute URL from env, or a sensible default.
+  // In production, use the absolute URL from env if provided.
   const envUrl = import.meta.env.VITE_API_URL
   if (envUrl && String(envUrl).trim()) {
     const trimmed = String(envUrl).trim().replace(/\/$/, '')
     return trimmed.endsWith('/api') ? trimmed : `${trimmed}/api`
   }
 
-  return 'http://localhost:5000/api'
+  // Production default: same-origin /api (works when served behind a reverse
+  // proxy that forwards /api → backend). Never fall back to localhost.
+  return '/api'
 }
 
 export const API_BASE_URL = resolveApiBaseUrl()
@@ -66,11 +67,11 @@ export function getApiErrorMessage(error, fallback = 'Something went wrong. Plea
   }
 
   if (error?.code === 'ERR_NETWORK' || !error?.response) {
-    return `Cannot reach the server at ${API_BASE_URL}. Make sure the backend is running on port 5000.`
+    return 'Cannot reach the server. Please check your connection and try again.'
   }
 
   if (error.response?.status === 404) {
-    return `Contact API not found (404). Check that the server registers app.use("/api/contact", contactRoutes).`
+    return 'The requested resource was not found (404).'
   }
 
   return error?.message || fallback

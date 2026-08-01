@@ -12,6 +12,7 @@ import {
 import { ROUTES } from '@constants/routes'
 
 function OrderSuccessPage() {
+  document.title = 'Order Confirmed — AquaPure'
   const location = useLocation()
   const order = location.state?.order
 
@@ -26,7 +27,7 @@ function OrderSuccessPage() {
 
   // Format date helper
   const formatDate = (dateStr) => {
-    if (!dateStr) return new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+    if (!dateStr) return 'N/A'
     return new Date(dateStr).toLocaleDateString('en-IN', {
       day: 'numeric',
       month: 'short',
@@ -75,12 +76,25 @@ function OrderSuccessPage() {
     totalAmount = 0,
   } = order
 
-  // Delivery status timeline
+  // Delivery status timeline — derived from actual order status
+  const ORDER_STEP_STATUS = {
+    Placed: 0,
+    Pending: 0,
+    Confirmed: 1,
+    Processing: 2,
+    Packed: 2,
+    Shipped: 2,
+    'Out For Delivery': 3,
+    Delivered: 4,
+    Completed: 4,
+    Cancelled: -1,
+  }
+  const currentStepIndex = ORDER_STEP_STATUS[order.orderStatus] ?? 0
   const timelineSteps = [
-    { title: 'Order Placed', desc: 'Received & Confirmed', completed: true },
-    { title: 'Quality Check', desc: 'Hydration purity audit', completed: true },
-    { title: 'Out for Delivery', desc: 'Express door delivery', completed: false },
-    { title: 'Delivered', desc: 'Satisfied customer', completed: false },
+    { title: 'Order Placed', desc: 'Received & Confirmed', completed: currentStepIndex >= 0 },
+    { title: 'Processing', desc: 'Quality check & packing', completed: currentStepIndex >= 2 },
+    { title: 'Shipped', desc: 'On its way to you', completed: currentStepIndex >= 3 },
+    { title: 'Delivered', desc: 'Enjoy your water!', completed: currentStepIndex >= 4 },
   ]
 
   return (
@@ -124,12 +138,14 @@ function OrderSuccessPage() {
           {/* Main Order Breakdown */}
           <div className="md:col-span-8 space-y-6">
 
+            <h2 className="sr-only">Order Details</h2>
+
             {/* Order Status & ID Header */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-4">
                 <div>
                   <p className="text-[11px] text-gray-400 font-semibold uppercase tracking-widest">Order ID</p>
-                  <p className="font-bold text-gray-900 text-lg font-mono tracking-tight">#{_id}</p>
+                  <p className="font-bold text-gray-900 text-lg font-mono tracking-tight">#{_id || 'N/A'}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-[11px] text-gray-400 font-semibold uppercase tracking-widest">Order Date</p>
@@ -213,11 +229,13 @@ function OrderSuccessPage() {
               </h3>
 
               <div className="text-xs text-gray-500 space-y-1 leading-relaxed">
-                <p className="font-bold text-gray-900 text-sm">{shippingAddress.fullName}</p>
-                <p>{shippingAddress.addressLine1}</p>
+                <p className="font-bold text-gray-900 text-sm">{shippingAddress.fullName || ''}</p>
+                {shippingAddress.addressLine1 && <p>{shippingAddress.addressLine1}</p>}
                 {shippingAddress.addressLine2 && <p>{shippingAddress.addressLine2}</p>}
-                <p>{shippingAddress.city}, {shippingAddress.state} - {shippingAddress.pincode}</p>
-                <p className="pt-1 font-semibold text-gray-500">Phone: {shippingAddress.phone}</p>
+                {(shippingAddress.city || shippingAddress.state || shippingAddress.pincode) && (
+                  <p>{shippingAddress.city || ''}{shippingAddress.city && shippingAddress.state ? ', ' : ''}{shippingAddress.state || ''}{shippingAddress.pincode ? ` - ${shippingAddress.pincode}` : ''}</p>
+                )}
+                {shippingAddress.phone && <p className="pt-1 font-semibold text-gray-500">Phone: {shippingAddress.phone}</p>}
               </div>
             </div>
 

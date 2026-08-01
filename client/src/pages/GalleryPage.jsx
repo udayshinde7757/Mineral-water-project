@@ -10,6 +10,7 @@ import GalleryCTA from '@components/gallery/GalleryCTA'
 
 // ─── GalleryPage ──────────────────────────────────────────────────────────────
 function GalleryPage() {
+  document.title = 'AquaPure Gallery — Our Journey of Pure Water'
   const [activeCategory, setActiveCategory] = useState('All')
   const [lightboxIndex, setLightboxIndex] = useState(null)
 

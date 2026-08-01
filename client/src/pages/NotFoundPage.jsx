@@ -3,6 +3,7 @@ import { ROUTES } from '@constants/routes'
 
 // ─── NotFoundPage ─────────────────────────────────────────────────────────────
 function NotFoundPage() {
+  document.title = 'Page Not Found — AquaPure'
   return (
     <section className="section-padding flex items-center justify-center min-h-[70vh]">
       <div className="container-app text-center">

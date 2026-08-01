@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { ROUTES } from '@constants/routes'
 import Layout from '@components/layout/Layout'
 import PageLoader from '@components/common/PageLoader'
+import ErrorBoundary from '@components/common/ErrorBoundary'
 import { ProtectedRoute, PublicOnlyRoute } from './ProtectedRoute'
 import AdminRoute from './AdminRoute'
 import AdminLayout from '@components/admin/AdminLayout'
@@ -23,7 +24,6 @@ function RouteChangeWatcher() {
     const from = prevPath.current
     prevPath.current = location.pathname
     if (from === ROUTES.CHECKOUT && location.pathname !== ROUTES.CHECKOUT) {
-      console.log('🧹 RouteChangeWatcher: leaving checkout → clearBuyNow()')
       clearBuyNow()
     }
   }, [location.pathname, clearBuyNow])
@@ -48,6 +48,9 @@ const EnquiryPage      = lazy(() => import('@pages/EnquiryPage'))
 // eslint-disable-next-line no-unused-vars
 const AdminPage        = lazy(() => import('@pages/AdminPage'))
 const ProductDetailsPage = lazy(() => import('@pages/ProductDetailsPage'))
+const PrivacyPolicyPage    = lazy(() => import('@pages/PrivacyPolicyPage'))
+const TermsOfServicePage   = lazy(() => import('@pages/TermsOfServicePage'))
+const RefundPolicyPage     = lazy(() => import('@pages/RefundPolicyPage'))
 const NotFoundPage     = lazy(() => import('@pages/NotFoundPage'))
 
 // ─── Admin Pages (role-protected) ─────────────────────────────────────────────
@@ -71,7 +74,8 @@ function AppRouter() {
   return (
     <BrowserRouter>
       <RouteChangeWatcher />
-      <Suspense fallback={<PageLoader />}>
+      <ErrorBoundary>
+        <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route element={<Layout />}>
             {/* Guest / Public-only routes (redirects to Home if already logged in) */}
@@ -94,6 +98,11 @@ function AppRouter() {
               <Route path={ROUTES.ENQUIRY}       element={<EnquiryPage />} />
               <Route path={ROUTES.PRODUCT_DETAILS} element={<ProductDetailsPage />} />
             </Route>
+
+            {/* Public policy pages (inside Layout, no auth required) */}
+            <Route path={ROUTES.PRIVACY_POLICY} element={<PrivacyPolicyPage />} />
+            <Route path={ROUTES.TERMS_OF_SERVICE} element={<TermsOfServicePage />} />
+            <Route path={ROUTES.REFUND_POLICY} element={<RefundPolicyPage />} />
 
             {/* Catch-all Not Found Route */}
             <Route path="*" element={<NotFoundPage />} />
@@ -121,7 +130,8 @@ function AppRouter() {
             </Route>
           </Route>
         </Routes>
-      </Suspense>
+        </Suspense>
+      </ErrorBoundary>
     </BrowserRouter>
   )
 }

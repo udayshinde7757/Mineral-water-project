@@ -16,6 +16,7 @@ import orderService from '@services/orderService'
 import { ROUTES } from '@constants/routes'
 
 function MyOrdersPage() {
+  document.title = 'My Orders — AquaPure'
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -374,7 +375,13 @@ function MyOrdersPage() {
         {/* Order Details Modal */}
         <AnimatePresence>
           {selectedOrder && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm">
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Order details"
+              onKeyDown={(e) => { if (e.key === 'Escape') setSelectedOrder(null) }}
+            >
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -385,6 +392,7 @@ function MyOrdersPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedOrder(null)}
+                  aria-label="Close order details"
                   className="absolute top-6 right-6 p-2 rounded-xl text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors"
                 >
                   <FiX className="w-6 h-6" />
@@ -520,7 +528,13 @@ function MyOrdersPage() {
         {/* Cancel Confirmation Modal */}
         <AnimatePresence>
           {cancelModalOrder && (
-            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <div
+              className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Cancel order confirmation"
+              onKeyDown={(e) => { if (e.key === 'Escape') setCancelModalOrder(null) }}
+            >
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}

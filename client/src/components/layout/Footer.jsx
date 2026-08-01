@@ -166,9 +166,9 @@ function Footer() {
         <div className="container-app flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/40">
           <p>© {year} AquaPure Mineral Water Pvt. Ltd. All rights reserved.</p>
           <div className="flex gap-5">
-            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-white transition-colors">Refund Policy</a>
+            <Link to={ROUTES.PRIVACY_POLICY} className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link to={ROUTES.TERMS_OF_SERVICE} className="hover:text-white transition-colors">Terms of Service</Link>
+            <Link to={ROUTES.REFUND_POLICY} className="hover:text-white transition-colors">Refund Policy</Link>
           </div>
         </div>
       </div>

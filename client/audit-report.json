@@ -1,0 +1,435 @@
+{
+  "desktop": [
+    {
+      "route": "/",
+      "width": "1440",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 4
+      }
+    },
+    {
+      "route": "/about",
+      "width": "1440",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 3
+      }
+    },
+    {
+      "route": "/products",
+      "width": "1440",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 9
+      }
+    },
+    {
+      "route": "/products/6a6394c9043c31017d0e444c",
+      "width": "1440",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 4
+      }
+    },
+    {
+      "route": "/gallery",
+      "width": "1440",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 21
+      }
+    },
+    {
+      "route": "/contact",
+      "width": "1440",
+      "errors": [
+        "goto: page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/contact\", waiting until \"networkidle\"\u001b[22m\n"
+      ],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 2
+      }
+    },
+    {
+      "route": "/enquiry",
+      "width": "1440",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 0
+      }
+    },
+    {
+      "route": "/login",
+      "width": "1440",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 4
+      }
+    },
+    {
+      "route": "/signup",
+      "width": "1440",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 4
+      }
+    },
+    {
+      "route": "/cart",
+      "width": "1440",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 2
+      }
+    },
+    {
+      "route": "/checkout",
+      "width": "1440",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 2
+      }
+    },
+    {
+      "route": "/my-orders",
+      "width": "1440",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 35
+      }
+    },
+    {
+      "route": "/does-not-exist",
+      "width": "1440",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 0
+      }
+    }
+  ],
+  "mobile": [
+    {
+      "route": "/",
+      "width": "mobile",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 4
+      }
+    },
+    {
+      "route": "/about",
+      "width": "mobile",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 3
+      }
+    },
+    {
+      "route": "/products",
+      "width": "mobile",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 9
+      }
+    },
+    {
+      "route": "/products/6a6394c9043c31017d0e444c",
+      "width": "mobile",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 4
+      }
+    },
+    {
+      "route": "/gallery",
+      "width": "mobile",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 21
+      }
+    },
+    {
+      "route": "/contact",
+      "width": "mobile",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 2
+      }
+    }
+  ],
+  "tablet": [
+    {
+      "route": "/",
+      "width": "tablet",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 4
+      }
+    },
+    {
+      "route": "/about",
+      "width": "tablet",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 3
+      }
+    },
+    {
+      "route": "/products",
+      "width": "tablet",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 9
+      }
+    },
+    {
+      "route": "/products/6a6394c9043c31017d0e444c",
+      "width": "tablet",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 4
+      }
+    },
+    {
+      "route": "/gallery",
+      "width": "tablet",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 21
+      }
+    },
+    {
+      "route": "/contact",
+      "width": "tablet",
+      "errors": [],
+      "consoleMsgs": [],
+      "badResponses": [],
+      "brokenImgs": [],
+      "overflow": null,
+      "a11y": {
+        "noAlt": 0,
+        "emptyLinks": 0,
+        "emptyButtons": 0,
+        "unlabeled": 0,
+        "h1s": 1,
+        "totalImgs": 2
+      }
+    }
+  ]
+}

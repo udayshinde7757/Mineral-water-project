@@ -11,7 +11,7 @@ import {
 import ProductCard from '@components/products/ProductCard'
 import productService from '@services/productService'
 
-const MotionLink = motion(Link)
+const MotionLink = motion.create(Link)
 
 // ─── Easing ───────────────────────────────────────────────────────────────────
 const easeOut = [0.22, 1, 0.36, 1]

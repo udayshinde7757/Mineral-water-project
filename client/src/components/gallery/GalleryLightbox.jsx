@@ -86,7 +86,6 @@ function GalleryLightbox({ image, images, currentIndex, onClose, onNext, onPrev 
               type="button"
               onClick={onPrev}
               className="absolute left-4 z-30 p-3 rounded-full bg-gray-900/80 text-white border border-gray-700/80 shadow-xl transition-all duration-300 transform hover:scale-110 cursor-pointer outline-none"
-              style={{ hover: { background: 'linear-gradient(135deg, #0B4F6C, #01BAEF)', borderColor: '#01BAEF' } }}
               aria-label="Previous Image"
             >
               <FiChevronLeft className="w-7 h-7" />
@@ -97,7 +96,6 @@ function GalleryLightbox({ image, images, currentIndex, onClose, onNext, onPrev 
               type="button"
               onClick={onNext}
               className="absolute right-4 z-30 p-3 rounded-full bg-gray-900/80 text-white border border-gray-700/80 shadow-xl transition-all duration-300 transform hover:scale-110 cursor-pointer outline-none"
-              style={{ hover: { background: 'linear-gradient(135deg, #0B4F6C, #01BAEF)', borderColor: '#01BAEF' } }}
               aria-label="Next Image"
             >
               <FiChevronRight className="w-7 h-7" />
@@ -116,6 +114,7 @@ function GalleryLightbox({ image, images, currentIndex, onClose, onNext, onPrev 
                 src={image.src}
                 alt={image.title}
                 className="max-w-full max-h-full object-contain rounded-lg shadow-2xl border border-gray-800"
+                onError={(e) => { e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="%23999"%3E%3Crect width="400" height="300" fill="%23333"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23999" font-size="16"%3EImage unavailable%3C/text%3E%3C/svg%3E' }}
               />
             </motion.div>
           </div>

@@ -68,10 +68,10 @@ export const CONTACT_SOCIAL_LINKS = [
   },
 ]
 
-/** Google Maps embed — Government Polytechnic Nagpur */
+/** Google Maps embed — AquaPure Business Location */
 export const CONTACT_MAP_EMBED_URL =
   import.meta.env.VITE_GOOGLE_MAPS_EMBED_URL ||
-  'https://maps.google.com/maps?q=Government+Polytechnic+Nagpur,+Nagpur,+Maharashtra,+India&hl=en&z=16&output=embed'
+  'https://maps.google.com/maps?q=Nagpur,+Maharashtra,+India&hl=en&z=14&output=embed'
 
 export const CONTACT_MAP_LOCATION_LABEL =
-  'Government Polytechnic Nagpur, Nagpur, Maharashtra, India'
+  'Nagpur, Maharashtra, India'
