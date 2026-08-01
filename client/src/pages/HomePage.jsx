@@ -1,12 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, useInView, useMotionValue, useSpring } from 'framer-motion'
 import {
   FiDroplet,
   FiShield,
   FiTruck,
   FiStar,
   FiChevronRight,
+  FiAward,
+  FiUsers,
+  FiCheckCircle,
 } from 'react-icons/fi'
 import ProductCard from '@components/products/ProductCard'
 import productService from '@services/productService'
@@ -42,6 +45,33 @@ const cardReveal = {
   },
 }
 
+// ─── Animated Counter ────────────────────────────────────────────────────────
+function AnimatedCounter({ value, suffix = '' }) {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: '-60px' })
+  const motionValue = useMotionValue(0)
+  const springValue = useSpring(motionValue, { duration: 2000, bounce: 0 })
+  const [displayValue, setDisplayValue] = useState(0)
+
+  useEffect(() => {
+    if (isInView) {
+      motionValue.set(value)
+    }
+  }, [isInView, value, motionValue])
+
+  useEffect(() => {
+    return springValue.on('change', (latest) => {
+      setDisplayValue(Math.round(latest))
+    })
+  }, [springValue])
+
+  return (
+    <span ref={ref}>
+      {displayValue.toLocaleString('en-IN')}{suffix}
+    </span>
+  )
+}
+
 // ─── Hero Bottle SVG ─────────────────────────────────────────────────────────
 function BottleIllustration() {
   return (
@@ -51,6 +81,7 @@ function BottleIllustration() {
       xmlns="http://www.w3.org/2000/svg"
       className="w-48 sm:w-56 md:w-64 h-auto drop-shadow-xl"
       aria-hidden="true"
+      role="presentation"
     >
       {/* Bottle body */}
       <defs>
@@ -136,10 +167,11 @@ function BottleIllustration() {
 // ─── Star Rating ────────────────────────────────────────────────────────────
 function StarRating({ rating = 5 }) {
   return (
-    <div className="flex gap-1">
+    <div className="flex gap-1" aria-label={`Rated ${rating} out of 5 stars`}>
       {Array.from({ length: 5 }).map((_, i) => (
         <FiStar
           key={i}
+          aria-hidden="true"
           className={`w-4 h-4 ${i < rating ? 'fill-amber-400 text-amber-400' : 'text-gray-200'}`}
         />
       ))}
@@ -147,10 +179,22 @@ function StarRating({ rating = 5 }) {
   )
 }
 
+// ─── Trust Statistics ─────────────────────────────────────────────────────────
+const stats = [
+  { icon: FiUsers, value: 100000, suffix: '+', label: 'Happy Households' },
+  { icon: FiAward, value: 15, suffix: ' Years', label: 'Of Pure Excellence' },
+  { icon: FiShield, value: 100, suffix: '%', label: 'Quality Certified' },
+  { icon: FiCheckCircle, value: 5, suffix: ' States', label: 'Delivery Coverage' },
+]
+
 // ─── HomePage ────────────────────────────────────────────────────────────────
 function HomePage() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    document.title = 'AquaPure — Pure Natural Mineral Water | Premium Hydration Delivered'
+  }, [])
 
   useEffect(() => {
     let mounted = true
@@ -176,11 +220,16 @@ function HomePage() {
           HERO SECTION
           ═══════════════════════════════════════════════════════════════════════ */}
       <section
+        aria-label="Hero — AquaPure premium mineral water"
         className="relative flex items-center justify-center min-h-[85vh] overflow-hidden section-padding"
         style={{
           background: 'linear-gradient(170deg, #EEF6FB 0%, #F8FBFD 50%, #ffffff 100%)',
         }}
       >
+        {/* Decorative ambient orbs */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#22D3EE]/5 blur-3xl rounded-full pointer-events-none" aria-hidden="true" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#0F4C81]/5 blur-3xl rounded-full pointer-events-none" aria-hidden="true" />
+
         <div className="container-app w-full relative z-10">
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
             {/* Text Content */}
@@ -248,6 +297,19 @@ function HomePage() {
                   Learn More
                 </MotionLink>
               </motion.div>
+
+              {/* Trust indicators */}
+              <motion.div
+                variants={fadeUp}
+                className="flex flex-wrap gap-x-6 gap-y-2 mt-8 justify-center lg:justify-start"
+              >
+                {['ISO Certified', 'BPA Free', 'Free Delivery'].map((tag) => (
+                  <div key={tag} className="flex items-center gap-1.5 text-xs font-semibold" style={{ color: '#486581' }}>
+                    <FiCheckCircle className="w-3.5 h-3.5" style={{ color: '#22D3EE' }} aria-hidden="true" />
+                    {tag}
+                  </div>
+                ))}
+              </motion.div>
             </motion.div>
 
             {/* Bottle Illustration */}
@@ -256,6 +318,7 @@ function HomePage() {
               initial={{ opacity: 0, x: 60 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, ease: easeOut, delay: 0.3 }}
+              aria-hidden="true"
             >
               <BottleIllustration />
             </motion.div>
@@ -264,9 +327,39 @@ function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════════════
+          TRUST STATISTICS SECTION
+          ═══════════════════════════════════════════════════════════════════════ */}
+      <section className="py-12" style={{ backgroundColor: '#0F4C81' }} aria-label="AquaPure by the numbers">
+        <div className="container-app">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+            {stats.map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                className="text-center space-y-2"
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.5, ease: easeOut, delay: i * 0.1 }}
+              >
+                <div className="flex items-center justify-center mb-3">
+                  <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center">
+                    <stat.icon className="w-6 h-6 text-white" aria-hidden="true" />
+                  </div>
+                </div>
+                <p className="text-3xl sm:text-4xl font-extrabold text-white">
+                  <AnimatedCounter value={stat.value} suffix={stat.suffix} />
+                </p>
+                <p className="text-xs sm:text-sm font-medium text-white/70">{stat.label}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
           WHY AQUAPURE — Features
           ═══════════════════════════════════════════════════════════════════════ */}
-      <section className="section-padding" style={{ backgroundColor: '#EEF6FB' }}>
+      <section className="section-padding" style={{ backgroundColor: '#EEF6FB' }} aria-labelledby="features-heading">
         <div className="container-app">
           {/* Section Header */}
           <motion.div
@@ -279,7 +372,7 @@ function HomePage() {
             <motion.p variants={fadeUp} className="section-label mb-4">
               Why AquaPure
             </motion.p>
-            <motion.h2 variants={fadeUp} className="section-title">
+            <motion.h2 id="features-heading" variants={fadeUp} className="section-title">
               What Makes Us Different
             </motion.h2>
             <motion.p variants={fadeUp} className="section-subtitle mx-auto">
@@ -322,7 +415,7 @@ function HomePage() {
                     background: 'linear-gradient(135deg, rgba(15, 76, 129, 0.08), rgba(34, 211, 238, 0.12))',
                   }}
                 >
-                  <feature.Icon className="w-7 h-7" style={{ color: '#0F4C81' }} />
+                  <feature.Icon className="w-7 h-7" style={{ color: '#0F4C81' }} aria-hidden="true" />
                 </div>
                 <h3 className="text-lg font-bold mb-3" style={{ color: '#0A2540', fontFamily: 'var(--font-display)' }}>
                   {feature.title}
@@ -339,7 +432,7 @@ function HomePage() {
       {/* ═══════════════════════════════════════════════════════════════════════
           BEST SELLING PRODUCTS
           ═══════════════════════════════════════════════════════════════════════ */}
-      <section className="section-padding" style={{ backgroundColor: '#F8FBFD' }}>
+      <section className="section-padding" style={{ backgroundColor: '#F8FBFD' }} aria-labelledby="products-heading">
         <div className="container-app">
           <motion.div
             className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-12"
@@ -352,29 +445,30 @@ function HomePage() {
               <motion.p variants={fadeUp} className="section-label mb-3">
                 Shop
               </motion.p>
-              <motion.h2 variants={fadeUp} className="section-title">
+              <motion.h2 id="products-heading" variants={fadeUp} className="section-title">
                 Best Selling Products
               </motion.h2>
             </div>
             <motion.div variants={fadeUp}>
               <Link
                 to="/products"
-                className="inline-flex items-center gap-1.5 text-sm font-semibold transition-colors duration-200"
+                className="inline-flex items-center gap-1.5 text-sm font-semibold transition-colors duration-200 hover:underline underline-offset-4"
                 style={{ color: '#0F4C81' }}
               >
                 View All Products
-                <FiChevronRight className="w-4 h-4" />
+                <FiChevronRight className="w-4 h-4" aria-hidden="true" />
               </Link>
             </motion.div>
           </motion.div>
 
           {/* Products Grid */}
           {loading ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6" aria-label="Loading products...">
               {Array.from({ length: 4 }).map((_, i) => (
                 <div
                   key={i}
                   className="bg-white rounded-3xl border border-gray-100/80 h-96 animate-pulse"
+                  aria-hidden="true"
                 />
               ))}
             </div>
@@ -393,9 +487,15 @@ function HomePage() {
               ))}
             </div>
           ) : (
-            <p className="text-center py-12" style={{ color: '#7B8794' }}>
-              Products coming soon.
-            </p>
+            <div className="text-center py-16 space-y-4">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                <FiDroplet className="w-8 h-8" style={{ color: '#0F4C81' }} aria-hidden="true" />
+              </div>
+              <p className="font-semibold" style={{ color: '#102A43' }}>Products coming soon</p>
+              <p className="text-sm" style={{ color: '#7B8794' }}>
+                We're stocking up. Check back shortly.
+              </p>
+            </div>
           )}
         </div>
       </section>
@@ -403,7 +503,7 @@ function HomePage() {
       {/* ═══════════════════════════════════════════════════════════════════════
           TESTIMONIALS
           ═══════════════════════════════════════════════════════════════════════ */}
-      <section className="section-padding" style={{ backgroundColor: '#EEF6FB' }}>
+      <section className="section-padding" style={{ backgroundColor: '#EEF6FB' }} aria-labelledby="testimonials-heading">
         <div className="container-app">
           <motion.div
             className="text-center mb-14 md:mb-16"
@@ -415,7 +515,7 @@ function HomePage() {
             <motion.p variants={fadeUp} className="section-label mb-4">
               Testimonials
             </motion.p>
-            <motion.h2 variants={fadeUp} className="section-title">
+            <motion.h2 id="testimonials-heading" variants={fadeUp} className="section-title">
               What Our Customers Say
             </motion.h2>
           </motion.div>
@@ -426,7 +526,7 @@ function HomePage() {
                 name: 'Yash Thale',
                 role: 'Regular Customer',
                 text: 'AquaPure has completely changed how I think about drinking water. The taste is incredibly fresh and clean — I can tell the difference immediately. Highly recommended!',
-                rating: 4.8,
+                rating: 5,
               },
               {
                 name: 'Sairaj Deshmukh',
@@ -438,10 +538,10 @@ function HomePage() {
                 name: 'Vidhi Surve',
                 role: 'Home Chef',
                 text: 'I use AquaPure for all my cooking and beverages. The natural mineral content enhances the flavour of everything I prepare. It is now the only water in my kitchen.',
-                rating: 4.5,
+                rating: 5,
               },
             ].map((t, i) => (
-              <motion.div
+              <motion.article
                 key={t.name}
                 className="bg-white rounded-2xl border border-[#0F4C81]/10 p-8 flex flex-col h-full"
                 initial={{ opacity: 0, y: 30 }}
@@ -453,15 +553,15 @@ function HomePage() {
                 {/* Stars */}
                 <StarRating rating={t.rating} />
                 {/* Quote */}
-                <p className="text-sm leading-relaxed mt-4 flex-1" style={{ color: '#486581' }}>
+                <blockquote className="text-sm leading-relaxed mt-4 flex-1" style={{ color: '#486581' }}>
                   &ldquo;{t.text}&rdquo;
-                </p>
+                </blockquote>
                 {/* Author */}
-                <div className="mt-6 pt-4 border-t border-gray-100">
+                <footer className="mt-6 pt-4 border-t border-gray-100">
                   <p className="text-sm font-bold" style={{ color: '#0A2540' }}>{t.name}</p>
                   <p className="text-xs mt-0.5" style={{ color: '#7B8794' }}>{t.role}</p>
-                </div>
-              </motion.div>
+                </footer>
+              </motion.article>
             ))}
           </div>
         </div>
@@ -511,10 +611,9 @@ function HomePage() {
                   <Link
                     to="/products"
                     className="inline-flex items-center gap-2 btn-primary !px-10 !py-3.5 shadow-lg shadow-[#0F4C81]/20"
-                    style={{ textDecoration: 'none' }}
                   >
                     Order Now
-                    <FiChevronRight className="w-4 h-4" />
+                    <FiChevronRight className="w-4 h-4" aria-hidden="true" />
                   </Link>
                 </motion.div>
               </div>

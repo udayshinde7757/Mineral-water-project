@@ -101,15 +101,15 @@ function Navbar() {
         >
           <div
             className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center"
-            style={{ backgroundColor: '#0F4F81' }}
+            style={{ backgroundColor: '#0F4C81' }}
           >
             <FiDroplet className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
-          <span style={{ color: '#0F4F81' }}>AquaPure</span>
+          <span style={{ color: '#0F4C81' }}>AquaPure</span>
         </Link>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium relative">
+        <nav aria-label="Primary navigation" className="hidden md:flex items-center gap-8 text-sm font-medium relative">
           {navLinks.map((link) => (
             <NavLink
               key={link.path}
@@ -155,7 +155,7 @@ function Navbar() {
                   animate={{ scale: 1, transition: { type: 'spring', stiffness: 500, damping: 15 } }}
                   whileHover={{ scale: 1.15 }}
                   className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-extrabold shadow-brand-sm"
-                  style={{ backgroundColor: '#0F4F81' }}
+                  style={{ backgroundColor: '#0F4C81' }}
                 >
                   {cartCount}
                 </motion.span>
@@ -172,13 +172,14 @@ function Navbar() {
                 className="flex items-center gap-2 px-4 py-2 rounded-full font-medium text-sm transition-all border shadow-sm focus:outline-none"
                 style={{
                   background: 'rgba(15, 79, 129, 0.06)',
-                  color: '#0F4F81',
+                  color: '#0F4C81',
                   borderColor: 'rgba(15, 79, 129, 0.15)',
                 }}
                 aria-expanded={dropdownOpen}
+                aria-haspopup="true"
               >
                 <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white"
-                     style={{ backgroundColor: '#0F4F81' }}>
+                     style={{ backgroundColor: '#0F4C81' }}>
                   {user?.fullname ? user.fullname.charAt(0).toUpperCase() : 'U'}
                 </div>
                 <span className="font-semibold max-w-[120px] truncate">
@@ -199,6 +200,7 @@ function Navbar() {
                     initial="hidden"
                     animate="visible"
                     exit="exit"
+                    role="menu"
                     className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-card border border-gray-100 py-1 z-50 overflow-hidden"
                     style={{ transformOrigin: 'top' }}
                   >
@@ -210,16 +212,17 @@ function Navbar() {
                         {user?.fullname}
                       </p>
                       <div className="flex items-center gap-1.5 text-xs text-gray-500 truncate mt-0.5">
-                        <FiMail className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#0F4F81' }} />
+                        <FiMail className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#0F4C81' }} />
                         <span className="truncate">{user?.email}</span>
                       </div>
                     </div>
 
-                    <div className="p-1">
+                    <div className="p-1" role="none">
                       {user?.role === 'admin' && (
                         <Link
                           to={ROUTES.ADMIN_DASHBOARD}
                           onClick={() => setDropdownOpen(false)}
+                          role="menuitem"
                           className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm font-bold text-cyan-600 hover:bg-cyan-50 rounded-xl transition-colors"
                         >
                           <FiDroplet className="w-4 h-4 text-cyan-600" />
@@ -229,14 +232,16 @@ function Navbar() {
                       <Link
                         to={ROUTES.MY_ORDERS}
                         onClick={() => setDropdownOpen(false)}
+                        role="menuitem"
                         className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-primary-50/50 rounded-xl transition-colors"
                       >
-                        <FiPackage className="w-4 h-4" style={{ color: '#0F4F81' }} />
+                        <FiPackage className="w-4 h-4" style={{ color: '#0F4C81' }} />
                         <span>My Orders</span>
                       </Link>
                       <button
                         type="button"
                         onClick={handleLogout}
+                        role="menuitem"
                         className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-colors text-left"
                       >
                         <FiLogOut className="w-4 h-4 text-red-500" />
@@ -282,7 +287,7 @@ function Navbar() {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1, transition: { type: 'spring', stiffness: 500, damping: 15 } }}
                   className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-extrabold text-white shadow-brand-sm"
-                  style={{ backgroundColor: '#0F4F81' }}
+                  style={{ backgroundColor: '#0F4C81' }}
                 >
                   {cartCount}
                 </motion.span>
@@ -294,7 +299,9 @@ function Navbar() {
             type="button"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
             className="p-2 rounded-xl text-navy hover:bg-gray-100 transition-colors"
-            aria-label="Toggle Navigation Menu"
+            aria-label={mobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
           >
             {mobileMenuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
           </button>
@@ -309,7 +316,8 @@ function Navbar() {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="md:hidden border-t border-gray-100 bg-white/95 backdrop-blur-md overflow-hidden"
+            id="mobile-menu"
+          className="md:hidden border-t border-gray-100 bg-white/95 backdrop-blur-md overflow-hidden"
           >
             <div className="px-4 pt-3 pb-6 space-y-4">
               <nav className="flex flex-col space-y-1">
@@ -344,7 +352,7 @@ function Navbar() {
                     >
                       <span>Cart</span>
                       <span className="rounded-full px-2.5 py-0.5 text-[10px] font-extrabold text-white"
-                            style={{ backgroundColor: '#0F4F81' }}>
+                            style={{ backgroundColor: '#0F4C81' }}>
                         {cartCount}
                       </span>
                     </NavLink>

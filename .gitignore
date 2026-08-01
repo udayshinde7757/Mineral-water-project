@@ -83,3 +83,8 @@ coverage/
 *.pem
 .vercel
 .netlify
+
+# ===========================
+# Local tooling / AI config (machine-specific, do not commit)
+# ===========================
+.claude/
