@@ -72,98 +72,6 @@ function AnimatedCounter({ value, suffix = '' }) {
   )
 }
 
-// ─── Hero Bottle SVG ─────────────────────────────────────────────────────────
-function BottleIllustration() {
-  return (
-    <svg
-      viewBox="0 0 240 400"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-48 sm:w-56 md:w-64 h-auto drop-shadow-xl"
-      aria-hidden="true"
-      role="presentation"
-    >
-      {/* Bottle body */}
-      <defs>
-        <linearGradient id="bottleGrad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#0F4C81" stopOpacity="0.08" />
-          <stop offset="50%" stopColor="#22D3EE" stopOpacity="0.15" />
-          <stop offset="100%" stopColor="#0F4C81" stopOpacity="0.05" />
-        </linearGradient>
-        <linearGradient id="waterFill" x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0%" stopColor="#22D3EE" stopOpacity="0.35" />
-          <stop offset="100%" stopColor="#0F4C81" stopOpacity="0.20" />
-        </linearGradient>
-        <linearGradient id="shine" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.5" />
-          <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-
-      {/* Bottle outline */}
-      <path
-        d="M100 20 C100 20 95 8 100 4 C105 0 135 0 140 4 C145 8 140 20 140 20
-           L142 30 C142 30 155 50 158 80 C161 110 160 130 160 160
-           C160 190 158 210 155 240 C152 270 148 290 145 310
-           C142 330 140 350 140 370
-           C140 380 145 390 150 394
-           C155 398 155 400 120 400
-           C85 400 85 398 90 394
-           C95 390 100 380 100 370
-           C100 350 98 330 95 310
-           C92 290 88 270 85 240
-           C82 210 80 190 80 160
-           C80 130 79 110 82 80
-           C85 50 98 30 98 30 L100 20 Z"
-        fill="url(#bottleGrad)"
-        stroke="#0F4C81"
-        strokeWidth="1.5"
-        strokeOpacity="0.15"
-      />
-
-      {/* Water inside */}
-      <path
-        d="M86 240 C88 210 90 190 92 170
-           L148 170 C150 190 152 210 154 240
-           C155 280 154 320 152 360
-           C150 380 148 390 145 394
-           C140 398 100 398 95 394
-           C92 390 90 380 88 360
-           C86 320 85 280 86 240 Z"
-        fill="url(#waterFill)"
-      />
-
-      {/* Water ripple line */}
-      <path
-        d="M86 240 C100 250 120 235 140 245 C150 250 152 245 154 240"
-        stroke="#22D3EE"
-        strokeWidth="1"
-        strokeOpacity="0.5"
-        fill="none"
-      />
-
-      {/* Shine / highlight */}
-      <path
-        d="M100 60 L102 320"
-        stroke="url(#shine)"
-        strokeWidth="6"
-        strokeLinecap="round"
-        strokeOpacity="0.6"
-      />
-
-      {/* Cap */}
-      <rect x="95" y="2" width="50" height="18" rx="4" fill="#0F4C81" opacity="0.9" />
-      <rect x="98" y="4" width="44" height="4" rx="2" fill="#22D3EE" opacity="0.3" />
-
-      {/* Label */}
-      <rect x="92" y="290" width="56" height="60" rx="6" fill="#0F4C81" opacity="0.08" />
-      <rect x="98" y="298" width="44" height="3" rx="1.5" fill="#0F4C81" opacity="0.25" />
-      <rect x="98" y="306" width="30" height="2" rx="1" fill="#0F4C81" opacity="0.15" />
-      <circle cx="120" cy="330" r="8" fill="#22D3EE" opacity="0.2" />
-    </svg>
-  )
-}
-
 // ─── Star Rating ────────────────────────────────────────────────────────────
 function StarRating({ rating = 5 }) {
   return (
@@ -217,24 +125,45 @@ function HomePage() {
   return (
     <div>
       {/* ═══════════════════════════════════════════════════════════════════════
-          HERO SECTION
+          HERO SECTION — Full-Background Image
           ═══════════════════════════════════════════════════════════════════════ */}
       <section
         aria-label="Hero — AquaPure premium mineral water"
-        className="relative flex items-center justify-center min-h-[85vh] overflow-hidden section-padding"
-        style={{
-          background: 'linear-gradient(170deg, #EEF6FB 0%, #F8FBFD 50%, #ffffff 100%)',
-        }}
+        className="relative flex items-center min-h-screen overflow-hidden"
       >
-        {/* Decorative ambient orbs */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#22D3EE]/5 blur-3xl rounded-full pointer-events-none" aria-hidden="true" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#0F4C81]/5 blur-3xl rounded-full pointer-events-none" aria-hidden="true" />
+        {/* Background image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: 'url(/images/mountainview.png)',
+            backgroundPosition: '60% center',
+          }}
+          aria-hidden="true"
+        />
 
-        <div className="container-app w-full relative z-10">
-          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
-            {/* Text Content */}
+        {/* Gradient overlay — left-to-right for text readability, keeps right side visible */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              'linear-gradient(to right, rgba(10, 37, 64, 0.88) 0%, rgba(10, 37, 64, 0.72) 30%, rgba(10, 37, 64, 0.30) 55%, transparent 75%)',
+          }}
+          aria-hidden="true"
+        />
+
+        {/* Top edge gradient for navbar blend */}
+        <div
+          className="absolute inset-x-0 top-0 h-32 pointer-events-none"
+          style={{
+            background: 'linear-gradient(to bottom, rgba(10, 37, 64, 0.40), transparent)',
+          }}
+          aria-hidden="true"
+        />
+
+        {/* Content */}
+        <div className="container-app w-full relative z-10 py-28 md:py-32">
+          <div className="max-w-2xl">
             <motion.div
-              className="flex-1 text-center lg:text-left"
               initial="hidden"
               animate="visible"
               variants={staggerContainer}
@@ -243,7 +172,7 @@ function HomePage() {
               <motion.p
                 variants={fadeUp}
                 className="text-sm font-semibold tracking-[0.25em] uppercase mb-5"
-                style={{ color: '#22D3EE', fontFamily: 'var(--font-sans)' }}
+                style={{ color: '#7DDAFB', fontFamily: 'var(--font-sans)' }}
               >
                 Premium Natural Mineral Water
               </motion.p>
@@ -251,15 +180,15 @@ function HomePage() {
               {/* Heading */}
               <motion.h1
                 variants={fadeUp}
-                className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight"
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight"
                 style={{
                   fontFamily: 'var(--font-display)',
                   letterSpacing: '-0.02em',
-                  color: '#0A2540',
+                  color: '#ffffff',
                 }}
               >
                 Pure Water,{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0F4C81] to-[#22D3EE]">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7DDAFB] to-[#22D3EE]">
                   Perfect Life
                 </span>
               </motion.h1>
@@ -267,8 +196,8 @@ function HomePage() {
               {/* Subtitle */}
               <motion.p
                 variants={fadeUp}
-                className="text-base sm:text-lg md:text-xl mt-5 max-w-xl mx-auto lg:mx-0"
-                style={{ color: '#486581', lineHeight: '1.7' }}
+                className="text-base sm:text-lg md:text-xl mt-6 max-w-xl leading-relaxed"
+                style={{ color: 'rgba(255, 255, 255, 0.80)', lineHeight: '1.7' }}
               >
                 Sourced from nature's finest springs and bottled with care.
                 AquaPure brings you the crisp, refreshing taste of pure mineral
@@ -278,19 +207,19 @@ function HomePage() {
               {/* CTA Buttons */}
               <motion.div
                 variants={fadeUp}
-                className="flex flex-col sm:flex-row gap-4 mt-10 justify-center lg:justify-start"
+                className="flex flex-col sm:flex-row gap-4 mt-10"
               >
                 <MotionLink
                   to="/products"
-                  className="btn-primary !px-10 !py-3.5 !text-sm sm:!text-base shadow-lg shadow-[#0F4C81]/20"
-                  whileHover={{ y: -2, boxShadow: '0 8px 25px rgba(15, 76, 129, 0.3)' }}
+                  className="btn-primary !px-10 !py-3.5 !text-sm sm:!text-base shadow-lg shadow-[#0F4C81]/30"
+                  whileHover={{ y: -2, boxShadow: '0 8px 25px rgba(15, 76, 129, 0.4)' }}
                   whileTap={{ scale: 0.98 }}
                 >
                   Shop Now
                 </MotionLink>
                 <MotionLink
                   to="/about"
-                  className="btn-secondary !px-10 !py-3.5 !text-sm sm:!text-base"
+                  className="!inline-flex !items-center !justify-center !gap-2 !font-semibold !px-10 !py-3.5 !rounded-xl !transition-all !duration-300 !ease-out !text-sm sm:!text-base !border-2 !border-white/80 !text-white hover:!bg-white/10"
                   whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -301,26 +230,15 @@ function HomePage() {
               {/* Trust indicators */}
               <motion.div
                 variants={fadeUp}
-                className="flex flex-wrap gap-x-6 gap-y-2 mt-8 justify-center lg:justify-start"
+                className="flex flex-wrap gap-x-6 gap-y-2 mt-10"
               >
                 {['ISO Certified', 'BPA Free', 'Free Delivery'].map((tag) => (
-                  <div key={tag} className="flex items-center gap-1.5 text-xs font-semibold" style={{ color: '#486581' }}>
-                    <FiCheckCircle className="w-3.5 h-3.5" style={{ color: '#22D3EE' }} aria-hidden="true" />
+                  <div key={tag} className="flex items-center gap-1.5 text-xs font-semibold" style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+                    <FiCheckCircle className="w-3.5 h-3.5" style={{ color: '#7DDAFB' }} aria-hidden="true" />
                     {tag}
                   </div>
                 ))}
               </motion.div>
-            </motion.div>
-
-            {/* Bottle Illustration */}
-            <motion.div
-              className="flex-shrink-0"
-              initial={{ opacity: 0, x: 60 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, ease: easeOut, delay: 0.3 }}
-              aria-hidden="true"
-            >
-              <BottleIllustration />
             </motion.div>
           </div>
         </div>
