@@ -281,7 +281,7 @@ export default function AdminOrderDetailPage() {
                 <span>₹{order.subtotal || order.totalAmount}</span>
               </div>
               <div className="flex justify-between text-slate-500">
-                <span>GST ({order.gst ? '18%' : '0%'})</span>
+                <span>GST ({order.gst && order.subtotal ? Math.round((order.gst / order.subtotal) * 100) + '%' : '0%'})</span>
                 <span>₹{order.gst || 0}</span>
               </div>
               <div className="flex justify-between text-slate-500">

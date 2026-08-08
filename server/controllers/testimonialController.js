@@ -105,7 +105,7 @@ const updateTestimonial = async (req, res) => {
     const updatedTestimonial = await Testimonial.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true, runValidators: true }
+      { returnDocument: "after", runValidators: true }
     );
 
     return res.status(200).json({

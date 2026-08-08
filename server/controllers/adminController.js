@@ -390,9 +390,43 @@ exports.getOrderDetails = async (req, res) => {
   }
 };
 
+// Valid order statuses (must match the Order model enum). Guards against
+// silently saving an invalid status (which would otherwise surface as a 500
+// from a Mongoose validation error instead of a clear 400).
+const ALLOWED_ORDER_STATUSES = [
+  "Placed",
+  "Pending",
+  "Confirmed",
+  "Processing",
+  "Packed",
+  "Shipped",
+  "Out For Delivery",
+  "Delivered",
+  "Completed",
+  "Cancelled",
+];
+
+// Dispatch customer notifications without blocking/failing the primary action.
+// The email/WhatsApp services already swallow their own errors and record them
+// in NotificationLog, but they can be slow (SMTP/HTTP); awaiting them would
+// keep an admin waiting on a status update that has already succeeded.
+function dispatchNotificationsAsync(...notifiers) {
+  for (const notifier of notifiers) {
+    Promise.resolve().then(notifier).catch(() => {});
+  }
+}
+
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { status, notes } = req.body;
+
+    if (!status || !ALLOWED_ORDER_STATUSES.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid order status "${status}". Allowed: ${ALLOWED_ORDER_STATUSES.join(", ")}.`,
+      });
+    }
+
     const order = await Order.findById(req.params.id);
 
     if (!order) {
@@ -408,9 +442,13 @@ exports.updateOrderStatus = async (req, res) => {
     if (status === "Shipped") order.shippedAt = now;
     if (status === "Out For Delivery") order.outForDeliveryAt = now;
     if (status === "Delivered") order.deliveredAt = now;
-    if (status === "Completed") {
-      order.completedAt = now;
-      if (order.paymentMethod === "COD") order.paymentStatus = "Paid";
+    // COD payment is collected at delivery, so it must be marked Paid here —
+    // otherwise a delivered COD order stays "Pending" in reports/dashboards.
+    if (
+      order.paymentMethod === "COD" &&
+      (status === "Delivered" || status === "Completed")
+    ) {
+      order.paymentStatus = "Paid";
     }
 
     order.statusHistory.push({
@@ -422,9 +460,11 @@ exports.updateOrderStatus = async (req, res) => {
 
     await order.save();
 
-    // Trigger Email & WhatsApp dispatches
-    await sendOrderStatusEmail(order, status, notes);
-    await sendOrderStatusWhatsApp(order, status, notes);
+    // Trigger Email & WhatsApp dispatches (non-blocking)
+    dispatchNotificationsAsync(
+      () => sendOrderStatusEmail(order, status, notes),
+      () => sendOrderStatusWhatsApp(order, status, notes)
+    );
 
     await logAdminActivity(req, "Order Status Updated", `Order #${order._id} status changed to ${status}`, "Orders");
 
@@ -458,8 +498,10 @@ exports.markOrderCompleted = async (req, res) => {
 
     await order.save();
 
-    await sendOrderStatusEmail(order, "Completed", "Thank you for shopping with AquaPure!");
-    await sendOrderStatusWhatsApp(order, "Completed", "Thank you for shopping with AquaPure!");
+    dispatchNotificationsAsync(
+      () => sendOrderStatusEmail(order, "Completed", "Thank you for shopping with AquaPure!"),
+      () => sendOrderStatusWhatsApp(order, "Completed", "Thank you for shopping with AquaPure!")
+    );
 
     await logAdminActivity(req, "Order Completed", `Order #${order._id} marked as completed`, "Orders");
 
@@ -524,8 +566,10 @@ exports.cancelOrder = async (req, res) => {
 
     await order.save();
 
-    await sendOrderStatusEmail(order, "Cancelled", order.cancellationReason);
-    await sendOrderStatusWhatsApp(order, "Cancelled", order.cancellationReason);
+    dispatchNotificationsAsync(
+      () => sendOrderStatusEmail(order, "Cancelled", order.cancellationReason),
+      () => sendOrderStatusWhatsApp(order, "Cancelled", order.cancellationReason)
+    );
 
     await logAdminActivity(req, "Order Cancelled", `Order #${order._id} cancelled by admin. Reason: ${order.cancellationReason}`, "Orders");
 
@@ -570,6 +614,11 @@ exports.getProducts = async (req, res) => {
   }
 };
 
+// Maps Mongoose validation/cast failures to a 400 instead of a bare 500.
+function badRequest(err) {
+  return err && (err.name === "ValidationError" || err.name === "CastError");
+}
+
 exports.createProduct = async (req, res) => {
   try {
     const {
@@ -577,14 +626,28 @@ exports.createProduct = async (req, res) => {
       rating, isFeatured, originalPrice, discountPercent, isOffer, offerText, isVisible
     } = req.body;
 
+    if (!name || !String(name).trim() || !size || !String(size).trim()) {
+      return res.status(400).json({ success: false, message: "Product name and size are required" });
+    }
+    if (price === undefined || price === null || price === "") {
+      return res.status(400).json({ success: false, message: "Product price is required" });
+    }
+    const parsedPrice = Number(price);
+    if (Number.isNaN(parsedPrice) || parsedPrice < 0) {
+      return res.status(400).json({ success: false, message: "Price must be a non-negative number" });
+    }
+    if (!image || !String(image).trim() || !description || !String(description).trim()) {
+      return res.status(400).json({ success: false, message: "Product image and description are required" });
+    }
+
     const product = new Product({
       name,
       size,
-      price: Number(price),
+      price: parsedPrice,
       image,
       images: Array.isArray(images) ? images : [image],
       category,
-      stock: Number(stock),
+      stock: stock !== undefined ? Number(stock) : 50,
       description,
       rating: rating ? Number(rating) : 4.8,
       isFeatured: Boolean(isFeatured),
@@ -600,13 +663,16 @@ exports.createProduct = async (req, res) => {
 
     return res.status(201).json({ success: true, message: "Product created successfully", product });
   } catch (err) {
+    if (badRequest(err)) {
+      return res.status(400).json({ success: false, message: err.message });
+    }
     return res.status(500).json({ success: false, message: err.message });
   }
 };
 
 exports.updateProduct = async (req, res) => {
   try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    const product = await Product.findByIdAndUpdate(req.params.id, req.body, { returnDocument: "after", runValidators: true });
     if (!product) {
       return res.status(404).json({ success: false, message: "Product not found" });
     }
@@ -614,6 +680,9 @@ exports.updateProduct = async (req, res) => {
     await logAdminActivity(req, "Product Updated", `Updated product "${product.name}"`, "Products");
     return res.status(200).json({ success: true, message: "Product updated successfully", product });
   } catch (err) {
+    if (badRequest(err)) {
+      return res.status(400).json({ success: false, message: err.message });
+    }
     return res.status(500).json({ success: false, message: err.message });
   }
 };
@@ -628,6 +697,9 @@ exports.deleteProduct = async (req, res) => {
     await logAdminActivity(req, "Product Deleted", `Deleted product "${product.name}"`, "Products");
     return res.status(200).json({ success: true, message: "Product deleted successfully" });
   } catch (err) {
+    if (badRequest(err)) {
+      return res.status(400).json({ success: false, message: "Invalid product ID" });
+    }
     return res.status(500).json({ success: false, message: err.message });
   }
 };
@@ -635,17 +707,25 @@ exports.deleteProduct = async (req, res) => {
 exports.updateStock = async (req, res) => {
   try {
     const { stock } = req.body;
+    const parsedStock = Number(stock);
+    if (stock === undefined || Number.isNaN(parsedStock) || parsedStock < 0) {
+      return res.status(400).json({ success: false, message: "Stock must be a non-negative number" });
+    }
+
     const product = await Product.findById(req.params.id);
     if (!product) {
       return res.status(404).json({ success: false, message: "Product not found" });
     }
 
-    product.stock = Number(stock);
+    product.stock = parsedStock;
     await product.save();
 
-    await logAdminActivity(req, "Stock Updated", `Stock updated for "${product.name}" to ${stock}`, "Inventory");
+    await logAdminActivity(req, "Stock Updated", `Stock updated for "${product.name}" to ${parsedStock}`, "Inventory");
     return res.status(200).json({ success: true, message: "Stock updated successfully", product });
   } catch (err) {
+    if (badRequest(err)) {
+      return res.status(400).json({ success: false, message: "Invalid product ID" });
+    }
     return res.status(500).json({ success: false, message: err.message });
   }
 };

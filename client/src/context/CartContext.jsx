@@ -102,8 +102,9 @@ export const CartProvider = ({ children }) => {
     }
   }
 
-  // Derived properties
-  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0)
+  // Derived properties. cartCount skips orphaned items whose product was
+  // deleted (productId populates to null) so the badge matches what's shown.
+  const cartCount = cartItems.reduce((total, item) => total + (item.productId ? item.quantity : 0), 0)
   const cartSubtotal = cartItems.reduce((total, item) => {
     const price = item.productId?.price || 0
     return total + price * item.quantity

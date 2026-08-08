@@ -100,8 +100,14 @@ exports.updateCartQuantity = async (req, res) => {
       });
     }
 
-    // Quantity cannot go below 1
-    const targetQuantity = Math.max(1, parseInt(quantity, 10));
+    // Quantity must be a positive integer — reject (don't silently clamp) bad input.
+    const targetQuantity = parseInt(quantity, 10);
+    if (!Number.isFinite(targetQuantity) || targetQuantity < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Quantity must be a positive integer",
+      });
+    }
 
     const user = await User.findById(req.user._id);
 

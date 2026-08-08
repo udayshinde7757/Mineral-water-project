@@ -57,8 +57,15 @@ function ProductDetailsPage() {
         setError('Product not found')
       }
     } catch (err) {
-      console.error('Error fetching product details:', err)
-      setError('Unable to load product. Please check your internet connection.')
+      // A 400/404 means the product doesn't exist (bad or deleted id) — show a
+      // clear message instead of a misleading "internet connection" error.
+      const status = err?.response?.status
+      if (status === 400 || status === 404) {
+        setError('Product not found')
+      } else {
+        console.error('Error fetching product details:', err)
+        setError('Unable to load product. Please check your internet connection.')
+      }
     } finally {
       setLoading(false)
     }

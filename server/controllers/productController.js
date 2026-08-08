@@ -75,10 +75,17 @@ const getProductById = async (req, res) => {
       product,
     });
   } catch (error) {
+    // Malformed ObjectId ("not-a-real-id") throws a CastError, not a 404.
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid product ID",
+      });
+    }
     console.error("Get Product By ID Error:", error);
     return res.status(500).json({
       success: false,
-      message: "Invalid product ID or server error",
+      message: "Server error fetching product",
     });
   }
 };
@@ -140,7 +147,7 @@ const updateProduct = async (req, res) => {
     }
 
     product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     });
 
@@ -150,6 +157,9 @@ const updateProduct = async (req, res) => {
       product,
     });
   } catch (error) {
+    if (error.name === "CastError") {
+      return res.status(400).json({ success: false, message: "Invalid product ID" });
+    }
     console.error("Update Product Error:", error);
     return res.status(500).json({
       success: false,
@@ -180,6 +190,9 @@ const deleteProduct = async (req, res) => {
       message: "Product deleted successfully",
     });
   } catch (error) {
+    if (error.name === "CastError") {
+      return res.status(400).json({ success: false, message: "Invalid product ID" });
+    }
     console.error("Delete Product Error:", error);
     return res.status(500).json({
       success: false,

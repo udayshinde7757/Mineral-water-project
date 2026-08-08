@@ -17,6 +17,8 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const addressRoutes = require("./routes/addressRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const enquiryRoutes = require("./routes/enquiryRoutes");
+const galleryRoutes = require("./routes/galleryRoutes");
+const testimonialRoutes = require("./routes/testimonialRoutes");
 
 const adminRoutes = require("./routes/adminRoutes");
 const settingsRoutes = require("./routes/settingsRoutes");
@@ -58,6 +60,8 @@ app.use("/api/payment", paymentRoutes);
 app.use("/api/address", addressRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/enquiry", enquiryRoutes);
+app.use("/api/gallery", galleryRoutes);
+app.use("/api/testimonials", testimonialRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/settings", settingsRoutes);
 

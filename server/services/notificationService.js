@@ -4,7 +4,7 @@
  */
 
 const { sendOrderConfirmationEmail } = require("./emailService");
-const { sendOrderConfirmationSMS } = require("./smsService");
+const { sendOrderPlacedMessage } = require("./whatsappService");
 const sendEmail = require("../utils/sendEmail");
 
 /**
@@ -71,27 +71,6 @@ const getEstimatedDeliveryString = (order) => {
     month: "long",
     day: "numeric",
   });
-};
-
-/**
- * Compact single-line address (for WhatsApp template params)
- */
-const formatAddressCompact = (address) => {
-  return `${address.fullName}, ${address.addressLine1}${
-    address.addressLine2 ? ", " + address.addressLine2 : ""
-  }, ${address.city}, ${address.state} ${address.pincode}`;
-};
-
-/**
- * AquaPure support contact shown to customers
- */
-const getSupportContact = () => {
-  return (
-    process.env.WHATSAPP_SUPPORT_NUMBER ||
-    process.env.SUPPORT_PHONE ||
-    process.env.OWNER_PHONE ||
-    "919356212824"
-  );
 };
 
 /**
@@ -238,88 +217,6 @@ const sendCustomerEmail = async (order) => {
     return { success: true, messageId: info.messageId };
   } catch (error) {
     console.error("❌ Customer email failed:", error.message);
-    return { success: false, message: error.message };
-  }
-};
-
-/**
- * Send Customer WhatsApp Notification (Meta WhatsApp Business Cloud API)
- */
-const sendCustomerWhatsApp = async (order) => {
-  try {
-    const { WHATSAPP_TOKEN, WHATSAPP_PHONE_NUMBER_ID, WHATSAPP_TEMPLATE_NAME } = process.env;
-
-    if (!WHATSAPP_TOKEN || !WHATSAPP_PHONE_NUMBER_ID) {
-      console.warn("⚠️  WhatsApp credentials not configured. Skipping customer WhatsApp.");
-      return { success: false, message: "WhatsApp not configured" };
-    }
-
-    const orderId = order._id.toString().slice(-8).toUpperCase();
-    const productsText = generateProductsWhatsApp(order.products);
-    const estimatedDate = getEstimatedDeliveryString(order);
-    const supportContact = getSupportContact();
-
-    // Format phone number
-    let phoneNumber = order.shippingAddress.phone;
-    phoneNumber = phoneNumber.replace(/\D/g, "");
-    if (!phoneNumber.startsWith("91") && phoneNumber.length === 10) {
-      phoneNumber = "91" + phoneNumber;
-    }
-
-    // Use template or custom message
-    const templateName = WHATSAPP_TEMPLATE_NAME || "order_confirmation";
-
-    // Expected template placeholders (update your Meta template to match):
-    // {{1}} Customer name | {{2}} Order ID | {{3}} Products (name × qty — amount)
-    // {{4}} Total amount | {{5}} Delivery address | {{6}} Payment status
-    // {{7}} Estimated delivery | {{8}} AquaPure support contact
-    const templateParams = [
-      { type: "text", text: order.shippingAddress.fullName }, // {{1}} - Customer name
-      { type: "text", text: orderId }, // {{2}} - Order ID
-      { type: "text", text: productsText }, // {{3}} - Products (name × qty — amount)
-      { type: "text", text: formatCurrency(order.totalAmount) }, // {{4}} - Total amount
-      { type: "text", text: formatAddressCompact(order.shippingAddress) }, // {{5}} - Delivery address
-      { type: "text", text: order.paymentStatus }, // {{6}} - Payment status
-      { type: "text", text: estimatedDate }, // {{7}} - Estimated delivery
-      { type: "text", text: supportContact }, // {{8}} - AquaPure support contact
-    ];
-
-    const response = await fetch(
-      `https://graph.facebook.com/v19.0/${WHATSAPP_PHONE_NUMBER_ID}/messages`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${WHATSAPP_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          messaging_product: "whatsapp",
-          to: phoneNumber,
-          type: "template",
-          template: {
-            name: templateName,
-            language: { code: "en" },
-            components: [
-              {
-                type: "body",
-                parameters: templateParams,
-              },
-            ],
-          },
-        }),
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error?.message || "WhatsApp API error");
-    }
-
-    console.log("📱 Customer WhatsApp sent:", data.messages?.[0]?.id);
-    return { success: true, messageId: data.messages?.[0]?.id };
-  } catch (error) {
-    console.error("❌ Customer WhatsApp failed:", error.message);
     return { success: false, message: error.message };
   }
 };
@@ -489,9 +386,9 @@ const sendAdminEmail = async (order) => {
  */
 const sendAdminWhatsApp = async (order) => {
   try {
-    const { WHATSAPP_TOKEN, WHATSAPP_PHONE_NUMBER_ID, ADMIN_WHATSAPP_NUMBER, WHATSAPP_ADMIN_TEMPLATE } = process.env;
+    const { WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID, ADMIN_WHATSAPP_NUMBER, WHATSAPP_ADMIN_TEMPLATE } = process.env;
 
-    if (!WHATSAPP_TOKEN || !WHATSAPP_PHONE_NUMBER_ID || !ADMIN_WHATSAPP_NUMBER) {
+    if (!WHATSAPP_ACCESS_TOKEN || !WHATSAPP_PHONE_NUMBER_ID || !ADMIN_WHATSAPP_NUMBER) {
       console.warn("⚠️  Admin WhatsApp not fully configured. Skipping.");
       return { success: false, message: "Admin WhatsApp not configured" };
     }
@@ -537,7 +434,7 @@ const sendAdminWhatsApp = async (order) => {
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${WHATSAPP_TOKEN}`,
+          Authorization: `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -579,9 +476,8 @@ const sendAdminWhatsApp = async (order) => {
  * Channels run SEQUENTIALLY in the required order:
  *   1. Owner Email
  *   2. Customer Email
- *   3. Customer WhatsApp
+ *   3. Customer WhatsApp (WhatsApp Cloud API)
  *   4. Owner WhatsApp
- *   5. Customer SMS (existing channel, preserved)
  *
  * Every step is isolated — a failure in one channel is logged and the next
  * channel still runs. Notifications NEVER fail or roll back the order.
@@ -593,9 +489,8 @@ const sendAllOrderNotifications = async (order) => {
   const steps = [
     { name: "Owner Email", fn: () => sendAdminEmail(order) },
     { name: "Customer Email", fn: () => sendCustomerEmail(order) },
-    { name: "Customer WhatsApp", fn: () => sendCustomerWhatsApp(order) },
+    { name: "Customer WhatsApp", fn: () => sendOrderPlacedMessage(order) },
     { name: "Owner WhatsApp", fn: () => sendAdminWhatsApp(order) },
-    { name: "Customer SMS", fn: () => sendOrderConfirmationSMS(order) },
   ];
 
   const results = [];
@@ -655,9 +550,9 @@ const formatDateLong = (date) => {
  */
 const sendWhatsAppMessage = async ({ to, templateName, params, label = "WhatsApp" }) => {
   try {
-    const { WHATSAPP_TOKEN, WHATSAPP_PHONE_NUMBER_ID } = process.env;
+    const { WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID } = process.env;
 
-    if (!WHATSAPP_TOKEN || !WHATSAPP_PHONE_NUMBER_ID) {
+    if (!WHATSAPP_ACCESS_TOKEN || !WHATSAPP_PHONE_NUMBER_ID) {
       console.warn(`⚠️  WhatsApp credentials not configured. Skipping ${label}.`);
       return { success: false, message: "WhatsApp not configured" };
     }
@@ -678,7 +573,7 @@ const sendWhatsAppMessage = async ({ to, templateName, params, label = "WhatsApp
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${WHATSAPP_TOKEN}`,
+          Authorization: `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -1234,7 +1129,6 @@ const sendRefundCompletedNotifications = async (order) => {
 module.exports = {
   sendAllOrderNotifications,
   sendCustomerEmail,
-  sendCustomerWhatsApp,
   sendAdminEmail,
   sendAdminWhatsApp,
   sendAllCancellationNotifications,
