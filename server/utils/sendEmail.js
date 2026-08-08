@@ -29,6 +29,9 @@ function resolveSmtpConfig() {
       transporterOptions: {
         service: process.env.SMTP_SERVICE || "gmail",
         auth: { user, pass },
+        connectionTimeout: 5000,
+        socketTimeout: 8000,
+        greetingTimeout: 5000,
       },
     };
   }
@@ -40,6 +43,9 @@ function resolveSmtpConfig() {
       port,
       secure,
       auth: { user, pass },
+      connectionTimeout: 5000,
+      socketTimeout: 8000,
+      greetingTimeout: 5000,
     },
   };
 }
