@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom'
 import ScrollToTop from '@components/common/ScrollToTop'
 import Navbar from './Navbar'
 import Footer from './Footer'
+import AquaChat from '@components/AquaChat/AquaChat'
 
 function Layout() {
   return (
@@ -23,6 +24,9 @@ function Layout() {
       </main>
 
       <Footer />
+
+      {/* AquaChat — global AI customer-support assistant (all pages) */}
+      <AquaChat />
     </div>
   )
 }

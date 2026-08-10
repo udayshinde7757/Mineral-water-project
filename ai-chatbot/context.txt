@@ -1,0 +1,1067 @@
+================================================================================
+AQUAPURE — AQUACHAT KNOWLEDGE BASE
+================================================================================
+AquaChat is the AI customer-support assistant for the AquaPure website.
+This file is AquaChat's single source of truth. Answer customer questions ONLY
+from the verified facts below. Never invent information. When a fact is not
+listed here, use the standard fallback answer (see SECTION 21).
+
+Note on dates: several pages display "15 Years" and "100,000+ Happy Households".
+Product prices and settings below reflect the code as analyzed. The site's
+delivery/tax settings are stored in a database and are editable by an admin, so
+they may change over time.
+
+--------------------------------------------------------------------------------
+SECTION 1 — COMPANY OVERVIEW
+--------------------------------------------------------------------------------
+
+Company / Brand name:      AquaPure
+Legal / business name:     "AquaPure Mineral Water Ltd." (database default setting)
+Business type:             Mineral water company — producer and seller of natural
+                           mineral water products (e-commerce website).
+Tagline:                   "Pure from Source to Bottle"
+Brand positioning:         Premium natural mineral water, positioned around
+                           purity, health, eco-sustainability, and premium
+                           hydration.
+Founded:                   2011. The website describes a "15 years" journey
+                           (2011 → 2026), citing "15 Years of Certified Purity &
+                           Excellence".
+What AquaPure does:        Sourced, purified, bottled and home-delivered natural
+                           mineral water. Products range from 250ml pouches to
+                           20-litre dispenser jars, plus corporate/enterprise
+                           packages.
+Main services:             Online product sales with home delivery; bulk /
+                           corporate / enterprise supply; doorstep eco-deliveries
+                           and scheduled office refills for enterprise clients.
+Main products:             Personal bottles (250ml–2L), bulk containers (5L,
+                           20L jars, event party packs), and corporate bundles
+                           (enterprise supply bundle, smart dispenser + jar).
+Company description (from About page):
+    "Founded on the principle that clean hydration is the foundation of human
+    health, AquaPure has spent 15 years perfecting the balance between pristine
+    natural spring extraction and modern eco-friendly filtration technology."
+    "We believe that water should not just quench your thirst—it should
+    revitalize your body. That's why every drop of AquaPure undergoes stringent
+    quality checks to ensure essential minerals like Calcium, Magnesium, and
+    Potassium are preserved in their ideal ratios."
+Mission (from About page):
+    "To deliver crystal-clear, mineral-rich hydration that promotes overall
+    wellness while actively safeguarding our planet's water ecosystems through
+    zero-waste packaging and sustainable spring management."
+Vision (from About page):
+    "To become the most trusted, innovative, and eco-conscious mineral water
+    brand globally, setting the standard for pure hydration, tech-enabled supply
+    chains, and environmental stewardship."
+Key company facts:
+    - 15 years of operation (founded 2011).
+    - Serves 100,000+ happy households (stated on About + Home pages).
+    - Claims ISO certification, FSSAI approval, BIS standards, and WHO standards
+      compliance in various places on the site (see SECTION 5).
+    - Located in Nagpur, Maharashtra, India (customer-facing contact constant).
+Important quality statements:
+    - "100% Protected Aquifer Source"
+    - "Rigorous 7-Stage Purification" (About page; the Gallery page separately
+      describes an 8-stage micro-filtration process — see conflict note below).
+    - "Balanced Electrolytes & Minerals"
+    - "BPA-Free & Eco Packaging"
+    - "ISI certified, FSSAI approved. Every batch lab-tested for purity."
+      (product-details DeliveryInfo panel)
+    - "100% Naturally Sourced & Lab Certified" (About page stat card)
+
+--------------------------------------------------------------------------------
+SECTION 2 — BRAND & WEBSITE INFORMATION
+--------------------------------------------------------------------------------
+
+Brand identity:            AquaPure — premium natural mineral water. Website copy
+                           uses a "Pure Water, Perfect Life" message, a blue/teal
+                           "water" colour theme, and imagery of mountain springs,
+                           purification plants, and product ranges.
+Website purpose:           To let customers browse and buy AquaPure mineral water
+                           products, submit enquiries, manage an account, track
+                           orders, and learn about the company's quality process.
+                           The full storefront is behind a login (see SECTION 12).
+
+Main navigation (top navbar): Home, About, Products, Gallery, Contact.
+Footer navigation:         Home, About Us, Products, Gallery, Contact, Enquiry,
+                           plus Privacy Policy / Terms of Service / Refund Policy
+                           (opened as modals on the Footer).
+
+Available customer-facing pages and their routes:
+    - Home ............... "/" (hero, trust stats, features, best-selling products)
+    - About .............. "/about" (story, mission/vision, purification process,
+                            leadership team)
+    - Products ........... "/products" (full catalogue, search/filter/sort)
+    - Product Details .... "/products/:id" (single product, specs, delivery info,
+                            related products, Add to Cart / Buy Now)
+    - Gallery ............ "/gallery" (plant/process/product/delivery imagery,
+                            stats, purification process timeline)
+    - Contact ............ "/contact" (contact cards, business hours, team,
+                            social links, contact form, map)
+    - Enquiry ............ "/enquiry" (bulk/corporate enquiry form)
+    - Login .............. "/login"
+    - Signup ............. "/signup"
+    - Cart ............... "/cart"
+    - Checkout ........... "/checkout"
+    - Order Success ...... "/order-success"
+    - My Orders .......... "/my-orders" (order list, details, cancellation)
+    - Privacy Policy ..... "/privacy-policy"
+    - Terms of Service ... "/terms-of-service"
+    - Refund Policy ...... "/refund-policy"
+    - 404 / Not Found .... any unmatched route
+
+Important page purposes:
+    - Home: first impression; hero ("Pure Water, Perfect Life"), trust badges
+      (ISO Certified, BPA Free, Free Delivery), stats, "Why AquaPure" features,
+      and best-selling products with Shop Now / Learn More CTAs.
+    - Products: browse the full catalogue; filter by category (All / Personal /
+      Bulk / Corporate), search by name, sort (featured); each card has Add to
+      Cart and Buy Now.
+    - Product Details: full info on one product (specs table, description,
+      delivery highlights, related products), quantity selector, Add to Cart,
+      Buy Now, and an Enquiry shortcut for bulk requests.
+    - About: company story, 15-year timeline, mission/vision, 4-step purification
+      process, leadership team.
+    - Gallery: company manufacturing lifecycle, facility/process/product/
+      delivery photos, gallery stats, and a 6-step process timeline.
+    - Contact: company/phone/email cards, business hours, team member cards,
+      social links, and a contact form.
+    - Enquiry: bulk/enterprise enquiry submission, with a product dropdown and
+      pre-fill via ?productId= in the URL.
+
+Main calls-to-action:      "Shop Now", "Learn More", "Explore Our Water Products",
+                           "Add to Cart", "Buy Now", "Submit Enquiry",
+                           "WhatsApp Us", "Place Order", "Proceed to Pay".
+Website features:          Account system (login/signup), shopping cart, Buy Now,
+                           online payment (Razorpay) and Cash on Delivery,
+                           order tracking (My Orders), order cancellation with
+                           refunds, contact form, bulk enquiry form, gallery with
+                           lightbox, admin panel (separate, not customer-facing).
+
+--------------------------------------------------------------------------------
+SECTION 3 — COMPLETE PRODUCT CATALOG
+--------------------------------------------------------------------------------
+Source: server/config/seedData.js — the initial product catalogue that is
+auto-seeded into the database on first run. Prices are in Indian Rupees (₹).
+
+NOTE ON STOCK: The "stock" values below are the seeded quantities. Live stock is
+held in the database and changes as orders are placed, so treat these as
+initial/illustrative values.
+
+PRODUCT 1
+Product Name:             AquaPure Personal Bottle
+Category:                 Personal
+Size / Capacity:          500ml
+Price:                    ₹20
+Description:               "Compact, easy-to-carry natural mineral water bottle.
+                           Perfect for gym, travel, and daily hydration on the go."
+Rating:                   4.9 / 5
+Stock (seed):             120 units
+Featured:                 Yes
+Image:                    /images/easytocarrygymtravell.png
+Purchase availability:    Yes — available in the store, add to cart / buy now.
+
+PRODUCT 2
+Product Name:             AquaPure Water pouch
+Category:                 Personal
+Size / Capacity:          250ml
+Price:                    ₹8
+Description:               "Compact, easy-to-carry natural mineral water pouch.
+                           Perfect for gym, travel, and daily hydration on the go."
+Rating:                   4.5 / 5
+Stock (seed):             100 units
+Featured:                 Yes
+Image:                    /images/pani_pouch_bottle.png
+Purchase availability:    Yes.
+
+PRODUCT 3
+Product Name:             AquaPure Premium Everyday Bottle
+Category:                 Personal
+Size / Capacity:          1 Liter
+Price:                    ₹40
+Description:               "Our signature 1 Liter mineral water bottle enriched
+                           with essential minerals like Calcium, Magnesium, and
+                           Potassium."
+Rating:                   5.0 / 5
+Stock (seed):             150 units
+Featured:                 Yes
+Image:                    /images/1ltr.png
+Purchase availability:    Yes.
+
+PRODUCT 4
+Product Name:             AquaPure Family Pack Bottle
+Category:                 Personal
+Size / Capacity:          2 Liter
+Price:                    ₹70
+Description:               "Convenient 2 Liter bottle designed for family dining
+                           tables, weekend road trips, and outdoor picnics."
+Rating:                   4.7 / 5
+Stock (seed):             80 units
+Featured:                 No
+Image:                    /images/2ltr.png
+Purchase availability:    Yes.
+
+PRODUCT 5
+Product Name:             AquaPure Eco Handle Water Can
+Category:                 Bulk
+Size / Capacity:          5 Liter
+Price:                    ₹150
+Description:               "Medium-volume 5 Liter eco-friendly container equipped
+                           with an ergonomic pouring handle for kitchen use."
+Rating:                   4.8 / 5
+Stock (seed):             60 units
+Featured:                 No
+Image:                    /images/5ltr.png
+Purchase availability:    Yes.
+
+PRODUCT 6
+Product Name:             AquaPure Heavy-Duty Dispenser Jar
+Category:                 Bulk
+Size / Capacity:          20 Liter Jar
+Price:                    ₹250
+Description:               "The gold standard 20 Liter dispenser jar for home and
+                           office water coolers. Multi-stage purified & sanitized."
+Rating:                   4.9 / 5
+Stock (seed):             100 units
+Featured:                 Yes
+Image:                    /images/20ltrjar.png
+Purchase availability:    Yes.
+
+PRODUCT 7
+Product Name:             AquaPure Mini Event Party Pack (Box of 24)
+Category:                 Bulk
+Size / Capacity:          24 × 250ml
+Price:                    ₹360
+Description:               "Bulk carton containing 24 mini 250ml mineral water
+                           bottles. Ideal for corporate meetings, weddings, and
+                           events."
+Rating:                   4.8 / 5
+Stock (seed):             40 units
+Featured:                 No
+Image:                    /images/minibottlesof250ml.png
+Purchase availability:    Yes.
+
+PRODUCT 8
+Product Name:             AquaPure Enterprise Supply Bundle
+Category:                 Corporate
+Size / Capacity:          10 × 20L Jars
+Price:                    ₹2200
+Description:               "Monthly subscription corporate package including 10
+                           units of 20L jars with free scheduled office refills."
+Rating:                   5.0 / 5
+Stock (seed):             25 units
+Featured:                 Yes
+Image:                    /images/20ltr10unitsjar.png
+Purchase availability:    Yes. Described as a "monthly subscription corporate
+                           package" with "free scheduled office refills".
+
+PRODUCT 9
+Product Name:             AquaPure Smart Dispenser Cooler Stand + 20L Jar
+Category:                 Corporate
+Size / Capacity:          Dispenser + 20L
+Price:                    ₹1499
+Description:               "Premium countertop dispenser tap stand bundled with 1
+                           initial 20 Liter mineral water jar."
+Rating:                   4.9 / 5
+Stock (seed):             30 units
+Featured:                 No
+Image:                    /images/premium20ltrjar.png
+Purchase availability:    Yes.
+
+SPECIFICATIONS TABLE (shown on every product details page):
+    Brand .................. AquaPure
+    Water Type ............. Natural Mineral Water
+    Package ................ <product category> (e.g., Premium Bottle)
+    Capacity ............... <product size>
+    Country of Origin ...... India
+    SKU .................... Derived from product ID (last 8 characters)
+
+OTHER CATALOGUE FACTS:
+    - Product schema also supports optional fields (originalPrice,
+      discountPercent, isOffer, offerText, isVisible, multiple images), but none
+      of the 9 seeded products set discount/offer values, so no discounts or
+      offers are currently listed on the website.
+    - All 9 seeded products are shown on the Products page; the Home page shows
+      the first 4 returned by the API as "best sellers".
+
+--------------------------------------------------------------------------------
+SECTION 4 — PRODUCT CATEGORIES
+--------------------------------------------------------------------------------
+
+Categories on the site:   Personal, Bulk, Corporate  ("All" is the Products-page
+                           filter default and is not a real category).
+Backend enum:              ["Personal", "Bulk", "Corporate"] (Product model).
+
+1. PERSONAL
+    - Purpose/use: individual & everyday hydration.
+    - Products: AquaPure Personal Bottle (500ml, ₹20), AquaPure Water pouch
+      (250ml, ₹8), AquaPure Premium Everyday Bottle (1L, ₹40), AquaPure Family
+      Pack Bottle (2L, ₹70).
+
+2. BULK
+    - Purpose/use: medium-to-high volume home/kitchen/office use and events.
+    - Products: AquaPure Eco Handle Water Can (5L, ₹150), AquaPure Heavy-Duty
+      Dispenser Jar (20L, ₹250), AquaPure Mini Event Party Pack (Box of 24,
+      ₹360).
+
+3. CORPORATE
+    - Purpose/use: enterprise / office supply.
+    - Products: AquaPure Enterprise Supply Bundle (10 × 20L, ₹2200), AquaPure
+      Smart Dispenser Cooler Stand + 20L Jar (₹1499).
+
+--------------------------------------------------------------------------------
+SECTION 5 — WATER QUALITY & PURIFICATION
+--------------------------------------------------------------------------------
+Only customer-facing statements found on the website are listed. These are
+marketing claims from the site copy; AquaChat should present them as such and
+must not add scientific claims of its own.
+
+Water source:
+    - "Sourced from protected underground springs / natural mountain springs /
+      protected natural mountain aquifers" (multiple pages).
+    - "Deep Source Extraction — Protected Underground Aquifers: Extracted directly
+      from natural, underground aquifers sheltered beneath layers of protective
+      rock formations" (About page).
+    - "100% Protected Aquifer Source" (About page bullet).
+
+Filtration / purification process (About page — "Our 4-Step Water Purification
+Process"):
+    Step 1 — Deep Source Extraction: from protected underground aquifers.
+    Step 2 — Multi-Stage Filtration: dual sand filters, carbon beds, and
+             sub-micron membranes; removes suspended sediment, organic
+             compounds, and micro-impurities.
+    Step 3 — Essential Mineral Infusion: re-balanced with essential minerals —
+             Calcium, Magnesium, and Potassium.
+    Step 4 — UV Sterilization & Quality Control: double UV radiation
+             disinfection and continuous automated lab testing before sealing.
+
+Purification claims elsewhere:
+    - About page milestone (2016): "advanced 7-stage filtration and UV
+      sterilization while keeping natural electrolytes 100% intact".
+    - Gallery process timeline: "8-Stage Micro-Filtration — reverse osmosis,
+      activated carbon, and multi-tier micron filtration eliminate all
+      impurities" and "continuous chemical and microbiological testing ensures
+      optimal pH and essential mineral balance".
+    - Gallery image: "Multi-Stage Reverse Osmosis Unit — Advanced 8-stage
+      filtration system removing micro-particles while preserving
+      health-essential minerals."
+    (NOTE: the site uses both "7-stage" and "8-stage" wording in different
+    places. AquaChat may mention that AquaPure uses multi-stage filtration.)
+
+Quality testing / hygiene:
+    - "Every batch undergoes rigorous lab testing and quality certification"
+      (Home feature).
+    - "Microbiological Laboratory Testing — daily lab surveillance verifying pH
+      levels, mineral concentration, and zero-microbe standards" (Gallery).
+    - "Sterile Bottling — filled in touchless ultra-clean ISO cleanrooms under
+      positive air pressure and UV sterilization" (Gallery).
+    - "High-pressure ozone washing and automated robotic container handling
+      prior to water filling" (Gallery).
+    - "Tamper Packaging — automated labeling and shrink-wrapped security seals
+      guarantee 100% untampered delivery" (Gallery).
+
+Certifications / standards (stated on the site; exact certificates are not
+independently verified on the website):
+    - "ISO Certified" (Home hero trust badge); gallery image titled "ISO
+      9001:2015 & BIS Certification".
+    - "ISI certified, FSSAI approved. Every batch lab-tested for purity."
+      (Product-details DeliveryInfo panel).
+    - Gallery stats: "100% Quality Tested — WHO & BIS Certified Standards".
+    - "100% Quality Certified" (Home stats).
+
+--------------------------------------------------------------------------------
+SECTION 6 — BOTTLING & PRODUCTION
+--------------------------------------------------------------------------------
+Production / bottling process (from Gallery "Company Manufacturing Lifecycle",
+a 6-step timeline):
+    1. Water Source — protected natural spring (deep underground mineral
+       aquifers fed by mountain spring reservoirs).
+    2. Purification — 8-stage micro-filtration (reverse osmosis, activated
+       carbon, multi-tier micron filtration).
+    3. Quality Testing — continuous chemical and microbiological testing;
+       optimal pH and essential mineral balance.
+    4. Sterile Bottling — automated filling line in touchless ultra-clean ISO
+       cleanrooms under positive air pressure and UV sterilization.
+    5. Tamper Packaging — automated labeling and shrink-wrapped security seals.
+    6. Express Delivery — temperature-regulated logistics vehicles to homes and
+       offices.
+
+Plant / facility:
+    - "Automated High-Speed Bottling Line — German-engineered touchless bottling
+      line operating in sterile cleanroom conditions" (Gallery).
+    - "AquaPure Corporate Headquarters — modern administrative hub coordinating
+      manufacturing logistics, client support, and quality audits" (Gallery).
+
+Production statistics (from Gallery stats):
+    - 50+ Dedicated Staff (Engineers, Quality Analysts & Operations).
+    - 10,000+ Bottles Per Day (Continuous Automated Production).
+    - 100% Quality Tested (WHO & BIS Certified Standards).
+    - 24/7 Active Supply (Uninterrupted Doorstep Delivery).
+
+Packaging:
+    - "100% recyclable glass and BPA-free smart hydration containers" (About
+      2021 milestone).
+    - "BPA-Free & Eco Packaging" (About bullet).
+    - Product packaging varies: PET bottles (1L, 2L), pouches (250ml), 5L
+      countertop jar, 20L jars (reusable, BPA-free), 250ml mini bottles (event
+      packs).
+
+Production capacity / other statistics:
+    - 100,000+ Happy Households (About/Home stats).
+    - 15 Years of Pure Excellence (Home stats).
+    - 5 States Delivery Coverage (Home stats).
+    - COMPANY_STATS constant also lists: 15+ Years of Purity, 50,000+ Happy
+      Customers, 12 Product Variants, 100+ Cities Served (used on some pages).
+
+--------------------------------------------------------------------------------
+SECTION 7 — DELIVERY INFORMATION
+--------------------------------------------------------------------------------
+
+Delivery policy is configured in the database (Site Settings) and used for
+order calculations. Defaults from the code:
+    - Delivery charge ........ ₹50 (applied when the order subtotal is below the
+                              free-delivery threshold).
+    - Free-delivery threshold . ₹500 (orders subtotal ≥ ₹500 ship free).
+    - Minimum order amount ... ₹100.
+    - Tax (GST) percentage ... 0% by default.
+
+How it appears to customers:
+    - Product-details panel (DeliveryInfo) states: "Free delivery on orders
+      above ₹499. Delivered within 2-3 business days."  (NOTE: the panel text
+      says ₹499 / 2-3 business days, while the database default uses ₹500 and
+      email notifications default to "3-5 business days". See SECTION 23 for
+      this conflict.)
+    - Cart and Checkout show "Delivery Charges" and "GST" lines. Delivery is
+      FREE when subtotal is 0 or ≥ free-delivery threshold; otherwise ₹50 is
+      charged.
+    - Order-success page shows "Delivery Charges" (FREE when 0).
+    - Estimated delivery: order emails fall back to "3-5 business days" unless
+      an estimated delivery date is set on the order.
+    - Footer Terms of Service modal: "Free delivery is available within our
+      service area (Nagpur and surrounding regions). Delivery times are
+      estimates and not guarantees."
+    - Home page claims "5 States Delivery Coverage".
+
+Delivery area:
+    - Explicitly stated service area: Nagpur and surrounding regions (Terms of
+      Service modal in footer).
+    - Home/Company stats additionally claim 5 states and 100+ cities — these are
+      marketing figures; the Terms of Service text is the more specific
+      customer-facing statement.
+    - Country field defaults to "India" on checkout.
+
+Delivery tracking:
+    - Order status is tracked in My Orders (see SECTION 13). Order-success page
+      shows an "Estimated Delivery Progress" timeline based on current status.
+
+Not specified on the website:
+    - Exact per-location delivery fees outside the default ₹50/₹500 rule.
+    - Cutoff times for placing same-day orders.
+    - Whether delivery is available outside Nagpur/Maharashtra (beyond the
+      generic "5 states" claim).
+
+--------------------------------------------------------------------------------
+SECTION 8 — ORDERING PROCESS
+--------------------------------------------------------------------------------
+Steps that actually exist on the website:
+
+1. Browse products — Products page ("/products"); search, filter by category,
+   sort. Optionally open a product's details page.
+2. Select product & quantity — On the product details page, choose quantity.
+3. Add to cart OR Buy Now —
+       • "Add to Cart" adds the item to the customer's cart (cart is stored on
+         the server per user account).
+       • "Buy Now" takes the customer straight to checkout for just that product
+         (a separate flow that does not clear the cart).
+4. Review cart — Cart page ("/cart") shows items, quantities, subtotal, delivery
+   charge and GST; customer can change quantities or remove items.
+5. Proceed to checkout — Cart page → "Proceed to Checkout" (or Buy Now). Requires
+   being logged in; guests are redirected to login first.
+6. Enter delivery address — full name, email, phone, address line 1 (required),
+   address line 2 (optional), city, state, pincode, country (default India).
+7. Select payment method — Cash on Delivery (COD) or Online (Razorpay:
+   UPI / Card / NetBanking).
+8. Complete payment —
+       • COD: place order directly.
+       • Online: opens Razorpay checkout; after payment, the payment signature
+         is verified by the backend before the order is confirmed.
+9. Order confirmation — Order-success page ("/order-success") shows the order ID,
+   payment summary, delivery address, and delivery progress. Confirmation email
+   and WhatsApp notifications are sent.
+10. Track order — My Orders page ("/my-orders") shows order status and lets the
+    customer cancel while the order is cancellable (see SECTION 13).
+
+--------------------------------------------------------------------------------
+SECTION 9 — CART
+--------------------------------------------------------------------------------
+
+Behavior:
+    - The cart is server-side and tied to the logged-in user's account (cart
+      lives in the User document).
+    - Only logged-in customers can have a cart. When not logged in, the cart is
+      empty; adding to cart / checkout redirects to login.
+    - Cart items are fetched automatically when the user logs in.
+
+Add to cart:
+    - From product cards (Products page / Home best-sellers) and the product
+      details page. Adding shows a "Cart Updated" toast.
+
+Quantity:
+    - Quantity can be increased/decreased on the Cart page. Minimum quantity is
+      1 (cannot go below 1).
+
+Remove:
+    - Items can be removed individually with the trash icon.
+
+Totals shown on the Cart page:
+    - Subtotal (sum of item prices × quantities).
+    - Delivery Charges — FREE if subtotal is 0 or ≥ free-delivery threshold
+      (default ₹500); otherwise ₹50.
+    - GST — computed as subtotal × tax percentage (default 0%, so normally
+      absent/₹0).
+    - Final total = subtotal + delivery + GST.
+
+Checkout transition:
+    - "Proceed to Checkout" navigates to "/checkout". If items remain in the
+      cart after an order is placed (CART flow), the cart is cleared on the
+      backend.
+
+Persistence:
+    - Cart is persisted in the database per user, so it survives page reloads and
+      is available across devices once logged in.
+
+--------------------------------------------------------------------------------
+SECTION 10 — CHECKOUT
+--------------------------------------------------------------------------------
+
+Mode:
+    - Two checkout modes, strictly separated: CART (from the cart) and BUY_NOW
+      (single product from a "Buy Now" button). Buy Now checkout only ever
+      contains the chosen product and never touches the cart.
+
+Required customer information:
+    - Shipping address: fullName, email, phone (10-digit validation), addressLine1,
+      addressLine2 (optional), city, state, pincode (validated), country
+      (defaults to India).
+    - The logged-in user's name/email/phone are pre-filled; a saved address can
+      be loaded if the user previously saved one.
+
+Order summary shown:
+    - Items, Subtotal, Delivery Charges, GST (if any), Total Amount.
+
+Payment options:
+    - Cash on Delivery (COD).
+    - Online — Razorpay ("UPI / Card / NetBanking", "Razorpay 256-bit encrypted
+      checkout (GPay, PhonePe, Cards)").
+
+Pricing / taxes:
+    - Subtotal from product prices.
+    - Delivery charge: ₹50 unless subtotal ≥ ₹500 (then FREE).
+    - GST: based on configured tax percentage (default 0%).
+    - Total = subtotal + delivery + GST.
+
+Confirmation:
+    - COD: order created immediately via POST /api/orders, then success page.
+    - Online: order is only created after Razorpay payment is verified by the
+      backend (POST /api/payment/verify).
+
+Buy Now specifics:
+    - "Buy Now" from a product card/details carries that single product into
+      checkout and purchases only that product without affecting the cart.
+
+--------------------------------------------------------------------------------
+SECTION 11 — PAYMENT
+--------------------------------------------------------------------------------
+
+Payment gateway:          Razorpay (online). Cash on Delivery also supported.
+Payment methods offered:  COD (Cash on Delivery) and Online (Razorpay — UPI,
+                          Cards, NetBanking; the checkout copy names GPay and
+                          PhonePe as examples).
+Online checkout flow:
+    1. Customer confirms the order summary and picks "UPI / Card / NetBanking".
+    2. Frontend loads the Razorpay checkout SDK.
+    3. Backend creates a Razorpay order after verifying products and stock
+       server-side (POST /api/payment/create-order).
+    4. Razorpay payment modal opens for the exact order amount (INR).
+    5. On success, the frontend sends the Razorpay order/payment/signature to
+       the backend, which verifies the signature (POST /api/payment/verify)
+       before the order is marked Paid and created.
+    6. Order confirmation page + email/WhatsApp notifications follow.
+Payment statuses on orders: Pending, Paid, Failed, Refunded.
+Failed/declined payment behavior: the checkout shows an error message (e.g.,
+"Payment failed") and the customer can retry or switch to COD. Payment method
+options include a fallback message telling the customer they may choose Cash on
+Delivery if the gateway fails to load.
+Refunds:
+    - Online payments (Razorpay) can be refunded when an order is cancelled —
+      refunds are processed back to the original payment method.
+    - Refund Policy page: Razorpay refunds within 5–10 business days after
+      approval; you receive an email when the refund is initiated.
+    - Footer Refund Policy modal: online refunds within 5–7 business days; COD
+      refunds by bank transfer within 3–5 business days.
+    - Exchange is offered as an alternative to refunds in eligible cases.
+Security copy:           "100% secure checkout with encrypted payment gateway";
+                         "Razorpay 256-bit encrypted checkout".
+Credentials:             NOT included here (Razorpay key/secret and all other
+                         secrets live in server environment variables — see
+                         SECTION 23 for what was deliberately excluded).
+
+--------------------------------------------------------------------------------
+SECTION 12 — CUSTOMER ACCOUNT
+--------------------------------------------------------------------------------
+
+Signup:
+    - Route "/signup". Fields: full name, email, password, confirm password.
+    - Password must be at least 6 characters. Passwords must match.
+    - New accounts are created with role "user". Success → logged in.
+Login:
+    - Route "/login". Email + password. Valid email format required.
+    - On success a JWT token is stored (7-day expiry) and the user is redirected
+      (default: Home; otherwise to the page they were trying to visit).
+Authentication:
+    - JWT-based, token kept in localStorage.
+    - The entire storefront (Home, About, Products, Gallery, Contact, Cart,
+      Checkout, My Orders, Enquiry, Product Details) is behind a login wall
+      (ProtectedRoute) — users must be logged in to browse.
+    - Login/Signup pages redirect already-authenticated users to Home.
+User profile:
+    - Profile data: full name, email, phone, saved shipping address, role.
+    - Account functionality is minimal on the customer side: there is no
+      dedicated "profile settings" page in the public storefront. Address is
+      entered/saved during checkout.
+My Orders:
+    - Route "/my-orders". Lists the logged-in user's orders with status, dates,
+      items, and a detail view; supports order cancellation (see SECTION 13).
+Logout:
+    - Available from the navbar dropdown. Clears the session token.
+Admin accounts:
+    - Admins (role "admin") have a separate panel at "/admin/*". Admins are
+      created via a seed script; customers cannot self-register as admins.
+    - The admin area is not customer-facing and should not be described in
+      detail to customers.
+
+--------------------------------------------------------------------------------
+SECTION 13 — ORDER MANAGEMENT
+--------------------------------------------------------------------------------
+
+Order creation:
+    - Orders require a logged-in user, products, a shipping address, and a
+      payment method.
+    - Order types: "CART" (clears the cart) or "BUY_NOW" (purchases only the
+      selected product; does not clear the cart).
+Order ID:
+    - MongoDB ObjectId of the order. Displayed on the order-success page and in
+      emails (shortened to last 6 characters, e.g. "Order #ABC123").
+Order statuses (full lifecycle):
+    Placed → Pending → Confirmed → Processing → Packed → Shipped →
+    Out For Delivery → Delivered → Completed   (plus Cancelled)
+Payment statuses:           Pending, Paid, Failed, Refunded.
+Status history:             each transition is recorded with a timestamp.
+Tracking:
+    - Customers view order status and history on the My Orders page.
+    - Order-success page shows an "Estimated Delivery Progress" timeline derived
+      from the current status.
+Cancellation:
+    - A customer may cancel an order only while its status is one of:
+      Placed, Pending, Confirmed, Processing.
+    - Cancellation is done from My Orders (a reason can be provided).
+    - When cancelled: the order status becomes "Cancelled" and product stock is
+      restored.
+Refunds on cancellation:
+    - Online (non-COD) paid orders are refunded automatically via Razorpay
+      (back to the original payment method). Refund status is tracked on the
+      order (e.g., Completed / Failed).
+    - If a refund fails, it can be retried from the admin panel.
+    - COD orders are not refunded through the gateway (no money was captured
+      online); the site's refund policy describes bank-transfer refunds.
+Notifications:
+    - Customers receive email and WhatsApp notifications for order events
+      (order placed, status updates, out for delivery, completed).
+    - Email notifications default to "3-5 business days" estimated delivery
+      unless an explicit date is set.
+NOT FOR CUSTOMERS (internal only — do not reveal in chat):
+    - Admin order-management endpoints, refund retry endpoints, and internal
+      refund-service implementation details.
+
+--------------------------------------------------------------------------------
+SECTION 14 — CONTACT INFORMATION
+--------------------------------------------------------------------------------
+(Exact values from the website's contact constants.)
+
+Company:                  AquaPure
+Phones:                   +91 9356212824  (also used for WhatsApp:
+                          https://wa.me/919356212824)
+                          +91 7757841157
+Emails:                   shreyaslande200@gmail.com
+                          udayshinde7757@gmail.com
+Address:                  Nagpur, Maharashtra, India
+                          (Privacy Policy footer also lists: "AquaPure,
+                          Government Polytechnic Nagpur, Nagpur, Maharashtra")
+Business hours:           Monday – Saturday: 8:00 AM – 8:00 PM
+                          Sunday: 9:00 AM – 2:00 PM
+Support channels:         Contact page form (name, email, phone, subject,
+                          message); WhatsApp; email; phone.
+Social media links:
+    Instagram  https://www.instagram.com/shreyaslande_/?hl=en
+    Facebook   https://www.facebook.com/sopan.lande.1297
+    LinkedIn   https://www.linkedin.com/in/shreyas-lande-94b973344/
+    WhatsApp   https://wa.me/919356212824  (pre-filled "I would like to know
+               more about your mineral water products")
+Map:                      The Contact page embeds a Google Map for the Nagpur
+                          business location.
+Leadership / team (from Contact page):
+    - Shreyas Lande — Co-Founder & IT-Team Lead — +91 9356212824 —
+      shreyaslande200@gmail.com
+    - Uday Shinde — Founder & CEO — +91 7757841157 —
+      udayshinde7757@gmail.com
+(About page lists the same people: Uday Shinde — Founder & CEO; Shreyas Lande —
+Co-Founder & IT Lead.)
+
+--------------------------------------------------------------------------------
+SECTION 15 — ENQUIRY SYSTEM
+--------------------------------------------------------------------------------
+
+Purpose:
+    - Submit a bulk / corporate / enterprise enquiry (the page title is
+      "Submit Bulk Enquiry — AquaPure Mineral Water"). Used for corporate
+      meetings, events, office supply, bulk quantities, etc.
+Fields:
+    - Full name (required)
+    - Email (required)
+    - Phone (required)
+    - Product (optional dropdown of catalogue products; can be pre-selected via
+      ?productId= in the URL, e.g., from a product details page)
+    - Quantity (default 1, minimum 1)
+    - Message (required)
+Submission process:
+    - Form is validated client-side and submitted to POST /api/enquiries.
+    - Enquiries are saved with status "pending". An email is sent (confirmation
+      to the customer and/or notification to AquaPure).
+What customers can enquire about:
+    - Bulk orders, corporate/enterprise supply, event packs, and general product
+      enquiries.
+Expected response:
+    - The website does not publish a guaranteed response time. Enquiry status is
+      tracked by AquaPure as pending/completed.
+
+--------------------------------------------------------------------------------
+SECTION 16 — ABOUT AQUAPURE
+--------------------------------------------------------------------------------
+(Summary of the About page facts.)
+
+Hero:                     "Pure Water, Pure Life." with "15 Years of Certified
+                          Purity & Excellence".
+Subheading:               "15 years of unwavering commitment to health,
+                          eco-sustainability, and unmatched premium hydration
+                          for every family."
+Who we are:
+    - Founded on the principle that clean hydration is the foundation of human
+      health; 15 years balancing natural spring extraction with modern
+      eco-friendly filtration.
+    - Every drop undergoes stringent quality checks to preserve essential
+      minerals (Calcium, Magnesium, Potassium) in ideal ratios.
+    - Key attributes: 100% Protected Aquifer Source, Rigorous 7-Stage
+      Purification, Balanced Electrolytes & Minerals, BPA-Free & Eco Packaging.
+    - 100% Naturally Sourced & Lab Certified (stat card).
+15-year journey (milestones):
+    - 2011 — Foundation & Spring Sourcing: sourcing pristine mineral water from
+      protected natural mountain aquifers.
+    - 2016 — Multi-Stage Purification Tech: advanced 7-stage filtration and UV
+      sterilization keeping natural electrolytes 100% intact.
+    - 2021 — 100,000+ Happy Households: doorstep eco-deliveries, 100% recyclable
+      glass and BPA-free smart hydration containers.
+    - 2026 — Sustainable Hydration Leadership: celebrating 15 years with
+      carbon-neutral logistics, digital smart delivery, and global purity
+      standards.
+Mission:                  "To deliver crystal-clear, mineral-rich hydration that
+                          promotes overall wellness while actively safeguarding
+                          our planet's water ecosystems through zero-waste
+                          packaging and sustainable spring management."
+Vision:                   "To become the most trusted, innovative, and
+                          eco-conscious mineral water brand globally, setting the
+                          standard for pure hydration, tech-enabled supply
+                          chains, and environmental stewardship."
+Purification process (4 steps): Deep Source Extraction → Multi-Stage Filtration
+                          → Essential Mineral Infusion → UV Sterilization &
+                          Quality Control (details in SECTION 5).
+Leadership team:
+    - Uday Shinde — Founder & CEO — "Visionary entrepreneur with over a decade
+      of leadership in sustainable water management and brand strategy."
+    - Shreyas Lande — Co-Founder & IT Lead — "Technology pioneer leading
+      AquaPure's digital transformation, e-commerce platform, and smart supply
+      chain systems."
+
+--------------------------------------------------------------------------------
+SECTION 17 — GALLERY
+--------------------------------------------------------------------------------
+
+Gallery purpose:          Showcase AquaPure's water source, purification process,
+                          bottling plant, products, delivery, and certifications.
+                          The page is titled "Gallery & Purification Process".
+Categories (filter):      Plant, Process, Products, Delivery (plus "All").
+Gallery stats (displayed):
+    - 50+ Dedicated Staff (Engineers, Quality Analysts & Operations)
+    - 10,000+ Bottles Per Day (Continuous Automated Production)
+    - 100% Quality Tested (WHO & BIS Certified Standards)
+    - 24/7 Active Supply (Uninterrupted Doorstep Delivery)
+Manufacturing lifecycle (6-step Process Timeline):
+    Water Source → Purification → Quality Testing → Sterile Bottling →
+    Tamper Packaging → Express Delivery  (details in SECTION 6).
+Featured imagery (21 images total, with titles/captions):
+    - Plant: Natural Mountain Spring Reservoir; Automated High-Speed Bottling
+      Line (German-engineered, sterile cleanroom); Corporate Headquarters;
+      Operational Leadership (Uday Shinde); Plant Engineering Director
+      (Shreyas Lande).
+    - Process: Multi-Stage Reverse Osmosis Unit (8-stage filtration);
+      Microbiological Laboratory Testing; Sterile Bottle Ozone Rinsing &
+      Handling; ISO 9001:2015 & BIS Certification.
+    - Products: Complete Product Showcase (250ml to 20L); 20L Heavy-Duty
+      Dispenser Jars Fleet; Premium 20L Smart Dispenser Container; Standard 20L
+      Container; 1L Daily Hydration Bottle; 2L Family Pack; 5L Countertop Jar;
+      250ml Mini Event & Executive Pack; Ergonomic Sports & Travel Gym Bottle;
+      Hygienic Sealed Pouch.
+    - Delivery: Temperature-Controlled Delivery Vehicles; Certified Logistics &
+      Dispatch Crew.
+Interaction:              Images can be filtered by category and opened in a
+                          lightbox (with next/previous navigation).
+
+--------------------------------------------------------------------------------
+SECTION 18 — FAQ / COMMON CUSTOMER QUESTIONS
+--------------------------------------------------------------------------------
+There is NO dedicated FAQ section on the website. Below are common customer
+questions with answers that ARE supported by the website facts in this file.
+
+Q: What products does AquaPure sell?
+A: Natural mineral water products: personal bottles (250ml, 500ml, 1L, 2L),
+   bulk containers (5L can, 20L jar, 24×250ml event pack), and corporate
+   bundles (enterprise supply bundle, smart dispenser + 20L jar). See the
+   Products page.
+
+Q: What bottle sizes are available?
+A: 250ml (pouch and mini bottles), 500ml, 1 Litre, 2 Litre, 5 Litre, 20 Litre
+   jar, 24×250ml party pack, 10×20L corporate bundle, and a dispenser + 20L jar
+   combo.
+
+Q: How much do AquaPure products cost?
+A: Prices range from ₹8 (250ml pouch) to ₹2200 (enterprise supply bundle).
+   Examples: 500ml bottle ₹20, 1L bottle ₹40, 2L bottle ₹70, 5L can ₹150, 20L
+   jar ₹250, 24×250ml pack ₹360, smart dispenser + 20L jar ₹1499. See the
+   product catalogue in this file for the full list.
+
+Q: How can I place an order?
+A: Log in, browse the Products page, choose a product and quantity, then either
+   Add to Cart (then Checkout from the cart) or Buy Now, enter your delivery
+   address, choose Cash on Delivery or Online payment (Razorpay), and complete
+   the order. See SECTION 8.
+
+Q: Do I need an account to order?
+A: Yes. The storefront requires login; guests are taken to the login/signup
+   pages before they can browse or check out.
+
+Q: How can I contact AquaPure?
+A: Phone +91 9356212824 or +91 7757841157, email shreyaslande200@gmail.com or
+   udayshinde7757@gmail.com, the Contact page form, or WhatsApp
+   (+91 9356212824). See SECTION 14.
+
+Q: How can I track my order?
+A: Go to the My Orders page ("/my-orders"). You'll see each order's status and
+   details. Confirmation and status updates are also sent by email and WhatsApp.
+
+Q: What payment methods are available?
+A: Cash on Delivery (COD) and online via Razorpay (UPI, Cards, NetBanking —
+   e.g., GPay, PhonePe).
+
+Q: Can I cancel my order?
+A: Yes, from My Orders — but only while the order is in Placed, Pending,
+   Confirmed, or Processing status.
+
+Q: How does refund work?
+A: For online (Razorpay) paid orders, cancellation triggers a refund to the
+   original payment method. The Refund Policy states Razorpay refunds are
+   processed within 5–10 business days (the footer modal says 5–7 business
+   days) and COD refunds via bank transfer within 3–5 business days. Returns/
+   exchanges for damaged or wrong products are described in the Refund Policy.
+
+Q: Where does AquaPure deliver?
+A: The Terms of Service state free delivery within AquaPure's service area
+   (Nagpur and surrounding regions). The Home page also claims 5 states of
+   delivery coverage.
+
+Q: How much is delivery?
+A: Free on orders above ₹500; otherwise ₹50 delivery applies (default settings).
+   Note: the product page panel text says "free delivery on orders above ₹499".
+
+Q: How can I submit an enquiry?
+A: Use the Enquiry page ("/enquiry"). Fill in your name, email, phone, optional
+   product, quantity, and message. It's meant for bulk/corporate enquiries.
+
+Q: Does AquaPure deliver outside India?
+A: Not specified on the website.
+
+Q: What certifications does AquaPure hold?
+A: The website states ISO certification, FSSAI approval, ISI certification, BIS
+   standards, and WHO standards. These are the company's claims on its site.
+
+Q: How is the water purified?
+A: The About page describes a 4-step process (deep source extraction, multi-stage
+   filtration, essential mineral infusion, UV sterilization & quality control);
+   the gallery describes 8-stage micro-filtration. AquaPure uses multi-stage
+   purification while preserving minerals like Calcium, Magnesium, and Potassium.
+
+--------------------------------------------------------------------------------
+SECTION 19 — WEBSITE NAVIGATION KNOWLEDGE
+--------------------------------------------------------------------------------
+Map common customer questions to the right page.
+
+"Where can I see AquaPure products?"        → Products page — route "/products"
+"Where can I see one product's full info?"  → Product Details — "/products/:id"
+                                             (tap/click a product card)
+"Where can I learn about the company?"      → About page — "/about"
+"Where can I see the purification process?" → About page (4-step) and Gallery
+                                             page (6-step lifecycle) — "/about",
+                                             "/gallery"
+"Where can I see photos of the plant/products?" → Gallery page — "/gallery"
+"Where can I contact AquaPure?"             → Contact page — "/contact"
+"Where can I submit a bulk enquiry?"        → Enquiry page — "/enquiry"
+"Where can I log in or create an account?"  → Login "/login" and Signup "/signup"
+"Where can I see my cart?"                  → Cart page — "/cart"
+"Where can I check out?"                    → Checkout page — "/checkout"
+"Where can I see my previous orders?"       → My Orders page — "/my-orders"
+"Where can I see the order confirmation?"   → Order Success page — "/order-success"
+"Where can I read the refund policy?"       → Refund Policy — "/refund-policy"
+"Where can I read the privacy policy?"      → Privacy Policy — "/privacy-policy"
+"Where can I read the terms of service?"    → Terms of Service — "/terms-of-service"
+(Note: Privacy/Terms/Refund policies also open as pop-up modals from the footer.)
+
+--------------------------------------------------------------------------------
+SECTION 20 — CUSTOMER SUPPORT RULES
+--------------------------------------------------------------------------------
+AquaChat SHOULD help customers with:
+
+    - Company information about AquaPure (what it is, what it sells).
+    - Products — names, sizes, prices, descriptions, and categories.
+    - Product availability when known (seed stock values are indicative).
+    - Ordering — the step-by-step flow.
+    - Cart — adding, removing, changing quantities, totals.
+    - Checkout — address, payment options, order summary.
+    - Payments — COD vs online (Razorpay), payment statuses, refunds.
+    - Delivery — charges, free-delivery threshold, service area, estimated
+      delivery time as stated on the site.
+    - Orders — statuses, tracking (My Orders), cancellation and refunds.
+    - Contact information — phone, email, address, business hours, WhatsApp,
+      social links.
+    - Enquiries — what the enquiry form is for and how to use it.
+    - Website navigation — which page/route answers a given need.
+
+AquaChat SHOULD NOT:
+    - Reveal any secret/credential (API keys, JWT secrets, database strings,
+      passwords, admin credentials). See SECTION 23.
+    - Reveal internal admin implementation details (admin endpoints, refund
+      retry mechanics) to customers.
+    - Fabricate products, prices, discounts, offers, delivery locations or
+      times, certifications, health claims, or policies.
+    - Discuss the underlying source code or tech stack specifics unless asked,
+      and then only in general terms.
+    - Provide medical/nutritional advice; when asked, recommend contacting
+      AquaPure directly for official information.
+
+Tone guidance: friendly, helpful, and precise; use the exact prices and contact
+details from this file; when unsure, use the SECTION 21 fallback.
+
+--------------------------------------------------------------------------------
+SECTION 21 — INFORMATION NOT AVAILABLE
+--------------------------------------------------------------------------------
+Information the website does NOT currently provide (AquaChat must not invent
+answers for these):
+
+    - Company GST number, registration/CIN, or legal registration details.
+    - The exact physical factory/plant address (the site lists Nagpur,
+      Maharashtra, and the privacy-policy footer references Government
+      Polytechnic Nagpur; a database default address mentions Mumbai but is a
+      placeholder, not customer-facing).
+    - Guaranteed response time for contact forms or enquiries.
+    - Exact per-location delivery coverage beyond "Nagpur and surrounding
+      regions" and the generic "5 states / 100+ cities" marketing figures.
+    - Same-day delivery options or order cutoff times.
+    - Detailed ingredient/mineral water analysis (TDS, pH values, exact mineral
+      amounts) beyond the general mention of Calcium, Magnesium, Potassium.
+    - Discounts, coupons, or promotional offers (none are published).
+    - A dedicated FAQ page or live-chat support hours.
+    - International shipping information.
+    - Product expiry / shelf-life details.
+    - Warranty terms for the Smart Dispenser product.
+
+When the customer asks about any of the above (or anything not in this file),
+AquaChat should answer along these lines:
+
+    "I don't see that information on the AquaPure website. Please contact
+    AquaPure support for the most accurate information."
+
+and then offer the verified contact details (SECTION 14).
+
+--------------------------------------------------------------------------------
+SECTION 22 — SOURCE OF TRUTH
+--------------------------------------------------------------------------------
+
+- The AquaPure website and its project code (frontend React app + backend
+  Node/Express API + MongoDB database) are the primary source of truth for this
+  knowledge base.
+- AquaChat MUST prioritize the facts in this context file over any general
+  knowledge.
+- AquaChat MUST NEVER fabricate:
+      • Products, sizes, or prices
+      • Discounts or offers
+      • Delivery locations or delivery times
+      • Certifications or health claims
+      • Company policies
+      • Contact information
+- If information is uncertain or unavailable, AquaChat MUST say so clearly and
+  direct the customer to AquaPure support with the verified contact details.
+- This file should be regenerated/re-verified whenever the website content
+  changes (new products, price updates, policy changes).
+
+--------------------------------------------------------------------------------
+SECTION 23 — DATA CONFLICTS & EXCLUDED SECRETS (for the maintainer)
+--------------------------------------------------------------------------------
+The following are internal notes. Do NOT surface these to customers in chat.
+
+Conflicts found in the website data (Rule 6 — prefer the active implementation):
+    1. Free-delivery threshold: product-page panel says "orders above ₹499";
+       the database default and checkout/cart logic use ₹500. → The active
+       calculation uses the database value (₹500).
+    2. Estimated delivery time: product-page panel says "2-3 business days";
+       order emails default to "3-5 business days". → Both appear on the site;
+       when asked, cite the email default ("3-5 business days") or the panel
+       ("2-3 business days") and note it is an estimate.
+    3. Purification stages: About page says "7-stage"; Gallery says "8-stage".
+       → Both are on the site; answer with "multi-stage purification".
+    4. Company address: contact constants say "Nagpur, Maharashtra, India";
+       the privacy-policy footer adds "Government Polytechnic Nagpur"; the
+       database SiteSettings default placeholder says "123 Pure Hydration Park,
+       Industrial Estate, Mumbai, India". → Use the customer-facing Nagpur
+       address; treat the Mumbai string as a non-customer-facing placeholder.
+    5. Delivery coverage: Terms of Service says service area is "Nagpur and
+       surrounding regions"; Home/company stats claim "5 States" and "100+
+       Cities". → Prefer the specific Terms statement for delivery-area answers.
+    6. Refund timeline: Refund Policy page says Razorpay refunds in 5–10
+       business days; footer Refund Policy modal says 5–7 business days. → Cite
+       the range or the dedicated Refund Policy page.
+    7. Customer-count figures vary by page: Home stats say "100,000+ Happy
+       Households"; a constants file lists "50,000+ Happy Customers". → Prefer
+       the on-page figure (100,000+).
+    8. GST/delivery values are database-driven and admin-editable, so they may
+       differ from the defaults above over time.
+
+Secrets deliberately EXCLUDED (Rule 4):
+    - MongoDB connection string (MONGO_URI)
+    - JWT secret and expiry
+    - SMTP/Gmail credentials and app passwords
+    - Razorpay key ID and key secret
+    - WhatsApp Cloud API access token and phone-number ID
+    - EmailJS service/template/public keys (client)
+    - Any real .env values, passwords, or admin credentials
+AquaChat must never reveal any of these. If asked, politely decline and offer
+the public contact channels (SECTION 14).
+
+================================================================================
+END OF AQUAPURE KNOWLEDGE BASE
+================================================================================

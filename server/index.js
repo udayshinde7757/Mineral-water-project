@@ -26,6 +26,7 @@ const testimonialRoutes = require("./routes/testimonialRoutes");
 
 const adminRoutes = require("./routes/adminRoutes");
 const settingsRoutes = require("./routes/settingsRoutes");
+const aquaChatRoutes = require("./routes/aquaChatRoutes");
 const seedAdminUser = require("./utils/seedAdmin");
 
 const app = express();
@@ -78,6 +79,7 @@ app.use("/api/gallery", galleryRoutes);
 app.use("/api/testimonials", testimonialRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/settings", settingsRoutes);
+app.use("/api/aquachat", aquaChatRoutes);
 
 
 app.get("/", (req, res) => {
