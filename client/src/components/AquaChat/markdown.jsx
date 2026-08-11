@@ -32,6 +32,9 @@ function isSafeLinkUrl(url) {
 
 // Renders inline markup into an array of React nodes.
 function renderInline(text, keyPrefix = '') {
+  // Defensive: never crash on a missing/empty token. All callers pass strings,
+  // but AI-generated Markdown is unpredictable — return an empty render instead.
+  if (typeof text !== 'string') return []
   const tokens = []
   // Order matters: bold before italic, both before code/link tokens.
   const regex = new RegExp(
@@ -132,12 +135,12 @@ export function renderMarkdown(markdown) {
     // Ordered list.
     const ordered = line.match(ORDERED_RE)
     if (ordered) {
-      const items = [ordered[2]]
+      const items = [ordered[1]]
       i += 1
       while (i < lines.length) {
         const m = lines[i].match(ORDERED_RE)
         if (m) {
-          items.push(m[2])
+          items.push(m[1])
           i += 1
         } else break
       }
