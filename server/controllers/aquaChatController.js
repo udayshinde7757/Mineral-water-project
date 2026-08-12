@@ -71,8 +71,13 @@ const chat = async (req, res) => {
   const pageLabel =
     typeof page === "string" && ALLOWED_PAGES.has(page) ? page : null;
 
+  // req.user is set by the optionalAuth middleware when a valid JWT is present
+  // (null for anonymous visitors). It is always resolved server-side from the
+  // token — the client can never supply a user id.
+  const user = req.user || null;
+
   try {
-    const { reply } = await aquaChat(cleanedMessage, history, pageLabel);
+    const { reply } = await aquaChat(cleanedMessage, history, pageLabel, user);
     return res.status(200).json({ success: true, reply });
   } catch (error) {
     console.error("AquaChat chat error:", error && error.message);

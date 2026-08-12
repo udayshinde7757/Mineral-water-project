@@ -12,6 +12,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const { getOrderContext } = require("./orderContextService");
 
 // --- Configuration (all overridable through server/.env) ----------------------
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
@@ -79,7 +80,9 @@ const SERVER_GUARD = [
 ].join("\n");
 
 // Build the full system prompt sent to Gemini (all assembled server-side).
-function buildSystemPrompt(pageLabel) {
+// `extraContext` is an optional per-request block (e.g. live order data) that is
+// appended to the authoritative section of the prompt.
+function buildSystemPrompt(pageLabel, extraContext) {
   const parts = [
     loadSystemInstruction().trim(),
     "",
@@ -97,6 +100,10 @@ function buildSystemPrompt(pageLabel) {
       `The customer is currently viewing the ${pageLabel} page of the AquaPure ` +
         "website. Use this to give relevant, specific help where useful."
     );
+  }
+
+  if (extraContext && String(extraContext).trim()) {
+    parts.push("", String(extraContext).trim());
   }
 
   return parts.join("\n");
@@ -264,14 +271,36 @@ async function callGemini(systemPrompt, contents) {
 }
 
 // --- Public API ----------------------------------------------------------------
-async function aquaChat(message, history, pageLabel) {
+// `user` is the OPTIONALLY authenticated user (req.user from JWT) or null.
+// When present, order questions are answered from the user's REAL order data.
+async function aquaChat(message, history, pageLabel, user = null) {
   const cleaned = normalizeMessage(message);
   if (!cleaned) {
     return makeUserError("Please type a message to start the conversation.");
   }
 
   const safeHistory = sanitizeHistory(history);
-  const systemPrompt = buildSystemPrompt(pageLabel || null);
+
+  // Pull real order context for the authenticated user (or the "not logged in"
+  // / "no orders" notes) whenever the message is about the customer's orders.
+  let orderContext = null;
+  try {
+    orderContext = await getOrderContext({
+      userId: user ? user._id : null,
+      message: cleaned,
+      history: safeHistory,
+    });
+  } catch (err) {
+    // Order lookup must never break the chat. Log it and continue without the
+    // context block — the AI will fall back to its normal knowledge base.
+    console.error("AquaChat order context error:", err.message);
+    orderContext = null;
+  }
+
+  const systemPrompt = buildSystemPrompt(
+    pageLabel || null,
+    orderContext ? orderContext.text : null
+  );
 
   const contents = safeHistory.map((m) => ({
     role: m.role,

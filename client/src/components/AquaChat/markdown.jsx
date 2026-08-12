@@ -86,7 +86,7 @@ function renderInline(text, keyPrefix = '') {
   return tokens
 }
 
-const BULLET_RE = /^\s*[-*+]\s+(.*)$/
+const BULLET_RE = /^\s*(?:[-*+]|•)\s+(.*)$/
 const ORDERED_RE = /^\s*\d+[.)]\s+(.*)$/
 const HEADING_RE = /^\s*(#{1,3})\s+(.*)$/
 
