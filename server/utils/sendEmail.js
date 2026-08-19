@@ -19,22 +19,9 @@ function resolveSmtpConfig() {
     return null;
   }
 
-  const host = process.env.SMTP_HOST || process.env.EMAIL_HOST;
-  const port = Number(process.env.SMTP_PORT || process.env.EMAIL_PORT) || 587;
-  const secure = process.env.SMTP_SECURE === "true";
-
-  if (!host) {
-    return {
-      user,
-      transporterOptions: {
-        service: process.env.SMTP_SERVICE || "gmail",
-        auth: { user, pass },
-        connectionTimeout: 5000,
-        socketTimeout: 8000,
-        greetingTimeout: 5000,
-      },
-    };
-  }
+  const host = process.env.SMTP_HOST || "smtp.gmail.com";
+  const port = Number(process.env.SMTP_PORT) || 465;
+  const secure = process.env.SMTP_SECURE !== undefined ? process.env.SMTP_SECURE === "true" : port === 465;
 
   return {
     user,
@@ -43,9 +30,9 @@ function resolveSmtpConfig() {
       port,
       secure,
       auth: { user, pass },
-      connectionTimeout: 5000,
-      socketTimeout: 8000,
-      greetingTimeout: 5000,
+      connectionTimeout: 10000,
+      socketTimeout: 15000,
+      greetingTimeout: 10000,
     },
   };
 }
