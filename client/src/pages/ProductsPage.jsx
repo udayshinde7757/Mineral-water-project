@@ -11,11 +11,8 @@ import {
 } from 'react-icons/fi'
 import productService from '@services/productService'
 import ProductCard from '@components/products/ProductCard'
-import useCart from '@hooks/useCart'
 
 function ProductsPage() {
-  const { addToCart } = useCart()
-
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -61,16 +58,6 @@ function ProductsPage() {
   const showToast = (message) => {
     setToastMessage(message)
     setTimeout(() => setToastMessage(null), 3000)
-  }
-
-  // Add to Cart Handler
-  const handleAddToCart = async (product) => {
-    try {
-      await addToCart(product._id)
-      showToast(`${product.name} added to cart!`)
-    } catch (err) {
-      showToast(err.message || 'Could not add product to cart')
-    }
   }
 
   return (
@@ -229,7 +216,7 @@ function ProductsPage() {
               <ProductCard
                 key={product._id}
                 product={product}
-                onAddToCart={handleAddToCart}
+                onAddToCart={(product) => showToast(`${product.name} added to cart!`)}
               />
             ))}
           </div>

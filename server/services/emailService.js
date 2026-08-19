@@ -9,6 +9,7 @@ async function getTransporter() {
   try {
     const settings = await SiteSettings.findOne();
     if (settings && settings.smtpUser && settings.smtpPass) {
+      console.log("[Email Service] Using SMTP config from database settings");
       return nodemailer.createTransport({
         host: settings.smtpHost || "smtp.gmail.com",
         port: settings.smtpPort || 587,
@@ -23,17 +24,21 @@ async function getTransporter() {
     console.warn("Could not fetch SMTP settings from DB, using fallback:", err.message);
   }
 
-  if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+  // Check env vars — support both SMTP_USER/SMTP_PASS and SMTP_EMAIL/SMTP_PASSWORD
+  const user = process.env.SMTP_USER || process.env.SMTP_EMAIL;
+  const pass = process.env.SMTP_PASS || process.env.SMTP_PASSWORD;
+
+  if (user && pass) {
+    console.log("[Email Service] Using SMTP config from environment variables");
     return nodemailer.createTransport({
       host: process.env.SMTP_HOST || "smtp.gmail.com",
       port: Number(process.env.SMTP_PORT) || 587,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
+      secure: process.env.SMTP_SECURE === "true",
+      auth: { user, pass },
     });
   }
 
+  console.warn("[Email Service] No SMTP credentials found in DB or env. Transporter not configured.");
   return null; // Return null if no transporter configured
 }
 

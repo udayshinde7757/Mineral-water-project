@@ -3,7 +3,6 @@
  * Supports: Customer Email, Customer WhatsApp, Admin Email, Admin WhatsApp
  */
 
-const { sendOrderConfirmationEmail } = require("./emailService");
 const { sendOrderPlacedMessage } = require("./whatsappService");
 const sendEmail = require("../utils/sendEmail");
 
