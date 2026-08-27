@@ -33,6 +33,7 @@ function resolveSmtpConfig() {
       port,
       secure,
       auth: { user, pass },
+      family: 4, // Force IPv4 socket connection — prevents ENETUNREACH on Render IPv6 lookup
       connectionTimeout: 10000,
       socketTimeout: 15000,
       greetingTimeout: 10000,

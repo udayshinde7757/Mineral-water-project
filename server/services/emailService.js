@@ -19,6 +19,7 @@ async function getTransporter() {
           user: settings.smtpUser,
           pass: settings.smtpPass,
         },
+        family: 4,
         connectionTimeout: 10000,
         socketTimeout: 15000,
       });
