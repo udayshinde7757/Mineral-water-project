@@ -19,6 +19,7 @@ function resolveSmtpConfig() {
     return null;
   }
 
+<<<<<<< HEAD
   const host = process.env.SMTP_HOST || process.env.EMAIL_HOST;
   const port = Number(process.env.SMTP_PORT || process.env.EMAIL_PORT) || 465;
   const secure =
@@ -43,6 +44,11 @@ function resolveSmtpConfig() {
       },
     };
   }
+=======
+  const host = process.env.SMTP_HOST || "smtp.gmail.com";
+  const port = Number(process.env.SMTP_PORT) || 465;
+  const secure = process.env.SMTP_SECURE !== undefined ? process.env.SMTP_SECURE === "true" : port === 465;
+>>>>>>> 92cf31ba2b4f1aa01ccaa44494554e3b8f384902
 
   return {
     user,

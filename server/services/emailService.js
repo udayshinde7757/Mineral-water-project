@@ -10,6 +10,7 @@ async function getTransporter() {
   try {
     const settings = await SiteSettings.findOne();
     if (settings && settings.smtpUser && settings.smtpPass) {
+      console.log("[Email Service] Using SMTP config from database settings");
       return nodemailer.createTransport({
         host: settings.smtpHost || "smtp.gmail.com",
         port: settings.smtpPort || 465,
@@ -26,11 +27,34 @@ async function getTransporter() {
     console.warn("Could not fetch SMTP settings from DB, using fallback:", err.message);
   }
 
+<<<<<<< HEAD
   const smtpConfig = sendEmail.resolveSmtpConfig ? sendEmail.resolveSmtpConfig() : null;
   if (smtpConfig) {
     return nodemailer.createTransport(smtpConfig.transporterOptions);
+=======
+  // Check env vars — support both SMTP_USER/SMTP_PASS and SMTP_EMAIL/SMTP_PASSWORD
+  const user = process.env.SMTP_USER || process.env.SMTP_EMAIL || process.env.EMAIL_USER;
+  const pass = process.env.SMTP_PASS || process.env.SMTP_PASSWORD || process.env.EMAIL_PASS;
+
+  if (user && pass) {
+    const host = process.env.SMTP_HOST || "smtp.gmail.com";
+    const port = Number(process.env.SMTP_PORT) || 465;
+    const secure = process.env.SMTP_SECURE !== undefined ? process.env.SMTP_SECURE === "true" : port === 465;
+
+    console.log(`[Email Service] Using SMTP config from environment variables (host: ${host}, port: ${port})`);
+    return nodemailer.createTransport({
+      host,
+      port,
+      secure,
+      auth: { user, pass },
+      connectionTimeout: 10000,
+      socketTimeout: 15000,
+      greetingTimeout: 10000,
+    });
+>>>>>>> 92cf31ba2b4f1aa01ccaa44494554e3b8f384902
   }
 
+  console.warn("[Email Service] No SMTP credentials found in DB or env. Transporter not configured.");
   return null; // Return null if no transporter configured
 }
 
