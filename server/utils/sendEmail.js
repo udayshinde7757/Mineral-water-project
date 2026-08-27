@@ -19,36 +19,12 @@ function resolveSmtpConfig() {
     return null;
   }
 
-<<<<<<< HEAD
-  const host = process.env.SMTP_HOST || process.env.EMAIL_HOST;
+  const host = process.env.SMTP_HOST || process.env.EMAIL_HOST || "smtp.gmail.com";
   const port = Number(process.env.SMTP_PORT || process.env.EMAIL_PORT) || 465;
   const secure =
     process.env.SMTP_SECURE !== undefined
       ? process.env.SMTP_SECURE === "true"
       : port === 465;
-
-  if (!host) {
-    // Default to Gmail host on port 465 SSL.
-    // Cloud hosting platforms like Render block/restrict outbound STARTTLS on port 587.
-    // Port 465 (direct SSL/TLS) is significantly more reliable.
-    return {
-      user,
-      transporterOptions: {
-        host: "smtp.gmail.com",
-        port: 465,
-        secure: true,
-        auth: { user, pass },
-        connectionTimeout: 10000,
-        socketTimeout: 15000,
-        greetingTimeout: 10000,
-      },
-    };
-  }
-=======
-  const host = process.env.SMTP_HOST || "smtp.gmail.com";
-  const port = Number(process.env.SMTP_PORT) || 465;
-  const secure = process.env.SMTP_SECURE !== undefined ? process.env.SMTP_SECURE === "true" : port === 465;
->>>>>>> 92cf31ba2b4f1aa01ccaa44494554e3b8f384902
 
   return {
     user,
