@@ -20,18 +20,26 @@ function resolveSmtpConfig() {
   }
 
   const host = process.env.SMTP_HOST || process.env.EMAIL_HOST;
-  const port = Number(process.env.SMTP_PORT || process.env.EMAIL_PORT) || 587;
-  const secure = process.env.SMTP_SECURE === "true";
+  const port = Number(process.env.SMTP_PORT || process.env.EMAIL_PORT) || 465;
+  const secure =
+    process.env.SMTP_SECURE !== undefined
+      ? process.env.SMTP_SECURE === "true"
+      : port === 465;
 
   if (!host) {
+    // Default to Gmail host on port 465 SSL.
+    // Cloud hosting platforms like Render block/restrict outbound STARTTLS on port 587.
+    // Port 465 (direct SSL/TLS) is significantly more reliable.
     return {
       user,
       transporterOptions: {
-        service: process.env.SMTP_SERVICE || "gmail",
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
         auth: { user, pass },
-        connectionTimeout: 5000,
-        socketTimeout: 8000,
-        greetingTimeout: 5000,
+        connectionTimeout: 10000,
+        socketTimeout: 15000,
+        greetingTimeout: 10000,
       },
     };
   }
@@ -43,9 +51,9 @@ function resolveSmtpConfig() {
       port,
       secure,
       auth: { user, pass },
-      connectionTimeout: 5000,
-      socketTimeout: 8000,
-      greetingTimeout: 5000,
+      connectionTimeout: 10000,
+      socketTimeout: 15000,
+      greetingTimeout: 10000,
     },
   };
 }
@@ -58,7 +66,7 @@ const sendEmail = async (options) => {
     transporter = nodemailer.createTransport(smtpConfig.transporterOptions);
   } else {
     console.warn(
-      "sendEmail: SMTP credentials missing (SMTP_EMAIL + SMTP_PASSWORD). Logging email to console instead."
+      "sendEmail: SMTP credentials missing (SMTP_EMAIL/SMTP_USER + SMTP_PASSWORD/SMTP_PASS). Logging email to console instead."
     );
     transporter = nodemailer.createTransport({
       streamTransport: true,
@@ -109,3 +117,4 @@ const sendEmail = async (options) => {
 };
 
 module.exports = sendEmail;
+module.exports.resolveSmtpConfig = resolveSmtpConfig;

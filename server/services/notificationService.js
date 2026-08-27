@@ -78,7 +78,8 @@ const getEstimatedDeliveryString = (order) => {
  */
 const sendCustomerEmail = async (order) => {
   try {
-    if (!process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {
+    const smtpConfig = sendEmail.resolveSmtpConfig ? sendEmail.resolveSmtpConfig() : null;
+    if (!smtpConfig) {
       console.warn("⚠️  SMTP credentials not configured. Skipping customer email.");
       return { success: false, message: "SMTP not configured" };
     }
@@ -197,24 +198,13 @@ const sendCustomerEmail = async (order) => {
     </body>
     </html>`;
 
-    const mailOptions = {
-      from: `"AquaPure" <${process.env.SMTP_EMAIL}>`,
+    const info = await sendEmail({
       to: order.shippingAddress.email,
       subject: `✅ AquaPure Order Confirmed — #${order._id.toString().slice(-8).toUpperCase()}`,
       html,
-    };
-
-    const transporter = require("nodemailer").createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.SMTP_EMAIL,
-        pass: process.env.SMTP_PASSWORD,
-      },
     });
-
-    const info = await transporter.sendMail(mailOptions);
-    console.log("📧 Customer email sent:", info.messageId);
-    return { success: true, messageId: info.messageId };
+    console.log("📧 Customer email sent:", info?.messageId || "Dispatched");
+    return { success: true, messageId: info?.messageId };
   } catch (error) {
     console.error("❌ Customer email failed:", error.message);
     return { success: false, message: error.message };
@@ -233,7 +223,8 @@ const sendAdminEmail = async (order) => {
       return { success: false, message: "Admin email not configured" };
     }
 
-    if (!process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {
+    const smtpConfig = sendEmail.resolveSmtpConfig ? sendEmail.resolveSmtpConfig() : null;
+    if (!smtpConfig) {
       console.warn("⚠️  SMTP credentials not configured. Skipping admin email.");
       return { success: false, message: "SMTP not configured" };
     }
@@ -357,24 +348,13 @@ const sendAdminEmail = async (order) => {
     </body>
     </html>`;
 
-    const transporter = require("nodemailer").createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.SMTP_EMAIL,
-        pass: process.env.SMTP_PASSWORD,
-      },
-    });
-
-    const mailOptions = {
-      from: `"AquaPure Admin" <${process.env.SMTP_EMAIL}>`,
+    const info = await sendEmail({
       to: adminEmail,
       subject: `🔔 New AquaPure Order — #${order._id.toString().slice(-8).toUpperCase()} — ${formatCurrency(order.totalAmount)}`,
       html,
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-    console.log("📧 Admin email sent:", info.messageId);
-    return { success: true, messageId: info.messageId };
+    });
+    console.log("📧 Admin email sent:", info?.messageId || "Dispatched");
+    return { success: true, messageId: info?.messageId };
   } catch (error) {
     console.error("❌ Admin email failed:", error.message);
     return { success: false, message: error.message };
@@ -689,7 +669,8 @@ const buildCancellationInfoRows = (order) => {
  */
 const sendCustomerCancellationEmail = async (order) => {
   try {
-    if (!process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {
+    const smtpConfig = sendEmail.resolveSmtpConfig ? sendEmail.resolveSmtpConfig() : null;
+    if (!smtpConfig) {
       console.warn("⚠️  SMTP credentials not configured. Skipping customer cancellation email.");
       return { success: false, message: "SMTP not configured" };
     }
@@ -771,20 +752,14 @@ const sendCustomerCancellationEmail = async (order) => {
       footerText: "AquaPure — Order Cancellation Notice",
     });
 
-    const transporter = require("nodemailer").createTransport({
-      service: "gmail",
-      auth: { user: process.env.SMTP_EMAIL, pass: process.env.SMTP_PASSWORD },
-    });
-
-    const info = await transporter.sendMail({
-      from: `"AquaPure" <${process.env.SMTP_EMAIL}>`,
+    const info = await sendEmail({
       to: order.shippingAddress.email,
       subject: "Order Cancelled Successfully - AquaPure",
       html,
     });
 
-    console.log("📧 Customer cancellation email sent:", info.messageId);
-    return { success: true, messageId: info.messageId };
+    console.log("📧 Customer cancellation email sent:", info?.messageId || "Dispatched");
+    return { success: true, messageId: info?.messageId };
   } catch (error) {
     console.error("❌ Customer cancellation email failed:", error.message);
     return { success: false, message: error.message };
@@ -842,7 +817,8 @@ const sendAdminCancellationEmail = async (order) => {
       console.warn("⚠️  Admin email not configured. Skipping admin cancellation email.");
       return { success: false, message: "Admin email not configured" };
     }
-    if (!process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {
+    const smtpConfig = sendEmail.resolveSmtpConfig ? sendEmail.resolveSmtpConfig() : null;
+    if (!smtpConfig) {
       console.warn("⚠️  SMTP credentials not configured. Skipping admin cancellation email.");
       return { success: false, message: "SMTP not configured" };
     }
@@ -919,20 +895,14 @@ const sendAdminCancellationEmail = async (order) => {
       footerText: "AquaPure — Admin Notification",
     });
 
-    const transporter = require("nodemailer").createTransport({
-      service: "gmail",
-      auth: { user: process.env.SMTP_EMAIL, pass: process.env.SMTP_PASSWORD },
-    });
-
-    const info = await transporter.sendMail({
-      from: `"AquaPure Admin" <${process.env.SMTP_EMAIL}>`,
+    const info = await sendEmail({
       to: adminEmail,
       subject: `Order Cancelled by Customer — #${order._id.toString().slice(-8).toUpperCase()}`,
       html,
     });
 
-    console.log("📧 Admin cancellation email sent:", info.messageId);
-    return { success: true, messageId: info.messageId };
+    console.log("📧 Admin cancellation email sent:", info?.messageId || "Dispatched");
+    return { success: true, messageId: info?.messageId };
   } catch (error) {
     console.error("❌ Admin cancellation email failed:", error.message);
     return { success: false, message: error.message };
@@ -972,7 +942,8 @@ const sendAdminCancellationWhatsApp = async (order) => {
  */
 const sendRefundCompletedEmail = async (order) => {
   try {
-    if (!process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {
+    const smtpConfig = sendEmail.resolveSmtpConfig ? sendEmail.resolveSmtpConfig() : null;
+    if (!smtpConfig) {
       console.warn("⚠️  SMTP credentials not configured. Skipping refund-completed email.");
       return { success: false, message: "SMTP not configured" };
     }
@@ -1014,20 +985,14 @@ const sendRefundCompletedEmail = async (order) => {
       footerText: "AquaPure — Refund Notification",
     });
 
-    const transporter = require("nodemailer").createTransport({
-      service: "gmail",
-      auth: { user: process.env.SMTP_EMAIL, pass: process.env.SMTP_PASSWORD },
-    });
-
-    const info = await transporter.sendMail({
-      from: `"AquaPure" <${process.env.SMTP_EMAIL}>`,
+    const info = await sendEmail({
       to: order.shippingAddress.email,
       subject: "Refund Completed - AquaPure",
       html,
     });
 
-    console.log("📧 Refund-completed email sent:", info.messageId);
-    return { success: true, messageId: info.messageId };
+    console.log("📧 Refund-completed email sent:", info?.messageId || "Dispatched");
+    return { success: true, messageId: info?.messageId };
   } catch (error) {
     console.error("❌ Refund-completed email failed:", error.message);
     return { success: false, message: error.message };

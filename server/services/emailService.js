@@ -1,6 +1,7 @@
 const nodemailer = require("nodemailer");
 const NotificationLog = require("../models/NotificationLog");
 const SiteSettings = require("../models/SiteSettings");
+const sendEmail = require("../utils/sendEmail");
 
 /**
  * Creates Nodemailer transporter from DB settings or environment variables.
@@ -11,27 +12,23 @@ async function getTransporter() {
     if (settings && settings.smtpUser && settings.smtpPass) {
       return nodemailer.createTransport({
         host: settings.smtpHost || "smtp.gmail.com",
-        port: settings.smtpPort || 587,
-        secure: settings.smtpPort === 465,
+        port: settings.smtpPort || 465,
+        secure: settings.smtpPort ? settings.smtpPort === 465 : true,
         auth: {
           user: settings.smtpUser,
           pass: settings.smtpPass,
         },
+        connectionTimeout: 10000,
+        socketTimeout: 15000,
       });
     }
   } catch (err) {
     console.warn("Could not fetch SMTP settings from DB, using fallback:", err.message);
   }
 
-  if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-    return nodemailer.createTransport({
-      host: process.env.SMTP_HOST || "smtp.gmail.com",
-      port: Number(process.env.SMTP_PORT) || 587,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
+  const smtpConfig = sendEmail.resolveSmtpConfig ? sendEmail.resolveSmtpConfig() : null;
+  if (smtpConfig) {
+    return nodemailer.createTransport(smtpConfig.transporterOptions);
   }
 
   return null; // Return null if no transporter configured
