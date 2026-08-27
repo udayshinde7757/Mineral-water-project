@@ -1,4 +1,10 @@
 {
+  "name": "mineral-water-project",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "cd client && npm run build"
+  },
   "dependencies": {
     "dotenv": "^17.4.2",
     "mongoose": "^9.8.0"
