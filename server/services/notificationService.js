@@ -264,12 +264,18 @@ const sendCustomerEmail = async (order) => {
     </body>
     </html>`;
 
+    const recipient = order.shippingAddress?.email || order.user?.email;
+    if (!recipient) {
+      console.warn("⚠️  No recipient email found on order. Skipping customer email.");
+      return { success: false, message: "Recipient email missing" };
+    }
+
     const info = await sendEmail({
-      to: order.shippingAddress.email,
+      to: recipient,
       subject: `✅ AquaPure Order Confirmed — #${order._id.toString().slice(-8).toUpperCase()}`,
       html,
     });
-    console.log("📧 Customer email sent:", info?.messageId || "Dispatched");
+    console.log(`📧 Customer email sent successfully to ${recipient}:`, info?.messageId || "Dispatched");
     return { success: true, messageId: info?.messageId };
   } catch (error) {
     console.error("❌ Customer email failed:", error.message);
