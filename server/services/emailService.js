@@ -1,41 +1,6 @@
-const nodemailer = require("nodemailer");
 const NotificationLog = require("../models/NotificationLog");
 const SiteSettings = require("../models/SiteSettings");
 const sendEmail = require("../utils/sendEmail");
-
-/**
- * Creates Nodemailer transporter from DB settings or environment variables.
- */
-async function getTransporter() {
-  try {
-    const settings = await SiteSettings.findOne();
-    if (settings && settings.smtpUser && settings.smtpPass) {
-      console.log("[Email Service] Using SMTP config from database settings");
-      return nodemailer.createTransport({
-        host: settings.smtpHost || "smtp.gmail.com",
-        port: settings.smtpPort || 465,
-        secure: settings.smtpPort ? settings.smtpPort === 465 : true,
-        auth: {
-          user: settings.smtpUser,
-          pass: settings.smtpPass,
-        },
-        family: 4,
-        connectionTimeout: 10000,
-        socketTimeout: 15000,
-      });
-    }
-  } catch (err) {
-    console.warn("Could not fetch SMTP settings from DB, using fallback:", err.message);
-  }
-
-  const smtpConfig = sendEmail.resolveSmtpConfig ? sendEmail.resolveSmtpConfig() : null;
-  if (smtpConfig) {
-    return nodemailer.createTransport(smtpConfig.transporterOptions);
-  }
-
-  console.warn("[Email Service] No SMTP credentials found in DB or env. Transporter not configured.");
-  return null; // Return null if no transporter configured
-}
 
 /**
  * Sends order status update email to customer & logs in NotificationLog DB.
@@ -89,18 +54,12 @@ async function sendOrderStatusEmail(order, statusEvent, customNotes = "") {
   let errorMsg = null;
 
   try {
-    const transporter = await getTransporter();
-    if (transporter) {
-      await transporter.sendMail({
-        from: '"AquaPure Admin" <no-reply@aquapure.com>',
-        to: recipient,
-        subject,
-        html: htmlContent,
-      });
-      console.log(`[Email Service] Email sent successfully to ${recipient} for event: ${statusEvent}`);
-    } else {
-      console.log(`[Email Service Mock] Transporter not configured. Simulated sending email to ${recipient}`);
-    }
+    await sendEmail({
+      to: recipient,
+      subject,
+      html: htmlContent,
+    });
+    console.log(`[Email Service] Email sent successfully to ${recipient} for event: ${statusEvent}`);
   } catch (err) {
     status = "Failed";
     errorMsg = err.message;

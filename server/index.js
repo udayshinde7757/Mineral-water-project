@@ -91,20 +91,25 @@ app.get("/", (req, res) => {
 
 // Health check endpoint — used by testing scripts and monitoring
 app.get("/api/health", (req, res) => {
+  const sendEmailUtils = require("./utils/sendEmail");
+  const emailConfig = sendEmailUtils.getValidatedEmailConfig ? sendEmailUtils.getValidatedEmailConfig() : {};
   const status = {
     server: "UP",
     db: dbConnected ? "CONNECTED" : "DISCONNECTED",
     timestamp: new Date().toISOString(),
+    email: {
+      provider: emailConfig.provider ? emailConfig.provider.toUpperCase() : "UNKNOWN",
+      configured: emailConfig.provider !== "mock",
+      from: emailConfig.from || "not set",
+    },
     env: {
       MONGO_URI: process.env.MONGO_URI ? "SET" : "MISSING",
       JWT_SECRET: process.env.JWT_SECRET ? "SET" : "MISSING",
       RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID ? "SET" : "MISSING",
-      RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET ? "SET" : "MISSING",
-      SMTP_EMAIL: process.env.SMTP_EMAIL ? "SET" : "MISSING",
-      SMTP_PASSWORD: process.env.SMTP_PASSWORD ? "SET" : "MISSING",
-      WHATSAPP_ACCESS_TOKEN: process.env.WHATSAPP_ACCESS_TOKEN ? "SET" : "MISSING",
-      WHATSAPP_PHONE_NUMBER_ID: process.env.WHATSAPP_PHONE_NUMBER_ID ? "SET" : "MISSING",
-      CONTACT_EMAIL_ENABLED: process.env.CONTACT_EMAIL_ENABLED || "not set",
+      RESEND_API_KEY: (process.env.RESEND_API_KEY || process.env.EMAIL_API_KEY) ? "SET" : "MISSING",
+      SMTP_EMAIL: (process.env.SMTP_EMAIL || process.env.SMTP_USER) ? "SET" : "MISSING",
+      SMTP_PASSWORD: (process.env.SMTP_PASSWORD || process.env.SMTP_PASS) ? "SET" : "MISSING",
+      CONTACT_EMAIL_ENABLED: process.env.CONTACT_EMAIL_ENABLED || "true",
     },
   };
   return res.status(dbConnected ? 200 : 503).json(status);
