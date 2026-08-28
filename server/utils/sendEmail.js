@@ -34,9 +34,9 @@ function resolveSmtpConfig() {
       secure,
       auth: { user, pass },
       family: 4, // Force IPv4 connection to prevent ENETUNREACH on Render
-      connectionTimeout: 15000,
-      socketTimeout: 20000,
-      greetingTimeout: 15000,
+      connectionTimeout: 12000,
+      socketTimeout: 15000,
+      greetingTimeout: 12000,
     },
   };
 }
@@ -88,6 +88,28 @@ const sendEmail = async (options) => {
 
     return info;
   } catch (error) {
+    // Dual-path fallback: If Port 465 SSL times out or fails on Render, retry via Port 587 STARTTLS
+    if (smtpConfig && (error.code === "ETIMEDOUT" || error.code === "ESOCKET" || error.code === "ECONNREFUSED")) {
+      console.warn(`⚠️ Primary SMTP (Port ${smtpConfig.transporterOptions.port}) failed (${error.code}). Retrying via Port 587 STARTTLS fallback...`);
+      try {
+        const fallbackTransporter = nodemailer.createTransport({
+          host: "smtp.gmail.com",
+          port: 587,
+          secure: false,
+          auth: smtpConfig.transporterOptions.auth,
+          family: 4,
+          connectionTimeout: 12000,
+          socketTimeout: 15000,
+          greetingTimeout: 12000,
+        });
+        const info = await fallbackTransporter.sendMail(mailOptions);
+        console.log(`✅ Email sent via Port 587 fallback to ${mailOptions.to} (messageId: ${info.messageId})`);
+        return info;
+      } catch (fallbackError) {
+        console.error("❌ Secondary SMTP Port 587 fallback also failed:", fallbackError.message);
+      }
+    }
+
     console.error("sendEmail failed:", {
       to: mailOptions.to,
       subject: mailOptions.subject,
