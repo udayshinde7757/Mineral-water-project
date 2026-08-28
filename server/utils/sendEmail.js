@@ -33,36 +33,30 @@ function resolveSmtpConfig() {
       port,
       secure,
       auth: { user, pass },
-      family: 4, // Force IPv4 socket connection — prevents ENETUNREACH on Render IPv6 lookup
-      pool: true, // Reuse open SMTP connection for back-to-back emails
-      maxConnections: 3,
-      maxMessages: 100,
-      connectionTimeout: 10000,
-      socketTimeout: 15000,
-      greetingTimeout: 10000,
+      family: 4, // Force IPv4 connection to prevent ENETUNREACH on Render
+      connectionTimeout: 15000,
+      socketTimeout: 20000,
+      greetingTimeout: 15000,
     },
   };
 }
 
-let cachedTransporter = null;
-let cachedUser = null;
-
-function getTransporter() {
-  const smtpConfig = resolveSmtpConfig();
-  if (!smtpConfig) {
-    return { smtpConfig: null, transporter: nodemailer.createTransport({ streamTransport: true, newline: "windows", buffer: true }) };
-  }
-
-  if (!cachedTransporter || cachedUser !== smtpConfig.user) {
-    cachedUser = smtpConfig.user;
-    cachedTransporter = nodemailer.createTransport(smtpConfig.transporterOptions);
-  }
-
-  return { smtpConfig, transporter: cachedTransporter };
-}
-
 const sendEmail = async (options) => {
-  const { smtpConfig, transporter } = getTransporter();
+  const smtpConfig = resolveSmtpConfig();
+  let transporter;
+
+  if (smtpConfig) {
+    transporter = nodemailer.createTransport(smtpConfig.transporterOptions);
+  } else {
+    console.warn(
+      "sendEmail: SMTP credentials missing (SMTP_EMAIL/SMTP_USER + SMTP_PASSWORD/SMTP_PASS). Logging email to console instead."
+    );
+    transporter = nodemailer.createTransport({
+      streamTransport: true,
+      newline: "windows",
+      buffer: true,
+    });
+  }
 
   const fromAddress =
     process.env.EMAIL_FROM ||

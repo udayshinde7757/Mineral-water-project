@@ -484,8 +484,13 @@ const sendAllOrderNotifications = async (order) => {
     { name: "Admin WhatsApp", fn: () => sendAdminWhatsApp(order) },
   ];
 
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   const results = [];
-  for (const step of steps) {
+
+  for (let i = 0; i < steps.length; i++) {
+    const step = steps[i];
+    if (i > 0) await delay(1000);
+
     try {
       const result = await step.fn();
       if (result && result.success) {
