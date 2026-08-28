@@ -146,8 +146,9 @@ const submitEnquiry = async (req, res) => {
         html: ownerEmailHtml,
       });
     } catch (mailError) {
-      console.error("Nodemailer Email System Error:", mailError.message);
+      console.error("Email System Error:", mailError.message);
       // Swallow email sending failure, save enquiry to DB anyway (requirement)
+      // In production on Render, email may fail if using SMTP (ports 465/587 are blocked)
     }
 
     return res.status(201).json({

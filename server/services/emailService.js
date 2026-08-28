@@ -6,6 +6,18 @@ const sendEmail = require("../utils/sendEmail");
  * Sends order status update email to customer & logs in NotificationLog DB.
  */
 async function sendOrderStatusEmail(order, statusEvent, customNotes = "") {
+  // Check email configuration before attempting to send
+  const emailConfig = sendEmail.getValidatedEmailConfig ? sendEmail.getValidatedEmailConfig() : null;
+  if (!emailConfig || emailConfig.provider === "mock") {
+    console.warn("⚠️  Email provider not configured. Skipping order status email.");
+    return { success: false, status: "Skipped", error: "Email provider not configured" };
+  }
+
+  if (emailConfig.provider === "smtp" && process.env.NODE_ENV === "production") {
+    console.warn("⚠️  SMTP provider in production (Render blocks ports 465/587).");
+    return { success: false, status: "Skipped", error: "SMTP not supported in production on Render" };
+  }
+
   const recipient = order.shippingAddress?.email || "customer@example.com";
   const customerName = order.shippingAddress?.fullName || "Valued Customer";
   const orderIdStr = order._id ? order._id.toString() : "ORD-UNKNOWN";

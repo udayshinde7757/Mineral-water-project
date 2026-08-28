@@ -31,8 +31,25 @@ const adminRoutes = require("./routes/adminRoutes");
 const settingsRoutes = require("./routes/settingsRoutes");
 const aquaChatRoutes = require("./routes/aquaChatRoutes");
 const seedAdminUser = require("./utils/seedAdmin");
+const sendEmailUtils = require("./utils/sendEmail");
 
 const app = express();
+
+// Validate email configuration at startup
+const emailValidation = sendEmailUtils.validateEmailConfig ? sendEmailUtils.validateEmailConfig() : null;
+if (emailValidation) {
+  if (!emailValidation.isValid) {
+    console.error("==== EMAIL CONFIGURATION ERROR ====");
+    console.error(`   ${emailValidation.message}`);
+    console.error(`   Recommendation: ${emailValidation.recommendation}`);
+    console.error("=====================================");
+  } else if (emailValidation.warning) {
+    console.warn("==== EMAIL CONFIGURATION WARNING ====");
+    console.warn(`   ${emailValidation.warning}`);
+    console.warn(`   Recommendation: ${emailValidation.recommendation}`);
+    console.warn("======================================");
+  }
+}
 
 // Track DB connectivity for /api/health
 let dbConnected = false;

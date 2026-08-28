@@ -170,10 +170,16 @@ const sendWhatsAppMessage = async ({ to, templateName, params, label }) => {
  */
 const sendCustomerEmail = async (order) => {
   try {
-    const smtpConfig = sendEmail.resolveSmtpConfig ? sendEmail.resolveSmtpConfig() : null;
-    if (!smtpConfig) {
-      console.warn("⚠️  SMTP credentials not configured. Skipping customer email.");
-      return { success: false, message: "SMTP not configured" };
+    const emailConfig = sendEmail.getValidatedEmailConfig ? sendEmail.getValidatedEmailConfig() : null;
+    if (!emailConfig || emailConfig.provider === "mock") {
+      console.warn("⚠️  Email provider not configured (no RESEND_API_KEY or SMTP). Skipping customer email.");
+      return { success: false, message: "Email provider not configured" };
+    }
+
+    // Don't send email if using SMTP in production (Render blocks it)
+    if (emailConfig.provider === "smtp" && process.env.NODE_ENV === "production") {
+      console.warn("⚠️  SMTP provider in production (Render blocks ports 465/587). Set RESEND_API_KEY instead.");
+      return { success: false, message: "SMTP not supported in production on Render" };
     }
 
     const productsHTML = generateProductsHTML(order.products);
@@ -289,16 +295,22 @@ const sendCustomerEmail = async (order) => {
 const sendAdminEmail = async (order) => {
   try {
     const adminEmail = process.env.ADMIN_EMAIL || process.env.COMPANY_EMAIL;
-    
+
     if (!adminEmail) {
       console.warn("⚠️  Admin email not configured. Skipping admin email.");
       return { success: false, message: "Admin email not configured" };
     }
 
-    const smtpConfig = sendEmail.resolveSmtpConfig ? sendEmail.resolveSmtpConfig() : null;
-    if (!smtpConfig) {
-      console.warn("⚠️  SMTP credentials not configured. Skipping admin email.");
-      return { success: false, message: "SMTP not configured" };
+    const emailConfig = sendEmail.getValidatedEmailConfig ? sendEmail.getValidatedEmailConfig() : null;
+    if (!emailConfig || emailConfig.provider === "mock") {
+      console.warn("⚠️  Email provider not configured (no RESEND_API_KEY or SMTP). Skipping admin email.");
+      return { success: false, message: "Email provider not configured" };
+    }
+
+    // Don't send email if using SMTP in production (Render blocks it)
+    if (emailConfig.provider === "smtp" && process.env.NODE_ENV === "production") {
+      console.warn("⚠️  SMTP provider in production (Render blocks ports 465/587). Set RESEND_API_KEY instead.");
+      return { success: false, message: "SMTP not supported in production on Render" };
     }
 
     const productsHTML = generateProductsHTML(order.products);
@@ -539,10 +551,15 @@ const buildCancellationInfoRows = (order) => {
  */
 const sendCustomerCancellationEmail = async (order) => {
   try {
-    const smtpConfig = sendEmail.resolveSmtpConfig ? sendEmail.resolveSmtpConfig() : null;
-    if (!smtpConfig) {
-      console.warn("⚠️  SMTP credentials not configured. Skipping customer cancellation email.");
-      return { success: false, message: "SMTP not configured" };
+    const emailConfig = sendEmail.getValidatedEmailConfig ? sendEmail.getValidatedEmailConfig() : null;
+    if (!emailConfig || emailConfig.provider === "mock") {
+      console.warn("⚠️  Email provider not configured. Skipping customer cancellation email.");
+      return { success: false, message: "Email provider not configured" };
+    }
+
+    if (emailConfig.provider === "smtp" && process.env.NODE_ENV === "production") {
+      console.warn("⚠️  SMTP provider in production (Render blocks ports 465/587).");
+      return { success: false, message: "SMTP not supported in production on Render" };
     }
 
     const isOnline = order.paymentMethod !== "COD";
@@ -656,10 +673,15 @@ const sendAdminCancellationEmail = async (order) => {
       return { success: false, message: "Admin email not configured" };
     }
 
-    const smtpConfig = sendEmail.resolveSmtpConfig ? sendEmail.resolveSmtpConfig() : null;
-    if (!smtpConfig) {
-      console.warn("⚠️  SMTP credentials not configured. Skipping admin cancellation email.");
-      return { success: false, message: "SMTP not configured" };
+    const emailConfig = sendEmail.getValidatedEmailConfig ? sendEmail.getValidatedEmailConfig() : null;
+    if (!emailConfig || emailConfig.provider === "mock") {
+      console.warn("⚠️  Email provider not configured. Skipping admin cancellation email.");
+      return { success: false, message: "Email provider not configured" };
+    }
+
+    if (emailConfig.provider === "smtp" && process.env.NODE_ENV === "production") {
+      console.warn("⚠️  SMTP provider in production (Render blocks ports 465/587).");
+      return { success: false, message: "SMTP not supported in production on Render" };
     }
 
     const contentHTML = `
@@ -763,10 +785,15 @@ const sendAllCancellationNotifications = async (order) => {
  */
 const sendRefundCompletedEmail = async (order) => {
   try {
-    const smtpConfig = sendEmail.resolveSmtpConfig ? sendEmail.resolveSmtpConfig() : null;
-    if (!smtpConfig) {
-      console.warn("⚠️  SMTP credentials not configured. Skipping refund-completed email.");
-      return { success: false, message: "SMTP not configured" };
+    const emailConfig = sendEmail.getValidatedEmailConfig ? sendEmail.getValidatedEmailConfig() : null;
+    if (!emailConfig || emailConfig.provider === "mock") {
+      console.warn("⚠️  Email provider not configured. Skipping refund-completed email.");
+      return { success: false, message: "Email provider not configured" };
+    }
+
+    if (emailConfig.provider === "smtp" && process.env.NODE_ENV === "production") {
+      console.warn("⚠️  SMTP provider in production (Render blocks ports 465/587).");
+      return { success: false, message: "SMTP not supported in production on Render" };
     }
 
     const contentHTML = `

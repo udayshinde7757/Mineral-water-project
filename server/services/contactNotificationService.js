@@ -13,6 +13,18 @@ async function notifyContactMessage(contact) {
 
   const ownerEmail = process.env.COMPANY_EMAIL || "info@aquapure.in";
 
+  // Check email configuration before attempting to send
+  const emailConfig = sendEmail.getValidatedEmailConfig ? sendEmail.getValidatedEmailConfig() : null;
+  if (!emailConfig || emailConfig.provider === "mock") {
+    console.warn("⚠️  Email provider not configured. Skipping contact notifications.");
+    return;
+  }
+
+  if (emailConfig.provider === "smtp" && process.env.NODE_ENV === "production") {
+    console.warn("⚠️  SMTP provider in production (Render blocks ports 465/587).");
+    return;
+  }
+
   const ownerHtml = `
     <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
       <h2 style="color: #0A77B7;">New Contact Form Message</h2>
@@ -26,12 +38,17 @@ async function notifyContactMessage(contact) {
   `;
 
   console.log(`Sending owner notification email to ${ownerEmail}...`);
-  await sendEmail({
-    to: ownerEmail,
-    subject: `Contact: ${contact.subject} — ${contact.name}`,
-    html: ownerHtml,
-  });
-  console.log(`Owner notification email sent to ${ownerEmail}.`);
+  try {
+    await sendEmail({
+      to: ownerEmail,
+      subject: `Contact: ${contact.subject} — ${contact.name}`,
+      html: ownerHtml,
+    });
+    console.log(`Owner notification email sent to ${ownerEmail}.`);
+  } catch (err) {
+    console.error("Owner notification email failed:", err.message);
+    // Don't throw - the contact form submission should still succeed
+  }
 
   const customerHtml = `
     <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
@@ -42,12 +59,17 @@ async function notifyContactMessage(contact) {
   `;
 
   console.log(`Sending customer confirmation email to ${contact.email}...`);
-  await sendEmail({
-    to: contact.email,
-    subject: "We received your message — AquaPure",
-    html: customerHtml,
-  });
-  console.log(`Customer confirmation email sent to ${contact.email}.`);
+  try {
+    await sendEmail({
+      to: contact.email,
+      subject: "We received your message — AquaPure",
+      html: customerHtml,
+    });
+    console.log(`Customer confirmation email sent to ${contact.email}.`);
+  } catch (err) {
+    console.error("Customer confirmation email failed:", err.message);
+    // Don't throw - the contact form submission should still succeed
+  }
 }
 
 module.exports = { notifyContactMessage };

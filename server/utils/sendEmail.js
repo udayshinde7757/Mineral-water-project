@@ -54,6 +54,8 @@ function getValidatedEmailConfig() {
     ? fromAddressRaw
     : `"${fromName}" <${fromAddressRaw}>`;
 
+  // Provider selection: HTTPS APIs first (Resend > Brevo), then SMTP as last resort
+  // SMTP is unreliable on Render and many cloud hosts - they block ports 465/587
   let provider = "mock";
   if (apiKey) {
     provider = "resend";
@@ -61,6 +63,11 @@ function getValidatedEmailConfig() {
     provider = "brevo";
   } else if (smtpUser && smtpPass) {
     provider = "smtp";
+    // Warn if SMTP is being used in production-like environment
+    if (process.env.NODE_ENV === "production") {
+      console.warn("⚠️  SMTP provider selected in production. For Render/cloud hosts,");
+      console.warn("    use RESEND_API_KEY instead (port 443 is never blocked).");
+    }
   }
 
   return {
@@ -78,6 +85,63 @@ function getValidatedEmailConfig() {
     fromEmailOnly: fromAddressRaw.replace(/.*<([^>]+)>.*/, "$1"),
     fromName,
   };
+}
+
+/**
+ * Validates that required email configuration is present.
+ * Returns object with isValid boolean and optional warning/error.
+ */
+function validateEmailConfig() {
+  const config = getValidatedEmailConfig();
+
+  if (config.provider === "mock") {
+    return {
+      isValid: false,
+      message: "No email provider configured. Set RESEND_API_KEY or SMTP credentials.",
+      recommendation: "Set RESEND_API_KEY for reliable HTTPS email delivery.",
+    };
+  }
+
+  if (config.provider === "resend" && !config.apiKey.startsWith("re_")) {
+    return {
+      isValid: false,
+      message: "Invalid Resend API key format.",
+      recommendation: "Get a valid API key from https://resend.com",
+    };
+  }
+
+  if (config.provider === "brevo" && !config.brevoKey.includes("_")) {
+    return {
+      isValid: false,
+      message: "Invalid Brevo API key format.",
+      recommendation: "Get a valid API key from https://brevo.com",
+    };
+  }
+
+  if (config.provider === "smtp") {
+    if (!config.smtp.host) {
+      return {
+        isValid: false,
+        message: "SMTP host not configured.",
+        recommendation: "Set SMTP_HOST (e.g., smtp.gmail.com)",
+      };
+    }
+    if (!config.smtp.user || !config.smtp.pass) {
+      return {
+        isValid: false,
+        message: "SMTP credentials incomplete.",
+        recommendation: "Set SMTP_EMAIL and SMTP_PASSWORD",
+      };
+    }
+    // Note: We don't fail for SMTP - it may work in local dev
+    return {
+      isValid: true,
+      warning: "SMTP provider selected. May not work on Render/cloud hosts.",
+      recommendation: "Consider using RESEND_API_KEY for production.",
+    };
+  }
+
+  return { isValid: true };
 }
 
 /**
@@ -188,6 +252,9 @@ async function sendViaBrevoApi(config, options) {
 
 /**
  * Send email via Nodemailer SMTP (For local dev or direct unblocked SMTP servers).
+ *
+ * WARNING: Many cloud hosts (Render, Vercel, Heroku) block outbound SMTP ports 465/587.
+ * For production, use RESEND_API_KEY or BREVO_API_KEY instead (HTTPS on port 443).
  */
 async function sendViaSmtp(config, options) {
   const transporter = nodemailer.createTransport({
@@ -196,9 +263,9 @@ async function sendViaSmtp(config, options) {
     secure: config.smtp.secure,
     auth: { user: config.smtp.user, pass: config.smtp.pass },
     family: 4,
-    connectionTimeout: 12000,
-    socketTimeout: 15000,
-    greetingTimeout: 12000,
+    connectionTimeout: 15000,
+    socketTimeout: 20000,
+    greetingTimeout: 15000,
   });
 
   try {
@@ -209,26 +276,37 @@ async function sendViaSmtp(config, options) {
       html: options.html,
     });
   } catch (error) {
-    // Port 465 -> Port 587 Fallback
-    if (error.code === "ETIMEDOUT" || error.code === "ESOCKET" || error.code === "ECONNREFUSED") {
-      console.warn(`[SMTP Dispatch] Primary Port ${config.smtp.port} failed (${error.code}). Retrying via Port 587 STARTTLS...`);
-      const fallbackTransporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 587,
-        secure: false,
-        auth: { user: config.smtp.user, pass: config.smtp.pass },
-        family: 4,
-        connectionTimeout: 12000,
-        socketTimeout: 15000,
-        greetingTimeout: 12000,
-      });
-      return await fallbackTransporter.sendMail({
-        from: config.from,
-        to: options.to,
-        subject: options.subject,
-        html: options.html,
-      });
+    // Only fallback if it's a port-specific error on Gmail
+    // ETIMEDOUT on port 465 might work on port 587 (but NOT on Render - both are blocked)
+    const isGmail = config.smtp.host.toLowerCase().includes("gmail");
+    const isPortError = error.code === "ETIMEDOUT" || error.code === "ECONNREFUSED";
+    const isTlsIssue = error.code === "EAUTH" && error.command === "AUTH";
+
+    if (isGmail && isPortError && config.smtp.port === 465) {
+      console.warn(`[SMTP Dispatch] Port 465 failed (${error.code}). Attempting Port 587 STARTTLS...`);
+      try {
+        const fallbackTransporter = nodemailer.createTransport({
+          host: config.smtp.host,
+          port: 587,
+          secure: false,
+          auth: { user: config.smtp.user, pass: config.smtp.pass },
+          family: 4,
+          connectionTimeout: 15000,
+          socketTimeout: 20000,
+          greetingTimeout: 15000,
+        });
+        return await fallbackTransporter.sendMail({
+          from: config.from,
+          to: options.to,
+          subject: options.subject,
+          html: options.html,
+        });
+      } catch (fallbackError) {
+        console.error(`[SMTP Dispatch] Port 587 fallback also failed: ${fallbackError.message}`);
+        throw fallbackError;
+      }
     }
+
     throw error;
   }
 }
@@ -277,3 +355,4 @@ const sendEmail = async (options) => {
 module.exports = sendEmail;
 module.exports.resolveSmtpConfig = resolveSmtpConfig;
 module.exports.getValidatedEmailConfig = getValidatedEmailConfig;
+module.exports.validateEmailConfig = validateEmailConfig;
